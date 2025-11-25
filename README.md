@@ -1,3 +1,17 @@
+# IGP Generator Project
+
+## Stack
+- Next.js (frontend + backend)
+- PostgreSQL (Railway)
+- OpenAI API
+- NextAuth
+
+## Structure
+/app     → Next.js pages, UI, API routes
+/db      → migrations + schema
+
+
+## Documentation Stuff
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
