@@ -1,10 +1,13 @@
 @import "tailwindcss";
 
+/* THESE ARE THE VARIABLES THAT YOU CAN CHANGE TO CHANGE THE COLOR SCHEME AND STUFF */
 :root {
   --background: white;
   --accent-background: #002860;
+  --accent-background-2: #0345a0;
   --foreground: #d70026;
-  --second-foreground: #a70825;
+  --foreground-2: #a70825;
+  --font-color: white;
   --primary-font: --font-poppins;
   --secondary-font: --font-raleway;
 }
@@ -18,18 +21,48 @@
 
 body {
   background: var(--background);
-  color: var(--foreground);
+  color: var(--font-color);
   font: var(--primary-font);
 }
 
+/* YO AIDEN THIS IS THE CSS YOU GOTTA CHANGE
+ITS LOWK NOT THAT HARD ITS PRETTY SELF EXPLANATORY */
+
+/* THIS IS THE BUTTON CSS */
 button {
   padding: 1%;
-  background: var(--foreground);
+  background: var(--accent-background);
   margin: 5%;
-  color: var(--background);
+  color: var(--font-color);
 }
 
 button:hover {
-  background: var(--second-foreground);
+  background: var(--accent-background-2);
+  cursor: pointer;
 }
 
+button:active {
+  background: var(--foreground);
+}
+
+
+/* THIS IS THE TEXT GROUP CSS */
+.text-group {
+  background: var(--foreground-2);
+  padding: 10px;
+  max-width: 200px;
+  margin: 10%;
+}
+
+.text-group-header {
+  font: var(--primary-font);
+}
+
+.text-group-line {
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+.text-group-body {
+  font: var(--secondary-font);
+}
