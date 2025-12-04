@@ -31,18 +31,28 @@ ITS LOWK NOT THAT HARD ITS PRETTY SELF EXPLANATORY */
 /* THIS IS THE BUTTON CSS */
 button {
   padding: 1%;
-  background: var(--accent-background);
+  background: #ffd8c4;
   margin: 5%;
-  color: var(--font-color);
+  color: var(--foreground);
+  font: var(--secondary-font);
+  font-weight:700;
+  transition: transform 0.1s ease;
+  border-radius: 15px;
 }
 
 button:hover {
-  background: var(--accent-background-2);
+  background:#ffc6a9;
   cursor: pointer;
+  color: var(--foreground);
+  transform: scale(1.01);
+  /*box-shadow: 5 5 20 5 #d3d3d3;*/
+
 }
 
 button:active {
-  background: var(--foreground);
+  background: #e6aa8c;
+  color: var(--foreground);
+  transform: scale(0.99);
 }
 
 
