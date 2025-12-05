@@ -5,9 +5,16 @@
   --background: white;
   --accent-background: #002860;
   --accent-background-2: #0345a0;
+
   --foreground: #d70026;
   --foreground-2: #a70825;
+
+  --button-color: #ffd8c4;
+  --button-color-2: #ffc6a9;
+  --button-color-3: #e6aa8c;
+
   --font-color: white;
+
   --primary-font: --font-poppins;
   --secondary-font: --font-raleway;
 }
@@ -30,9 +37,10 @@ ITS LOWK NOT THAT HARD ITS PRETTY SELF EXPLANATORY */
 
 /* THIS IS THE BUTTON CSS */
 button {
-  padding: 1%;
-  background: #ffd8c4;
-  margin: 5%;
+  padding: 8px 16px;
+  margin: 5px;
+  white-space: nowrap;
+  background: var(--button-color);
   color: var(--foreground);
   font: var(--secondary-font);
   font-weight:700;
@@ -41,7 +49,7 @@ button {
 }
 
 button:hover {
-  background:#ffc6a9;
+  background: var(--button-color-2);
   cursor: pointer;
   color: var(--foreground);
   transform: scale(1.01);
@@ -50,7 +58,7 @@ button:hover {
 }
 
 button:active {
-  background: #e6aa8c;
+  background: var(--button-color-3);
   color: var(--foreground);
   transform: scale(0.99);
 }
@@ -75,4 +83,42 @@ button:active {
 
 .text-group-body {
   font: var(--secondary-font);
+}
+
+/* NAVBAR STUFF */
+
+.navbar {
+  width: 100%;
+  background: var(--button-color);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.nav-brand {
+  display: flex;
+  gap: 10px;
+}
+
+.nav-title {
+  font: var(--primary-font);
+  color: var(--foreground-2);
+  font-weight: bold;
+}
+
+.nav-logo-wrap {
+  position: relative;
+  width: 100px;
+  height: 75px;
+}
+
+.nav-logo {
+  object-fit: contain;
+}
+
+.nav-links {
+  margin-right: 10px;
+  margin-left: auto;
+  display: flex;
+  gap: 10px;
 }
