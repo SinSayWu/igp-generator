@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Poppins, Raleway } from "next/font/google";
+import Navbar from "./components/Navbar"
 import "./globals.css";
 
 // Existing Geist fonts
@@ -42,6 +43,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${raleway.variable} ${poppins.variable}`}
     >
       <body className="antialiased">
+        <Navbar />
         {children}
       </body>
     </html>
