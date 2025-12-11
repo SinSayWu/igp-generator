@@ -12,10 +12,23 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
+model Student {
   id           String   @id @default(cuid())
   email        String   @unique
-  name         String?
+  firstName    String
+  lastName     String
   passwordHash String
   createdAt    DateTime @default(now())
+
+  schoolID String?
+}
+
+model School {
+  id   String  @id @default(cuid())
+  name String?
+}
+
+model Course {
+  id   String @id @default(cuid())
+  name String
 }

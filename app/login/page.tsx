@@ -1,5 +1,10 @@
 export default function Login() {
     return (
-        <button>This is the Login Page</button>
+        <>
+            <p>Login</p>
+            <input placeholder="Username" type="text"></input>
+            <input placeholder="Password" type="password"></input>
+            <button>Log In</button>
+        </>
     )
 }
