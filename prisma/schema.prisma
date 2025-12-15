@@ -6,29 +6,54 @@
 
 generator client {
   provider = "prisma-client-js"
+  output   = "/app/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-}
-
-model Student {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  firstName    String
-  lastName     String
-  passwordHash String
-  createdAt    DateTime @default(now())
-
-  schoolID String?
+  url      = env("DATABASE_URL")
 }
 
 model School {
-  id   String  @id @default(cuid())
-  name String?
+  id             String          @id @default(cuid())
+  schoolCode     Int             @unique
+  name           String
+  createdAt      DateTime        @default(now())
+  backgroundInfo String?         @db.Text()
+  administrators Administrator[]
+  students       Student[]
 }
 
-model Course {
-  id   String @id @default(cuid())
-  name String
+model Administrator {
+  id            String   @id @default(cuid())
+  firstName     String
+  lastName      String
+  middleName    String?
+  preferredName String?
+  email         String   @unique
+  createdAt     DateTime @default(now())
+  passwordHash  String
+  gender        String
+
+  schoolId String
+  school   School @relation(fields: [schoolId], references: [id])
+}
+
+model Student {
+  id             String   @id @default(cuid())
+  firstName      String
+  lastName       String
+  middleName     String?
+  preferredName  String?
+  email          String   @unique
+  phoneNumber    String?  @unique
+  createdAt      DateTime @default(now())
+  passwordHash   String
+  grade          Int
+  graduationYear Int
+  gender         String
+  backgroundInfo String?  @db.Text()
+
+  schoolId String
+  school   School @relation(fields: [schoolId], references: [id])
 }
