@@ -21,6 +21,7 @@ export default function Navbar() {
             
             <div className="nav-links">
                 <button><Link href="/dbtesting">DB Testing For Yuhang</Link></button>
+                <button><Link href="/llmtesting">llmtesting</Link></button>
                 <button><Link href="/signup">Sign Up</Link></button>
                 <button><Link href="/login">Login</Link></button>
             </div>
