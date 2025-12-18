@@ -14,16 +14,23 @@ datasource db {
 }
 
 model School {
-  id             String          @id @default(cuid())
-  schoolCode     Int             @unique
-  name           String
-  createdAt      DateTime        @default(now())
-  backgroundInfo String?         @db.Text()
-  administrators Administrator[]
-  students       Student[]
+  id                String   @id @default(cuid())
+  schoolStudentCode Int      @unique
+  schoolAdminCode   Int      @unique
+  name              String
+  createdAt         DateTime @default(now())
+  backgroundInfo    String?  @db.Text()
+
+  students Student[]
+  admins   Administrator[]
 }
 
-model Administrator {
+enum UserRole {
+  STUDENT
+  ADMIN
+}
+
+model User {
   id            String   @id @default(cuid())
   firstName     String
   lastName      String
@@ -34,25 +41,44 @@ model Administrator {
   passwordHash  String
   gender        String
 
-  schoolId String
-  school   School @relation(fields: [schoolId], references: [id])
+  role UserRole
+
+  student Student?
+  admin   Administrator?
+
+  sessions Session[]
+}
+
+model Administrator {
+  // Actual parameters
+
+  // Link to User model and relate to school
+  userId String @id
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  school   School? @relation(fields: [schoolId], references: [id])
+  schoolId String?
 }
 
 model Student {
-  id             String   @id @default(cuid())
-  firstName      String
-  lastName       String
-  middleName     String?
-  preferredName  String?
-  email          String   @unique
-  phoneNumber    String?  @unique
-  createdAt      DateTime @default(now())
-  passwordHash   String
-  grade          Int
-  graduationYear Int
-  gender         String
-  backgroundInfo String?  @db.Text()
+  // Actual parameters
+  gradeLevel     Int
+  gpa            Float?
+  graduationYear Int?
 
-  schoolId String
-  school   School @relation(fields: [schoolId], references: [id])
+  // Link to User model and relate to school
+  userId String @id
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  school   School? @relation(fields: [schoolId], references: [id])
+  schoolId String?
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 }

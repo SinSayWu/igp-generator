@@ -13,7 +13,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function CreateAdminPage() {
+export default function CreateAdminSignUpPage() {
   const router = useRouter();
 
   const [firstName, setFirstName] = useState("");
@@ -33,7 +33,7 @@ export default function CreateAdminPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("/admin", {
+      const res = await fetch("/admin/signup/api", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -55,7 +55,8 @@ export default function CreateAdminPage() {
         throw new Error(data.error || "Signup failed");
       }
 
-      router.push("/admin/login");
+      router.push("/dashboard");
+      router.refresh();
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
@@ -68,7 +69,7 @@ export default function CreateAdminPage() {
   }
 
   return (
-    <div style={{ maxWidth: 400, margin: "0 auto" }}>
+    <div>
       <h1>Create Admin Account</h1>
 
       <form onSubmit={handleSubmit}>

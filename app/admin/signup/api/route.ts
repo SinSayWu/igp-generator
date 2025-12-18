@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { createSession } from "@/lib/session";
+import { revalidatePath } from "next/cache";
 
 export async function POST(req: Request) {
     try {
@@ -20,7 +22,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
 
-        const existing = await prisma.administrator.findUnique({
+        const existing = await prisma.user.findUnique({
             where: { email },
         });
 
@@ -29,7 +31,7 @@ export async function POST(req: Request) {
         }
 
         const school = await prisma.school.findUnique({
-            where: { schoolCode: schoolCode },
+            where: { schoolAdminCode: schoolCode },
         });
 
         if (school == null) {
@@ -40,7 +42,8 @@ export async function POST(req: Request) {
 
         const passwordHash = await bcrypt.hash(password, 12);
 
-        const admin = await prisma.administrator.create({
+        // Create the User
+        const user = await prisma.user.create({
             data: {
                 firstName,
                 lastName,
@@ -49,11 +52,35 @@ export async function POST(req: Request) {
                 gender,
                 email,
                 passwordHash,
+                role: "ADMIN",
+            },
+        });
+
+        // Create the Admin
+        await prisma.administrator.create({
+            data: {
+                userId: user.id,
                 schoolId,
             },
         });
 
-        return NextResponse.json({ id: admin.id, email: admin.email }, { status: 201 });
+        const { session, expiresAt } = await createSession(user.id);
+
+        revalidatePath("/", "layout");
+
+        const res = NextResponse.redirect(
+            new URL("/dashboard", req.url)
+        );
+
+        res.cookies.set("session", session.id, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            path: "/",
+            expires: expiresAt,
+        });
+
+        return res;
     } catch (error) {
         console.error("ADMIN CREATE ERROR:", error);
 
