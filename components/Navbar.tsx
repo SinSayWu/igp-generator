@@ -29,7 +29,7 @@ export default async function Navbar() {
                 {!isLoggedIn ? (
                     <>
                         <button>
-                            <Link href="/admin/signup">Sign Up</Link>
+                            <Link href="/signup">Sign Up</Link>
                         </button>
                         <button>
                             <Link href="/login">Login</Link>

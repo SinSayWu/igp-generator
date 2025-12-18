@@ -1,19 +1,35 @@
-import Image from "next/image";
+import { cookies } from "next/headers";
+import { getSession } from "@/lib/session";
+import { prisma } from "@/lib/prisma";
+import DefaultHomePage from "@/app/defaultHome";
 
-export default function Home() {
-  return (
-    <>
-      <div className="text-group">
-        <h1 className="text-group-header">
-          This is our basic text group. FORMAT THE CSS IN THE CODE.
-        </h1>
-        <hr className="text-group-line"/>
-        <div className="text-group-body">
-          This is the body text.
-          Lorem ipsum blah blah blah idk the rest.
-          hahahahhahahaahaha
-        </div>
-      </div>
-    </>
-  );
+export default async function HomePage() {
+    const sessionId = (await cookies()).get("session")?.value;
+
+    if (!sessionId) return <DefaultHomePage />;
+
+    const session = await getSession(sessionId);
+
+    if (!session) return <DefaultHomePage />;
+
+    const user = await prisma.user.findUnique({
+        where: { id: session.userId },
+        include: {
+            student: true,
+            admin: true,
+        },
+    });
+
+    if (!user) return <DefaultHomePage />;
+
+    return (
+        <>
+            <h1>
+                Hello {user.firstName} {user.lastName}
+            </h1>
+            <h1>Account Type: {user.role}</h1>
+            <h1>Email: {user.email}</h1>
+            <h1>Gender: {user.gender}</h1>
+        </>
+    );
 }

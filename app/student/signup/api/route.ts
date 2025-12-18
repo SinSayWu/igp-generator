@@ -16,6 +16,8 @@ export async function POST(req: Request) {
             email,
             password,
             schoolCode,
+            grade,
+            gradYear,
         } = body;
 
         if (!email || !password || !schoolCode) {
@@ -27,11 +29,11 @@ export async function POST(req: Request) {
         });
 
         if (existing) {
-            return NextResponse.json({ error: "User with this email already exists!" }, { status: 409 });
+            return NextResponse.json({ error: "User with this email already exists" }, { status: 409 });
         }
 
         const school = await prisma.school.findUnique({
-            where: { schoolAdminCode: schoolCode },
+            where: { schoolStudentCode: schoolCode },
         });
 
         if (school == null) {
@@ -52,15 +54,17 @@ export async function POST(req: Request) {
                 gender,
                 email,
                 passwordHash,
-                role: "ADMIN",
+                role: "STUDENT",
             },
         });
 
         // Create the Admin
-        await prisma.administrator.create({
+        await prisma.student.create({
             data: {
                 userId: user.id,
                 schoolId,
+                gradeLevel: grade,
+                graduationYear: gradYear,
             },
         });
 
