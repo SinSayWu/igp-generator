@@ -1,5 +1,5 @@
 export default function Signup() {
-    return (
+        return (
         <div className ="nav-padding">
             <div className="login-container">
                 <p className="pop-text">Begin your ascension today</p>

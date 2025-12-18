@@ -25,7 +25,5 @@ export default function Navbar() {
                 <button><Link href="/login">Login</Link></button>
             </div>
         </nav>
-
-
     )
 }
