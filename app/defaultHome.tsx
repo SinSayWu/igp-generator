@@ -1,17 +1,56 @@
+"use client";
+
+import { useEffect, useRef } from 'react';
+
 export default function DefaultHomePage() {
-    return (
-        <>
-            <h1>Log in dingus</h1>
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0 });
+
+    if (contentRef.current) {
+      observer.observe(contentRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <>
+      <div className="hero-section">
+        <h1 className="summit-title">SUMMIT</h1>
+        <img 
+            src="/transparent.png" 
+            alt="Mountain Foreground" 
+            className="mountain-foreground" 
+        />
+      </div>
+
+      <section ref={contentRef} className="content-card">
+        <div className="login-container">
             <div className="text-group">
-                <h1 className="text-group-header">
-                    This is our basic text group. FORMAT THE CSS IN THE CODE.
-                </h1>
+                <h2 className="text-group-header">
+                    Summit is your own <span style={{color: 'var(--foreground)'}}>personalized AI</span>
+                </h2>
                 <hr className="text-group-line" />
                 <div className="text-group-body">
-                    This is the body text. Lorem ipsum blah blah blah idk the rest.
-                    hahahahhahahaahaha
+                    Tuned to focus and guide you through class selections 
+                    and extracurriculars to help you get into the college you want.
                 </div>
             </div>
-        </>
-    );
+
+            <button className="pop-text" style={{fontSize: '1.5rem'}}>
+                BEGIN YOUR CLIMB
+            </button>
+        </div>
+      </section>
+    </>
+  );
 }
