@@ -5,7 +5,7 @@ export async function POST(req: NextRequest) {
     const sessionId = req.cookies.get("session")?.value;
 
     if (sessionId) {
-        await prisma.session.delete({
+        await prisma.session.deleteMany({
             where: { id: sessionId },
         });
     }
