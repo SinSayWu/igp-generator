@@ -40,7 +40,7 @@ export default async function Navbar() {
                         <button>
                             <Link href="/dashboard">Dashbaord</Link>
                         </button>
-                        <form action="/logout/api" method="POST">
+                        <form action="/api/logout" method="POST">
                             <button type="submit">Log Out</button>
                         </form>
                     </>
