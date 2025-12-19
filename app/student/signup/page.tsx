@@ -30,6 +30,7 @@ export default function CreateStudentSignUpPage() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({
           firstName,
           lastName,

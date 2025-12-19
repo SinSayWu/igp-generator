@@ -38,6 +38,7 @@ export default function CreateAdminSignUpPage() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({
           firstName,
           lastName,
