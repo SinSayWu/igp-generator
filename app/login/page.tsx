@@ -74,7 +74,7 @@ export default function CreateLoginPage() {
 
                 {error && <p style={{ color: "red" }}>{error}</p>}
 
-                <button type="submit" disabled={loading}>
+                <button type="submit" disabled={loading} className="btn">
                     {loading ? "Logging in..." : "Log In"}
                 </button>
             </form>

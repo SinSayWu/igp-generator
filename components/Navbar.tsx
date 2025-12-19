@@ -28,20 +28,14 @@ export default async function Navbar() {
             <div className="nav-links">
                 {!isLoggedIn ? (
                     <>
-                        <button>
-                            <Link href="/signup">Sign Up</Link>
-                        </button>
-                        <button>
-                            <Link href="/login">Login</Link>
-                        </button>
+                            <Link href="/signup" className="btn">Sign Up</Link>
+                            <Link href="/login" className="btn">Login</Link>
                     </>
                 ) : (
                     <>
-                        <button>
-                            <Link href="/dashboard">Dashbaord</Link>
-                        </button>
+                        <Link href="/dashboard" className="btn">Dashbaord</Link>
                         <form action="/api/logout" method="POST">
-                            <button type="submit">Log Out</button>
+                            <button type="submit" className="btn">Log Out</button>
                         </form>
                     </>
                 )}

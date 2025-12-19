@@ -32,7 +32,7 @@ body {
   font: var(--primary-font);
 }
 
-.pop-text {
+.btn.pop-text {
   padding: 8px 16px;
   color: var(--foreground);
   font: var(--secondary-font);
@@ -46,7 +46,7 @@ body {
 ITS LOWK NOT THAT HARD ITS PRETTY SELF EXPLANATORY */
 
 /* THIS IS THE BUTTON CSS */
-button {
+.btn {
   padding: 8px 16px;
   margin: 5px;
   white-space: nowrap;
@@ -58,7 +58,7 @@ button {
   border-radius: 15px;
 }
 
-button:hover {
+.btn:hover {
   background: var(--button-color-2);
   cursor: pointer;
   color: var(--foreground);
@@ -67,7 +67,7 @@ button:hover {
 
 }
 
-button:active {
+.btn:active {
   background: var(--button-color-3);
   color: var(--foreground);
   transform: scale(0.99);

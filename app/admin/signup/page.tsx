@@ -150,7 +150,7 @@ export default function CreateAdminSignUpPage() {
 
         {error && <p style={{ color: "red" }}>{error}</p>}
 
-        <button type="submit" disabled={loading}>
+        <button type="submit" disabled={loading} className="btn">
           {loading ? "Creating..." : "Create Admin"}
         </button>
       </form>
