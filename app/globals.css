@@ -144,12 +144,13 @@ ITS LOWK NOT THAT HARD ITS PRETTY SELF EXPLANATORY */
 /*Login Page*/
 
 .signup-inputs {
-  padding: 10px 10px;
+  padding: 12px;
   border-radius: 10px;
-  max-width: 280px;
-  background-color:#ffd8c4;
-  margin: 0px 50px;
-  width:100%
+  background-color: #ffd8c4;
+  width: 100%;             
+  border: none;
+  outline: none;
+  box-sizing: border-box;  
 }
 
 .half-input {
@@ -164,9 +165,20 @@ ITS LOWK NOT THAT HARD ITS PRETTY SELF EXPLANATORY */
   display: flex;
   flex-direction: column;   
   align-items: center;      
-  gap: 30px;                
+  gap: 30px;     
+  width:100%;           
 }
 
+.login-container label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;  
+  width: 100%;
+  max-width: 300px;         
+  font-family: var(--secondary-font);
+  font-weight: 500;
+  gap: 5px;                 
+}
 .name-row {
   display: flex;
   flex-direction: row;        
@@ -178,7 +190,6 @@ ITS LOWK NOT THAT HARD ITS PRETTY SELF EXPLANATORY */
 
 /*landing page*/
 .hero-section {
-  /* LAYER 1: The Sky */
   background-color: #ffc6a9; 
   height: 100vh;
   width: 100%;
@@ -227,10 +238,9 @@ ITS LOWK NOT THAT HARD ITS PRETTY SELF EXPLANATORY */
   min-height: 100vh;
   margin-top: -20vh;
   
-  /* Card Animation Setup */
-  opacity: 0;
-  transform: translateY(100px);
-  transition: all 1s ease-out;
+  /* Animation removed - card is always visible */
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .content-card::before {
@@ -244,10 +254,8 @@ ITS LOWK NOT THAT HARD ITS PRETTY SELF EXPLANATORY */
   pointer-events: none;
 }
 
-.content-card.is-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
+/* Removed .content-card.is-visible class since animation is disabled */
+
 @keyframes floatUp {
   from { 
     opacity: 0; 

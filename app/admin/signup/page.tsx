@@ -70,10 +70,10 @@ export default function CreateAdminSignUpPage() {
   }
 
   return (
-    <div>
-      <h1>Create Admin Account</h1>
+    <div className="nav-padding login-container">
+      <h1 >Create Admin Account</h1>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="login-container">
         <label>
           First Name
           <input
@@ -81,6 +81,7 @@ export default function CreateAdminSignUpPage() {
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
             required
+            className="signup-inputs"
           />
         </label>
         <label>
@@ -89,6 +90,7 @@ export default function CreateAdminSignUpPage() {
             type="text"
             value={middleName}
             onChange={(e) => setMiddleName(e.target.value)}
+            className="signup-inputs"
           />
         </label>
         <label>
@@ -98,6 +100,7 @@ export default function CreateAdminSignUpPage() {
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
             required
+            className="signup-inputs"
           />
         </label>
         <label>
@@ -106,6 +109,7 @@ export default function CreateAdminSignUpPage() {
             type="text"
             value={preferredName}
             onChange={(e) => setPreferredName(e.target.value)}
+            className="signup-inputs"
           />
         </label>
         <label>
@@ -115,6 +119,7 @@ export default function CreateAdminSignUpPage() {
             value={gender}
             onChange={(e) => setGender(e.target.value)}
             required
+            className="signup-inputs"
           />
         </label>
 
@@ -125,6 +130,7 @@ export default function CreateAdminSignUpPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            className="signup-inputs"
           />
         </label>
 
@@ -135,6 +141,7 @@ export default function CreateAdminSignUpPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            className="signup-inputs"
           />
         </label>
 
@@ -145,6 +152,7 @@ export default function CreateAdminSignUpPage() {
             value={schoolCode}
             onChange={(e) => setSchoolCode(e.target.valueAsNumber)}
             required
+            className="signup-inputs"
           />
         </label>
 

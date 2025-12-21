@@ -48,33 +48,41 @@ export default function CreateLoginPage() {
     }
 
     return (
-        <div>
-            <h1>Login</h1>
+        <div className="login-container">
+            <h1 style={{ fontSize: "2.5rem", marginBottom: "20px", marginTop: "50px", fontStyle: "var(--primary-font)", color: "var(--foreground)"}}>
+                Login
+            </h1>
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} className="login-container">
                 <label>
-                    Email
+                    <div style={{ marginBottom: "8px", fontWeight: "600" }}>Email</div>
                     <input
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
+                        className="signup-inputs"
                     />
                 </label>
 
                 <label>
-                    Password
+                    <div style={{ marginBottom: "8px", fontWeight: "600" }}>Password</div>
                     <input
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
+                        className="signup-inputs"
                     />
                 </label>
 
-                {error && <p style={{ color: "red" }}>{error}</p>}
+                {error && (
+                    <p style={{ color: "var(--foreground)", fontWeight: "700", textAlign: "center" }}>
+                        {error}
+                    </p>
+                )}
 
-                <button type="submit" disabled={loading} className="btn">
+                <button type="submit" disabled={loading} className="btn pop-text" style={{fontWeight: "500"}}>
                     {loading ? "Logging in..." : "Log In"}
                 </button>
             </form>

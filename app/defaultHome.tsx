@@ -31,7 +31,7 @@ export default function DefaultHomePage() {
             <div className="hero-section">
                 <h1 className="summit-title">SUMMIT</h1>
                 <Image
-                    src="/transparent.png"
+                    src="/background.png"
                     alt="Mountain Foreground"
                     fill
                     className="mountain-foreground"
