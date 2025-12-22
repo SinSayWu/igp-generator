@@ -54,6 +54,7 @@ ITS LOWK NOT THAT HARD ITS PRETTY SELF EXPLANATORY */
   color: var(--foreground);
   font: var(--secondary-font);
   font-weight:700;
+  font-size: large;
   transition: transform 0.1s ease;
   border-radius: 15px;
 }
@@ -76,25 +77,36 @@ ITS LOWK NOT THAT HARD ITS PRETTY SELF EXPLANATORY */
 
 /* THIS IS THE TEXT GROUP CSS */
 .text-group {
-  background: var(--foreground-2);
-  padding: 10px;
-  max-width: 200px;
-  margin: 10%;
+  background: none;
+  max-width: none;
+  margin: 5%;
   border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .text-group-header {
   font: var(--primary-font);
+  font-weight: 700;
+  font-size:x-large;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
 .text-group-line {
-  margin-top: 5px;
+  margin-top: 10px;
   margin-bottom: 10px;
 }
 
 .text-group-body {
   font: var(--secondary-font);
+  font-weight: 550;
+  font-size: large;
+  text-align: center;
 }
+
 
 /* NAVBAR STUFF */
 
@@ -166,7 +178,8 @@ ITS LOWK NOT THAT HARD ITS PRETTY SELF EXPLANATORY */
   flex-direction: column;   
   align-items: center;      
   gap: 30px;     
-  width:100%;           
+  width:100%;
+  max-width: none;           
 }
 
 .login-container label {
@@ -183,7 +196,7 @@ ITS LOWK NOT THAT HARD ITS PRETTY SELF EXPLANATORY */
   display: flex;
   flex-direction: row;        
   justify-content: center;             
-  gap: 10px;           
+  gap: 10 px;           
   max-width: 300px;
   width: 100%;  
 }

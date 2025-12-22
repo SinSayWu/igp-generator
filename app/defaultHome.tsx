@@ -43,13 +43,13 @@ export default function DefaultHomePage() {
                 <div className="login-container">
                     <div className="text-group">
                         <h2 className="text-group-header">
-                            Summit is your own{" "}
-                            <span style={{ color: "var(--foreground)" }}>personalized AI</span>
+                            Summit is your own
+                            <span style={{ color: "var(--foreground)", marginLeft:"0.25em"}}> personalized AI</span>
                         </h2>
                         <hr className="text-group-line" />
                         <div className="text-group-body">
-                            Tuned to focus and guide you through class selections and
-                            extracurriculars to help you get into the college you want.
+                            Tuned to guide you through class selections and
+                            extracurriculars to help you get into your dream college.
                         </div>
                     </div>
 
