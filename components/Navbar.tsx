@@ -4,8 +4,11 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { getSession } from "@/lib/session";
 import LogoutButton from "./LogoutButton";
+import { unstable_noStore as noStore } from "next/cache";
 
 export default async function Navbar() {
+    noStore();
+    
     const cookieStore = await cookies();
     const sessionId = cookieStore.get("session")?.value;
 
