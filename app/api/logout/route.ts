@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
         });
     }
 
-    const res = NextResponse.redirect(new URL("/", req.nextUrl.origin));
+    const res = NextResponse.redirect("/");
 
     res.cookies.set("session", "", {
         httpOnly: true,
