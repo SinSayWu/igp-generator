@@ -3,7 +3,7 @@ import logo from "@/images/logo.png";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { getSession } from "@/lib/session";
-
+import LogoutButton from "./LogoutButton";
 
 export default async function Navbar() {
     const cookieStore = await cookies();
@@ -28,15 +28,13 @@ export default async function Navbar() {
             <div className="nav-links">
                 {!isLoggedIn ? (
                     <>
-                            <Link href="/signup" className="btn">Sign Up</Link>
-                            <Link href="/login" className="btn">Login</Link>
+                        <Link href="/signup" className="btn">Sign Up</Link>
+                        <Link href="/login" className="btn">Login</Link>
                     </>
                 ) : (
                     <>
-                        <Link href="/dashboard" className="btn">Dashbaord</Link>
-                        <form action="/api/logout" method="POST">
-                            <button type="submit" className="btn">Log Out</button>
-                        </form>
+                        <Link href="/dashboard" className="btn">Dashboard</Link>
+                        <LogoutButton />
                     </>
                 )}
             </div>
