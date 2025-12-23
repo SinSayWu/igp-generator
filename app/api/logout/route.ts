@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
         });
     }
 
-    const res = NextResponse.redirect("/", { status: 303 });
+    const res = NextResponse.redirect(new URL("/", req.url), { status: 303 });
 
     res.cookies.set("session", "", {
         httpOnly: true,
