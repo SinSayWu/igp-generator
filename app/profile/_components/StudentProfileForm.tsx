@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/prisma";
-import ProfileEditor from "./ProfileEditor"; // Import the new component
+import ProfileEditor from "./ProfileEditor";
 
 export default async function StudentProfileForm({ userId }: { userId: string }) {
+  // 1. Fetch the student and their current selections
   const student = await prisma.student.findUnique({
     where: { userId: userId },
     include: { clubs: true, sports: true, courses: true },
@@ -11,7 +12,8 @@ export default async function StudentProfileForm({ userId }: { userId: string })
     return <div>Error: Student not assigned to a school.</div>;
   }
 
-  // Fetch available options filtered by school
+  // 2. Fetch all available options for this school
+  // We pass these RAW to the editor. We do NOT need to format them here anymore.
   const allClubs = await prisma.club.findMany({
     where: { schoolId: student.schoolId },
     orderBy: { name: "asc" },
@@ -27,19 +29,14 @@ export default async function StudentProfileForm({ userId }: { userId: string })
     orderBy: [{ department: "asc" }, { name: "asc" }],
   });
 
-  // Map data to a consistent format for the generic table component
-  // We add a 'detail' field to display extra info like (Math) or (Fall)
-  const formattedClubs = allClubs.map(c => ({ id: c.id, name: c.name, detail: c.category }));
-  const formattedSports = allSports.map(s => ({ id: s.id, name: s.name, detail: s.season }));
-  const formattedCourses = allCourses.map(c => ({ id: c.id, name: c.name, detail: c.department }));
-
+  // 3. Pass everything down directly
   return (
     <ProfileEditor 
       userId={userId}
       student={student}
-      allClubs={formattedClubs}
-      allSports={formattedSports}
-      allCourses={formattedCourses}
+      allClubs={allClubs}
+      allSports={allSports}
+      allCourses={allCourses}
     />
   );
 }
