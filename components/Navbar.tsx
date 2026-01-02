@@ -37,6 +37,7 @@ export default async function Navbar() {
                 ) : (
                     <>
                         <Link href="/dashboard" className="btn">Dashboard</Link>
+                        <Link href="/profile" className="btn">Profile</Link>
                         <LogoutButton />
                     </>
                 )}

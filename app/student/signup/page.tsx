@@ -6,16 +6,23 @@ import { useRouter } from "next/navigation";
 export default function CreateStudentSignUpPage() {
   const router = useRouter();
 
+  // Basic Info
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [middleName, setMiddleName] = useState("");
   const [preferredName, setPreferredName] = useState("");
   const [gender, setGender] = useState("");
+  
+  // Credentials
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [schoolCode, setSchoolCode] = useState<number | "">(0);
-  const [grade, setGrade] = useState<number | "">(0);
-  const [gradYear, setGradYear] = useState<number | "">(0);
+  
+  // School Info - Initialized as empty strings for better UX
+  const [schoolCode, setSchoolCode] = useState<number | "">("");
+  const [grade, setGrade] = useState<number | "">("");
+  const [gradYear, setGradYear] = useState<number | "">("");
+
+  // UI State
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -39,7 +46,7 @@ export default function CreateStudentSignUpPage() {
           gender,
           email,
           password,
-          schoolCode,
+          schoolCode, // Sends either the number or "" (backend handles validation)
           grade,
           gradYear,
         }),
@@ -50,8 +57,10 @@ export default function CreateStudentSignUpPage() {
         throw new Error(data.error || "Signup failed");
       }
 
+      // Success! Redirect to the dashboard
       router.push("/dashboard");
       router.refresh();
+      
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
@@ -68,6 +77,7 @@ export default function CreateStudentSignUpPage() {
       <h1>Create Student Account</h1>
 
       <form onSubmit={handleSubmit} className="login-container">
+        {/* --- NAME FIELDS --- */}
         <label>
           First Name
           <input
@@ -78,6 +88,7 @@ export default function CreateStudentSignUpPage() {
             className="signup-inputs"
           />
         </label>
+        
         <label>
           Middle Name (Optional)
           <input
@@ -87,6 +98,7 @@ export default function CreateStudentSignUpPage() {
             className="signup-inputs"
           />
         </label>
+        
         <label>
           Last Name
           <input
@@ -97,6 +109,7 @@ export default function CreateStudentSignUpPage() {
             className="signup-inputs"
           />
         </label>
+        
         <label>
           Preferred Name (Optional)
           <input
@@ -106,6 +119,7 @@ export default function CreateStudentSignUpPage() {
             className="signup-inputs"
           />
         </label>
+        
         <label>
           Gender
           <input
@@ -117,6 +131,7 @@ export default function CreateStudentSignUpPage() {
           />
         </label>
 
+        {/* --- CREDENTIALS --- */}
         <label>
           Email
           <input
@@ -139,13 +154,18 @@ export default function CreateStudentSignUpPage() {
           />
         </label>
 
+        {/* --- SCHOOL DETAILS (Optimized Inputs) --- */}
         <label>
           School ID 
           <input
             type="number"
             value={schoolCode}
-            onChange={(e) => setSchoolCode(e.target.valueAsNumber)}
+            onChange={(e) => {
+                const val = e.target.valueAsNumber;
+                setSchoolCode(isNaN(val) ? "" : val);
+            }}
             required
+            placeholder="e.g. 12345"
             className="signup-inputs"
           />
         </label>
@@ -155,8 +175,14 @@ export default function CreateStudentSignUpPage() {
           <input
             type="number"
             value={grade}
-            onChange={(e) => setGrade(e.target.valueAsNumber)}
+            onChange={(e) => {
+                const val = e.target.valueAsNumber;
+                setGrade(isNaN(val) ? "" : val);
+            }}
             required
+            placeholder="9-12"
+            min="9"
+            max="12"
             className="signup-inputs"
           />
         </label>
@@ -166,15 +192,25 @@ export default function CreateStudentSignUpPage() {
           <input
             type="number"
             value={gradYear}
-            onChange={(e) => setGradYear(e.target.valueAsNumber)}
+            onChange={(e) => {
+                const val = e.target.valueAsNumber;
+                setGradYear(isNaN(val) ? "" : val);
+            }}
+            placeholder="e.g. 2029"
             className="signup-inputs"
           />
         </label>
 
-        {error && <p style={{ color: "red" }}>{error}</p>}
+        {/* --- ERROR & SUBMIT --- */}
+        {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
 
-        <button type="submit" disabled={loading} className="btn">
-          {loading ? "Creating..." : "Create Student"}
+        <button 
+          type="submit" 
+          disabled={loading} 
+          className="btn"
+          style={{ marginTop: "20px", opacity: loading ? 0.7 : 1 }}
+        >
+          {loading ? "Creating Account..." : "Create Student"}
         </button>
       </form>
     </div>

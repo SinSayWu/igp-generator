@@ -1,0 +1,93 @@
+[
+  {
+    "club_id": "CLUB-SRV-INTERACT",
+    "name": "Interact Club",
+    "category": "Service",
+    "description": "A service organization sponsored by the Rotary Club. Members participate in community service projects such as food drives for Clemson Community Care and the Clemson Christmas Parade.",
+    "notes": "One of the largest clubs on campus with over 125 members."
+  },
+  {
+    "club_id": "CLUB-ACAD-BETA",
+    "name": "Beta Club",
+    "category": "Academic / Honor Society",
+    "description": "National organization promoting the ideals of academic achievement, character, service, and leadership.",
+    "notes": "Open to sophomores and juniors with an unweighted GPA of 3.5 or higher. Deadline to join is typically in October."
+  },
+  {
+    "club_id": "CLUB-ACAD-SNHS",
+    "name": "Science National Honor Society (SNHS)",
+    "category": "Academic / Honor Society",
+    "description": "Honor society for students excelling in science. Members often participate in the SC Region 1 Science Fair and the annual SNHS Research Symposium.",
+    "notes": "By invitation only to qualifying Juniors and Seniors. Members must maintain high academic standing in science coursework."
+  },
+  {
+    "club_id": "CLUB-ACAD-RESEARCH",
+    "name": "Research Club",
+    "category": "Academic / STEM",
+    "description": "A club dedicated to conducting and presenting original student research. Works closely with SNHS and AP Capstone students.",
+    "notes": "Open to all grades. Prepares students for competitions like the ISEF-affiliated regional science fair."
+  },
+  {
+    "club_id": "CLUB-INT-LIT-LIONS",
+    "name": "Literary Lions Book Club",
+    "category": "Interest",
+    "description": "Student-led book club that meets monthly to discuss books from various genres (e.g., Dystopian, Mystery, Graphic Novels).",
+    "notes": "Meets monthly in the Library Learning Commons (LLC). Leaders organize events like author visits."
+  },
+  {
+    "club_id": "CLUB-LEAD-STUCO",
+    "name": "Student Council",
+    "category": "Leadership",
+    "description": "Student government body responsible for organizing school-wide events, spirit weeks, and representing student interests.",
+    "notes": "Organizes major events like Homecoming and charity drives."
+  },
+  {
+    "club_id": "CLUB-LEAD-LINK",
+    "name": "Link Crew",
+    "category": "Leadership / Mentoring",
+    "description": "A high school transition program that welcomes freshmen and makes them feel comfortable throughout the first year of their high school experience.",
+    "notes": "Juniors and Seniors serve as mentors (Link Leaders) for incoming freshmen."
+  },
+  {
+    "club_id": "CLUB-CTE-DECA",
+    "name": "DECA",
+    "category": "Career / Business",
+    "description": "Prepares emerging leaders and entrepreneurs in marketing, finance, hospitality, and management.",
+    "notes": "You do not have to be a career center student to join."
+  },
+  {
+    "club_id": "CLUB-MIL-JROTC",
+    "name": "Air Force JROTC",
+    "category": "Leadership / Military",
+    "description": "Curriculum focuses on leadership, aerospace science, and community service. The cadet corps often leads school ceremonies.",
+    "notes": "Cadets participate in events like Patriot Day activities and color guard presentations."
+  },
+  {
+    "club_id": "CLUB-ARTS-BAND",
+    "name": "Lions Pride Marching Band",
+    "category": "Fine Arts",
+    "description": "Competitive marching band that performs at football games and competitions.",
+    "notes": "Frequent state champions (e.g., 2023 State Champions). Includes Color Guard."
+  },
+  {
+    "club_id": "CLUB-ARTS-CHORUS",
+    "name": "Chorus / Leo Voces",
+    "category": "Fine Arts",
+    "description": "Vocal ensembles performing at school concerts and state assessments.",
+    "notes": "Includes 'Concert Choir' and the advanced 'Leo Voces' group. Consistently receive 'Superior' ratings at festivals."
+  },
+  {
+    "club_id": "CLUB-ARTS-STRINGS",
+    "name": "Strings / Orchestra",
+    "category": "Fine Arts",
+    "description": "String orchestra ensemble performing varying repertoires from classical to thematic pop concerts.",
+    "notes": "Hosts events like the annual 'Costume Concert' in October."
+  },
+  {
+    "club_id": "CLUB-ARTS-DRAMA",
+    "name": "Drama / Theatre",
+    "category": "Fine Arts",
+    "description": "Produces school plays and musicals.",
+    "notes": "Roughly 9% of the student body participates in drama productions."
+  }
+]

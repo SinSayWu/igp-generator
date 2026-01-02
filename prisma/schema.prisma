@@ -1,8 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// prisma/schema.prisma
 
 generator client {
   provider = "prisma-client-js"
@@ -13,6 +9,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// --------------------------------------
+// SCHOOL & ROLES
+// --------------------------------------
+
 model School {
   id                String   @id @default(cuid())
   schoolStudentCode Int      @unique
@@ -21,14 +21,24 @@ model School {
   createdAt         DateTime @default(now())
   backgroundInfo    String?  @db.Text()
 
-  students Student[]
-  admins   Administrator[]
+  // People
+  students          Student[]
+  admins            Administrator[]
+
+  // Activities & Catalog (Owned by the School)
+  clubs             Club[]
+  sports            Sport[]
+  courses           Course[]
 }
 
 enum UserRole {
   STUDENT
   ADMIN
 }
+
+// --------------------------------------
+// USERS & AUTH
+// --------------------------------------
 
 model User {
   id            String   @id @default(cuid())
@@ -40,38 +50,14 @@ model User {
   createdAt     DateTime @default(now())
   passwordHash  String
   gender        String
+  
+  role          UserRole
 
-  role UserRole
+  // Relations to specific role tables
+  student       Student?
+  admin         Administrator?
 
-  student Student?
-  admin   Administrator?
-
-  sessions Session[]
-}
-
-model Administrator {
-  // Actual parameters
-
-  // Link to User model and relate to school
-  userId String @id
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  school   School? @relation(fields: [schoolId], references: [id])
-  schoolId String?
-}
-
-model Student {
-  // Actual parameters
-  gradeLevel     Int
-  gpa            Float?
-  graduationYear Int?
-
-  // Link to User model and relate to school
-  userId String @id
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  school   School? @relation(fields: [schoolId], references: [id])
-  schoolId String?
+  sessions      Session[]
 }
 
 model Session {
@@ -79,6 +65,93 @@ model Session {
   createdAt DateTime @default(now())
   expiresAt DateTime
 
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+// --------------------------------------
+// SPECIFIC ROLES
+// --------------------------------------
+
+model Administrator {
+  userId   String @id
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  school   School? @relation(fields: [schoolId], references: [id])
+  schoolId String?
+}
+
+model Student {
+  // Academic Info
+  gradeLevel     Int
+  gpa            Float?
+  graduationYear Int?
+  bio            String?   
+  interests      String?   
+
+  // Link to User
+  userId   String @id
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Link to School
+  school   School? @relation(fields: [schoolId], references: [id])
+  schoolId String?
+
+  // Many-to-Many Relations (Student selections)
+  clubs    Club[]
+  sports   Sport[]
+  courses  Course[]
+}
+
+// --------------------------------------
+// ACTIVITIES & CATALOG
+// --------------------------------------
+
+model Club {
+  id          String    @id @default(cuid())
+  name        String    
+  category    String    // e.g. "Service", "Academic"
+  description String?
+  
+  // Link to School (Required)
+  schoolId    String
+  school      School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  // Students who joined this club
+  students    Student[] 
+
+  // Unique name PER school (Two schools can both have "Beta Club")
+  @@unique([name, schoolId])
+}
+
+model Sport {
+  id          String    @id @default(cuid())
+  name        String    
+  season      String    // "Fall", "Winter", "Spring"
+  gender      String    // "Men's", "Women's", "Co-ed"
+  
+  // Link to School (Required)
+  schoolId    String
+  school      School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  students    Student[]
+
+  // Unique name PER school
+  @@unique([name, schoolId])
+}
+
+model Course {
+  id          String    @id @default(cuid())
+  name        String    
+  department  String    // "Math", "English"
+  code        String?   // "MAT-101"
+  
+  // Link to School (Required)
+  schoolId    String
+  school      School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  students    Student[]
+
+  // Unique name PER school
+  @@unique([name, schoolId])
 }

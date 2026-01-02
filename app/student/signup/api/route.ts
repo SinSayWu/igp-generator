@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { createSession } from "@/lib/session";
-import { revalidatePath } from "next/cache";
 
 export async function POST(req: Request) {
     try {
@@ -15,15 +14,17 @@ export async function POST(req: Request) {
             gender,
             email,
             password,
-            schoolCode,
-            grade,
-            gradYear,
+            schoolCode, // e.g., 12345
+            grade,      // Ensure your form sends this as a number (e.g., 9)
+            gradYear,   // Ensure your form sends this as a number (e.g., 2029)
         } = body;
 
+        // 1. Basic Validation
         if (!email || !password || !schoolCode) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
 
+        // 2. Check for existing user
         const existing = await prisma.user.findUnique({
             where: { email },
         });
@@ -32,19 +33,19 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "User with this email already exists" }, { status: 409 });
         }
 
+        // 3. Verify School Code
         const school = await prisma.school.findUnique({
-            where: { schoolStudentCode: schoolCode },
+            where: { schoolStudentCode: Number(schoolCode) }, // Cast to Number just in case
         });
 
-        if (school == null) {
-            return NextResponse.json({ error: "School code does not exist" }, { status: 400 });
+        if (!school) {
+            return NextResponse.json({ error: "Invalid School Code" }, { status: 400 });
         }
-
-        const schoolId = school.id;
 
         const passwordHash = await bcrypt.hash(password, 12);
 
-        // Create the User
+        // 4. Create User AND Student in ONE step (Transactional)
+        // This prevents "orphan" users if student creation fails
         const user = await prisma.user.create({
             data: {
                 firstName,
@@ -55,26 +56,23 @@ export async function POST(req: Request) {
                 email,
                 passwordHash,
                 role: "STUDENT",
+                // Create the linked Student profile immediately
+                student: {
+                    create: {
+                        schoolId: school.id,
+                        gradeLevel: Number(grade),
+                        graduationYear: Number(gradYear),
+                        // Clubs, Sports, Bio are initially empty/null
+                    }
+                }
             },
         });
 
-        // Create the Admin
-        await prisma.student.create({
-            data: {
-                userId: user.id,
-                schoolId,
-                gradeLevel: grade,
-                graduationYear: gradYear,
-            },
-        });
-
+        // 5. Create Session
         const { session, expiresAt } = await createSession(user.id);
 
-        revalidatePath("/", "layout");
-
-        const res = NextResponse.redirect(
-            new URL("/dashboard", req.url)
-        );
+        // 6. Return JSON (Let the frontend handle the redirect)
+        const res = NextResponse.json({ success: true });
 
         res.cookies.set("session", session.id, {
             httpOnly: true,
@@ -85,14 +83,11 @@ export async function POST(req: Request) {
         });
 
         return res;
-    } catch (error) {
-        console.error("ADMIN CREATE ERROR:", error);
 
+    } catch (error) {
+        console.error("SIGNUP ERROR:", error);
         return NextResponse.json(
-            {
-                error: "Failed to create admin",
-                details: error instanceof Error ? error.message : error,
-            },
+            { error: "Failed to create account" },
             { status: 500 }
         );
     }

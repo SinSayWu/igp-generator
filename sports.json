@@ -1,0 +1,122 @@
+[
+  {
+    "sport_id": "SPT-FALL-FB",
+    "name": "Football",
+    "season": "Fall",
+    "gender": "Men's (Co-ed)",
+    "levels_offered": ["Varsity", "JV", "D-Team"],
+    "notes": "Singleton Field. Recent State Champions (3A) in 2020, 2021, and 2023."
+  },
+  {
+    "sport_id": "SPT-FALL-VB",
+    "name": "Volleyball",
+    "season": "Fall",
+    "gender": "Women's",
+    "levels_offered": ["Varsity", "JV"],
+    "notes": "Tryouts typically held in Summer (late July/early August)."
+  },
+  {
+    "sport_id": "SPT-FALL-CHEER",
+    "name": "Competitive Cheer",
+    "season": "Fall",
+    "gender": "Women's (Co-ed)",
+    "levels_offered": ["Varsity", "JV"],
+    "notes": "Competition season is Fall; Spirit/Sideline cheer continues into Winter."
+  },
+  {
+    "sport_id": "SPT-FALL-XC",
+    "name": "Cross Country",
+    "season": "Fall",
+    "gender": "Co-ed (Separate Teams)",
+    "levels_offered": ["Varsity", "JV"],
+    "notes": "Both Men's and Women's teams have multiple state titles."
+  },
+  {
+    "sport_id": "SPT-FALL-SWIM",
+    "name": "Swimming",
+    "season": "Fall",
+    "gender": "Co-ed",
+    "levels_offered": ["Varsity"],
+    "notes": "Practices often held at local aquatic centers (e.g., Central-Clemson Rec)."
+  },
+  {
+    "sport_id": "SPT-FALL-GTEN",
+    "name": "Tennis (Girls)",
+    "season": "Fall",
+    "gender": "Women's",
+    "levels_offered": ["Varsity", "JV"],
+    "notes": "State Champions 1979-1982."
+  },
+  {
+    "sport_id": "SPT-FALL-GGOLF",
+    "name": "Golf (Girls)",
+    "season": "Fall",
+    "gender": "Women's",
+    "levels_offered": ["Varsity"],
+    "notes": "AAAA State Champions 2018, 2019."
+  },
+  {
+    "sport_id": "SPT-WIN-BSK",
+    "name": "Basketball",
+    "season": "Winter",
+    "gender": "Men's & Women's",
+    "levels_offered": ["Varsity", "JV"],
+    "notes": "Separate teams for Boys and Girls."
+  },
+  {
+    "sport_id": "SPT-WIN-WR",
+    "name": "Wrestling",
+    "season": "Winter",
+    "gender": "Co-ed",
+    "levels_offered": ["Varsity", "JV"],
+    "notes": "Matches held in gymnasium."
+  },
+  {
+    "sport_id": "SPT-SPR-SOC",
+    "name": "Soccer",
+    "season": "Spring",
+    "gender": "Men's & Women's",
+    "levels_offered": ["Varsity", "JV"],
+    "notes": "Men's team: Recent State Champions 2022, 2023."
+  },
+  {
+    "sport_id": "SPT-SPR-BASE",
+    "name": "Baseball",
+    "season": "Spring",
+    "gender": "Men's",
+    "levels_offered": ["Varsity", "JV"],
+    "notes": "1968 State Champions."
+  },
+  {
+    "sport_id": "SPT-SPR-SOFT",
+    "name": "Softball",
+    "season": "Spring",
+    "gender": "Women's",
+    "levels_offered": ["Varsity", "JV"],
+    "notes": "Upper State Champions 2012."
+  },
+  {
+    "sport_id": "SPT-SPR-TRK",
+    "name": "Track & Field",
+    "season": "Spring",
+    "gender": "Co-ed",
+    "levels_offered": ["Varsity"],
+    "notes": "Includes running, jumping, and throwing events."
+  },
+  {
+    "sport_id": "SPT-SPR-BTEN",
+    "name": "Tennis (Boys)",
+    "season": "Spring",
+    "gender": "Men's",
+    "levels_offered": ["Varsity", "JV"],
+    "notes": "State Champions 1981."
+  },
+  {
+    "sport_id": "SPT-SPR-BGOLF",
+    "name": "Golf (Boys)",
+    "season": "Spring",
+    "gender": "Men's",
+    "levels_offered": ["Varsity", "JV"],
+    "notes": "Traditional spring sport for boys in SCHSL."
+  }
+]
