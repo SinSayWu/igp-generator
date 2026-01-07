@@ -42,14 +42,82 @@ export default function DefaultHomePage() {
             <section ref={contentRef} className="content-card">
                 <div className="login-container">
                     <div className="text-group">
-                        <h2 className="text-group-header">
-                            Summit is your own
-                            <span style={{ color: "var(--foreground)", marginLeft:"0.25em"}}> personalized AI</span>
+                        <div className="text-group-body" style={{ fontSize: "1.5rem", fontWeight: "700" }}>
+                            <span className="highlight-red">Summit</span> is your own{" "}
+                            <span className="highlight-red">personalized AI,</span> tuned to focus and
+                            guide you through class selections and extracurriculars to{" "}
+                            <span className="highlight-red">
+                                help you get into the college you want
+                            </span>
+                            .
+                        </div>
+                    </div>
+
+                    {/* Floating Logos Placeholder */}
+                    <div className="logo-placeholder">College logos will just float around here</div>
+
+                    {/* Plot Your Future Section */}
+                    <div className="text-group section-spacer">
+                        <h2 className="text-group-header red-header">PLOT YOUR FUTURE</h2>
+                        {/* <hr className="text-group-line" /> */}
+                        <div className="text-group-body" style={{ maxWidth: "800px" }}>
+                            <span className="highlight-red">Summit</span> combs through hundreds of colleges and
+                            databases to give you the best idea of what you need to
+                            accomplish to reach your <span className="highlight-red">peak</span>. It recommends classes and
+                            extracurricular based on where you want to attend and what
+                            you want to achieve, packed into a <span className="highlight-red">personalized IGP</span> just for
+                            you.
+                        </div>
+                    </div>
+
+                    {/* Floating Logos Placeholder */}
+                    <div className="logo-placeholder">College logos will just float around here</div>
+
+                    {/* 3 Steps Section */}
+                    <div className="section-spacer" style={{ width: "100%" }}>
+                        <h2 className="text-group-header red-header" style={{ justifyContent: "center" }}>
+                            Only 3 Steps!
                         </h2>
-                        <hr className="text-group-line" />
-                        <div className="text-group-body">
-                            Tuned to guide you through class selections and
-                            extracurriculars to help you get into your dream college.
+                        <div className="steps-container">
+                            <div className="step-item">
+                                <div className="step-title">Basic Setup</div>
+                                <div className="text-group-body-left step-description">
+                                    Simply upload your school's graduation
+                                    requirements and provided classes to get
+                                    started.
+                                </div>
+                            </div>
+                            <div className="step-item">
+                                <div className="step-title">Personalization</div>
+                                <div className="text-group-body-left step-description">
+                                    Establish Summit's new personalized task. Tell it
+                                    what classes and clubs you have participated in
+                                    and what colleges you are interested in
+                                    applying to.
+                                </div>
+                            </div>
+                            <div className="step-item">
+                                <div className="step-title">Results</div>
+                                <div className="text-group-body-left step-description">
+                                    Summit will gather all of the provided
+                                    information and furnish a polished IGP to
+                                    highlight your needs and outline a plan to
+                                    help you apply to your dream college
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Why Us Section */}
+                    <div className="text-group section-spacer">
+                        <h2 className="text-group-header red-header">WHY US?</h2>
+                        <div className="text-group-body" style={{ maxWidth: "800px" }}>
+                            We want to provide a streamlined and simplified service that
+                            will help you <span className="highlight-red">jumpstart your future</span>. By creating Summit as a
+                            personalized AI that takes your interests and goals to provide
+                            assistance for your college interests, we hope to make a
+                            positive impact and make the process less stressful for
+                            everybody who uses it.
                         </div>
                     </div>
 

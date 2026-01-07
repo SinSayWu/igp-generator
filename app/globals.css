@@ -36,9 +36,9 @@ body {
   padding: 8px 16px;
   color: var(--foreground);
   font: var(--secondary-font);
-  font-weight:1000;
+  font-weight: 1000;
   border-radius: 15px;
-  font-size:20px;
+  font-size: 20px;
 }
 
 
@@ -53,7 +53,7 @@ ITS LOWK NOT THAT HARD ITS PRETTY SELF EXPLANATORY */
   background: var(--button-color);
   color: var(--foreground);
   font: var(--secondary-font);
-  font-weight:700;
+  font-weight: 700;
   font-size: large;
   transition: transform 0.1s ease;
   border-radius: 15px;
@@ -89,7 +89,7 @@ ITS LOWK NOT THAT HARD ITS PRETTY SELF EXPLANATORY */
 .text-group-header {
   font: var(--primary-font);
   font-weight: 700;
-  font-size:x-large;
+  font-size: x-large;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -105,6 +105,13 @@ ITS LOWK NOT THAT HARD ITS PRETTY SELF EXPLANATORY */
   font-weight: 550;
   font-size: large;
   text-align: center;
+}
+
+.text-group-body-left {
+  font: var(--secondary-font);
+  font-weight: 550;
+  font-size: large;
+  text-align: left;
 }
 
 
@@ -159,51 +166,52 @@ ITS LOWK NOT THAT HARD ITS PRETTY SELF EXPLANATORY */
   padding: 12px;
   border-radius: 10px;
   background-color: #ffd8c4;
-  width: 100%;             
+  width: 100%;
   border: none;
   outline: none;
-  box-sizing: border-box;  
+  box-sizing: border-box;
 }
 
 .half-input {
-  max-width:135px;
-  background-color:#ffd8c4;
+  max-width: 135px;
+  background-color: #ffd8c4;
   padding: 10px 10px;
   border-radius: 10px;
-  width:100%
+  width: 100%
 }
 
 .login-container {
   display: flex;
-  flex-direction: column;   
-  align-items: center;      
-  gap: 30px;     
-  width:100%;
-  max-width: none;           
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  width: 100%;
+  max-width: none;
 }
 
 .login-container label {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;  
+  align-items: flex-start;
   width: 100%;
-  max-width: 300px;         
+  max-width: 300px;
   font-family: var(--secondary-font);
   font-weight: 500;
-  gap: 5px;                 
+  gap: 5px;
 }
+
 .name-row {
   display: flex;
-  flex-direction: row;        
-  justify-content: center;             
-  gap: 10 px;           
+  flex-direction: row;
+  justify-content: center;
+  gap: 10px;
   max-width: 300px;
-  width: 100%;  
+  width: 100%;
 }
 
 /*landing page*/
 .hero-section {
-  background-color: #ffc6a9; 
+  background-color: #ffc6a9;
   height: 100vh;
   width: 100%;
   position: relative;
@@ -215,25 +223,26 @@ ITS LOWK NOT THAT HARD ITS PRETTY SELF EXPLANATORY */
 
 .summit-title {
   position: absolute;
-  z-index: 1; 
+  z-index: 1;
   left: 50%;
-  transform: translateX(-67%); 
-  top: auto; 
-  bottom: 45vw;
-  bottom: clamp(150px, 45vw, 50vh);
+  transform: translateX(-50%);
+  top: auto;
+  bottom: 60vh;
+  /* Increased to ensure it clears the 50vh mountain min-height */
   font-family: var(--primary-font);
-  font-size: clamp(6rem, 18vw, 15rem); 
+  font-size: clamp(4rem, 15vw, 15rem);
+  /* Slightly adjusted min size */
   font-weight: 500;
   color: var(--foreground);
   margin: 0;
   white-space: nowrap;
-  opacity: 0; 
+  opacity: 0;
   animation: floatUp 1s ease-out forwards;
   animation-delay: 0.5s;
 }
 
 .mountain-foreground {
-  position: aboslute;
+  position: absolute;
   z-index: 2;
   bottom: 0;
   left: 0;
@@ -241,6 +250,8 @@ ITS LOWK NOT THAT HARD ITS PRETTY SELF EXPLANATORY */
   height: auto;
   min-height: 50vh;
   object-fit: cover;
+  object-position: bottom center;
+  /* Anchor mountains to bottom */
 }
 
 .content-card {
@@ -250,7 +261,7 @@ ITS LOWK NOT THAT HARD ITS PRETTY SELF EXPLANATORY */
   padding: 20px 20px 60px 20px;
   min-height: 100vh;
   margin-top: -20vh;
-  
+
   /* Animation removed - card is always visible */
   opacity: 1;
   transform: translateY(0);
@@ -270,12 +281,94 @@ ITS LOWK NOT THAT HARD ITS PRETTY SELF EXPLANATORY */
 /* Removed .content-card.is-visible class since animation is disabled */
 
 @keyframes floatUp {
-  from { 
-    opacity: 0; 
-    transform: translateX(-50%) translateY(-30px); /* Keep X centered, move Y down */
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-30px);
+    /* Keep X centered, move Y down */
   }
-  to { 
-    opacity: 1; 
-    transform: translateX(-50%) translateY(0);    /* Keep X centered, move Y to 0 */
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    /* Keep X centered, move Y to 0 */
   }
+}
+
+/* NEW HOME PAGE SECTIONS */
+
+.red-header {
+  color: var(--foreground);
+  text-transform: uppercase;
+  font-weight: 800;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.highlight-red {
+  color: var(--foreground);
+  font-weight: 700;
+}
+
+.logo-placeholder {
+  width: 100%;
+  padding: 40px 0;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.5rem;
+  background-color: #f5f5f5;
+  /* Light gray to distinguish */
+  margin: 30px 0;
+  border-radius: 10px;
+}
+
+/* THIS IS HOW YOU ARE GOING TO GRADUALLY CHANGE THE CSS KAYAK*/
+
+.steps-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 30px;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.step-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.step-title {
+  color: var(--foreground);
+  border-bottom: 2px solid var(--foreground);
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.step-description {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--font-color);
+  /* Ensure text is visible */
+  display: block;
+}
+
+/* Responsive steps */
+@media (max-width: 768px) {
+  .steps-container {
+    flex-direction: column;
+  }
+}
+
+/* Section spacers */
+.section-spacer {
+  margin-top: 60px;
+  margin-bottom: 60px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
