@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function DefaultHomePage() {
     const contentRef = useRef<HTMLDivElement>(null);
@@ -53,8 +54,6 @@ export default function DefaultHomePage() {
                         </div>
                     </div>
 
-
-
                     {/* Plot Your Future Section */}
                     <div className="text-group section-spacer">
                         <h2 className="text-group-header red-header">PLOT YOUR FUTURE</h2>
@@ -68,8 +67,7 @@ export default function DefaultHomePage() {
                             you.
                         </div>
                     </div>
-
-                    
+              
                     {/* Floating Logos Placeholder */}
                     <div className="logo-placeholder">
                         <div className="logo-wrapper">
@@ -137,9 +135,13 @@ export default function DefaultHomePage() {
                         </div>
                     </div>
 
-                    <button className="btn pop-text" style={{ fontSize: "1.5rem" }}>
+                    <Link
+                        href="/signup"
+                        className="btn pop-text"
+                        style={{ fontSize: "1.5rem" }}
+                        >
                         BEGIN YOUR CLIMB
-                    </button>
+                        </Link>
                 </div>
             </section>
         </>
