@@ -311,17 +311,37 @@ ITS LOWK NOT THAT HARD ITS PRETTY SELF EXPLANATORY */
 
 .logo-placeholder {
   width: 100%;
-  padding: 40px 0;
-  text-align: center;
-  font-weight: 700;
-  font-size: 1.5rem;
   background-color: #f5f5f5;
-  /* Light gray to distinguish */
   margin: 30px 0;
   border-radius: 10px;
+
+  display: flex;
+  flex-wrap: wrap;        
+  justify-content: center;
+  align-items: center;
+  gap: 50px;
 }
 
-/* THIS IS HOW YOU ARE GOING TO GRADUALLY CHANGE THE CSS KAYAK*/
+.logo-wrapper {
+  width: auto;          
+  max-width: 475px;   
+  height: 80px;         
+  overflow: hidden;      
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo-wrapper img {
+  max-height: 100%;     
+  width: auto;           
+  object-fit: contain;  
+  display: block;
+}
+
+
+
+/* THIS IS HOW YOU ARE GOING TO GRADUALLY CHANGE THE CSS KAYAK. uhuh*/
 
 .steps-container {
   display: flex;
@@ -365,8 +385,8 @@ ITS LOWK NOT THAT HARD ITS PRETTY SELF EXPLANATORY */
 
 /* Section spacers */
 .section-spacer {
-  margin-top: 60px;
-  margin-bottom: 60px;
+  margin-top: 30px;
+  margin-bottom: 30px;
   width: 100%;
   display: flex;
   flex-direction: column;

@@ -53,8 +53,7 @@ export default function DefaultHomePage() {
                         </div>
                     </div>
 
-                    {/* Floating Logos Placeholder */}
-                    <div className="logo-placeholder">College logos will just float around here</div>
+
 
                     {/* Plot Your Future Section */}
                     <div className="text-group section-spacer">
@@ -70,8 +69,25 @@ export default function DefaultHomePage() {
                         </div>
                     </div>
 
+                    
                     {/* Floating Logos Placeholder */}
-                    <div className="logo-placeholder">College logos will just float around here</div>
+                    <div className="logo-placeholder">
+                        <div className="logo-wrapper">
+                            <img src="/logos/Clemson.png" alt="Clemson Logo"/>
+                        </div>
+                        <div className="logo-wrapper">
+                            <img src="/logos/USC.png" alt="USC Logo"/>
+                        </div>
+                        <div className="logo-wrapper">
+                            <img src="/logos/MIT.png" alt="MIT Logo"/>
+                        </div>
+                         <div className="logo-wrapper">
+                            <img src="/logos/Furman.png" alt="Furman Logo"/>
+                        </div>
+                         <div className="logo-wrapper">
+                            <img src="/logos/Harvard.png" alt="Harvard Logo"/>
+                        </div>
+                    </div>
 
                     {/* 3 Steps Section */}
                     <div className="section-spacer" style={{ width: "100%" }}>
