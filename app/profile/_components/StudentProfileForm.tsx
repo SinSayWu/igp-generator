@@ -5,7 +5,14 @@ export default async function StudentProfileForm({ userId }: { userId: string })
   // 1. Fetch the student and their current selections
   const student = await prisma.student.findUnique({
     where: { userId: userId },
-    include: { clubs: true, sports: true, courses: true },
+    include: { 
+      clubs: true, 
+      sports: true, 
+      courses: true,
+      targetColleges: true,
+      nationwideActs: true,
+      focusPrograms: true,
+    },
   });
 
   if (!student || !student.schoolId) {
@@ -13,7 +20,6 @@ export default async function StudentProfileForm({ userId }: { userId: string })
   }
 
   // 2. Fetch all available options for this school
-  // We pass these RAW to the editor. We do NOT need to format them here anymore.
   const allClubs = await prisma.club.findMany({
     where: { schoolId: student.schoolId },
     orderBy: { name: "asc" },
@@ -29,6 +35,19 @@ export default async function StudentProfileForm({ userId }: { userId: string })
     orderBy: [{ department: "asc" }, { name: "asc" }],
   });
 
+  const allColleges = await prisma.college.findMany({
+    orderBy: { name: "asc" }
+  });
+
+  // NEW: Fetch programs for this specific school
+  const schoolPrograms = await prisma.program.findMany({
+    where: { schoolId: student.schoolId },
+    orderBy: { name: "asc" }
+  });
+
+  // NEW: Fetch all available nationwide acts
+  const allNationwideActs = await prisma.nationwideAct.findMany({ orderBy: { name: "asc" }});
+
   // 3. Pass everything down directly
   return (
     <ProfileEditor 
@@ -37,6 +56,9 @@ export default async function StudentProfileForm({ userId }: { userId: string })
       allClubs={allClubs}
       allSports={allSports}
       allCourses={allCourses}
+      allColleges={allColleges}
+      allNationwideActs={allNationwideActs}
+      allPrograms={schoolPrograms}
     />
   );
 }

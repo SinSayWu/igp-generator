@@ -1,6 +1,6 @@
-import { PrismaClient, UserRole } from '@prisma/client' // Import UserRole enum
-import { clubs, sports, courses } from './seed-data'
-import * as bcrypt from 'bcryptjs' // Make sure you have this installed
+import { PrismaClient } from '@prisma/client'
+import { clubs, sports, courses, colleges, nationwideActs, schoolPrograms } from './seed-data'
+import * as bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
@@ -60,12 +60,67 @@ async function main() {
   }
 
   // =======================================================
-  // 3. TEST ACCOUNTS
+  // 3. COLLEGES (With Requirements & Suggestions)
+  // =======================================================
+  // 3. COLLEGES
+  console.log('Seeding colleges...')
+
+  for (const college of colleges) {
+    await prisma.college.upsert({
+      where: { name: college.name },
+      update: { 
+        type: college.type, // <--- UPDATE THIS
+        requirements: college.requirements,
+        suggestions: college.suggestions 
+      }, 
+      create: {
+        name: college.name,
+        type: college.type, // <--- CREATE THIS
+        requirements: college.requirements,
+        suggestions: college.suggestions || []
+      }
+    })
+  }
+
+  // =======================================================
+  // 4. NATIONWIDE ACTS (NEW)
+  // =======================================================
+  console.log('Seeding nationwide acts...')
+  
+  for (const act of nationwideActs) {
+    await prisma.nationwideAct.upsert({
+      where: { name: act.name },
+      update: { color: act.color },
+      create: {
+        name: act.name,
+        color: act.color
+      }
+    })
+  }
+
+  // =======================================================
+  // 5. SCHOOL PROGRAMS (NEW)
+  // =======================================================
+  console.log('Seeding school programs...')
+  
+  for (const prog of schoolPrograms) {
+    await prisma.program.upsert({
+      where: { name_schoolId: { name: prog.name, schoolId } },
+      update: { description: prog.description },
+      create: {
+        name: prog.name,
+        description: prog.description,
+        schoolId: schoolId
+      }
+    })
+  }
+
+  // =======================================================
+  // 4. TEST ACCOUNTS
   // =======================================================
 
   console.log('Creating test accounts...')
   
-  // A simple, insecure password for all test accounts
   const hashedPassword = await bcrypt.hash("password", 10)
 
   const testUsers = [
@@ -79,8 +134,6 @@ async function main() {
     const baseEmail = `${person.first.toLowerCase()}.${person.last.toLowerCase()}`
 
     // --- CREATE STUDENT ACCOUNT ---
-    // Email: firstname.lastname@student.com
-    // Password: password
     await prisma.user.upsert({
       where: { email: `${baseEmail}@student.com` },
       update: {},
@@ -94,16 +147,17 @@ async function main() {
         student: {
           create: {
             schoolId: schoolId,
-            gradeLevel: 11, // Defaulting everyone to Juniors for testing
-            graduationYear: 2027
+            gradeLevel: 11,
+            graduationYear: 2027, // This matches your schema Int? field
+            // We initialize empty arrays for new fields to be safe
+            interests: [],
+            targetColleges: { connect: [] } 
           }
         }
       }
     })
 
     // --- CREATE ADMIN ACCOUNT ---
-    // Email: firstname.lastname@admin.com
-    // Password: password
     await prisma.user.upsert({
       where: { email: `${baseEmail}@admin.com` },
       update: {},
@@ -124,8 +178,10 @@ async function main() {
   }
 
   console.log(`Seeding finished.`)
-  console.log(`Created 8 test accounts (4 Students, 4 Admins).`)
-  console.log(`All passwords are: "password"`)
+  console.log(`- ${clubs.length} clubs`)
+  console.log(`- ${sports.length} sports`)
+  console.log(`- ${courses.length} courses`)
+  console.log(`- ${colleges.length} colleges`)
 }
 
 main()

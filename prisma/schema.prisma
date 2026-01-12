@@ -22,13 +22,14 @@ model School {
   backgroundInfo    String?  @db.Text()
 
   // People
-  students          Student[]
-  admins            Administrator[]
+  students Student[]
+  admins   Administrator[]
 
   // Activities & Catalog (Owned by the School)
-  clubs             Club[]
-  sports            Sport[]
-  courses           Course[]
+  clubs    Club[]
+  sports   Sport[]
+  courses  Course[]
+  programs Program[]
 }
 
 enum UserRole {
@@ -50,14 +51,14 @@ model User {
   createdAt     DateTime @default(now())
   passwordHash  String
   gender        String
-  
-  role          UserRole
+
+  role UserRole
 
   // Relations to specific role tables
-  student       Student?
-  admin         Administrator?
+  student Student?
+  admin   Administrator?
 
-  sessions      Session[]
+  sessions Session[]
 }
 
 model Session {
@@ -65,8 +66,8 @@ model Session {
   createdAt DateTime @default(now())
   expiresAt DateTime
 
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 }
 
 // --------------------------------------
@@ -74,33 +75,79 @@ model Session {
 // --------------------------------------
 
 model Administrator {
-  userId   String @id
-  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @id
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   school   School? @relation(fields: [schoolId], references: [id])
   schoolId String?
 }
 
 model Student {
-  // Academic Info
+  // ... (Grade, GPA, Bio, etc. remain the same) ...
   gradeLevel     Int
-  gpa            Float?
-  graduationYear Int?
-  bio            String?   
-  interests      String?   
+  graduationYear Int
+  bio            String?
+  interests      String[]
 
-  // Link to User
-  userId   String @id
-  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Future Plans
+  postHighSchoolPlan String?
+  careerInterest     String?
+  interestedInNCAA   Boolean @default(false)
 
-  // Link to School
+  // RELATIONSHIPS
+  userId String @id
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   school   School? @relation(fields: [schoolId], references: [id])
   schoolId String?
 
-  // Many-to-Many Relations (Student selections)
-  clubs    Club[]
-  sports   Sport[]
-  courses  Course[]
+  // Activities
+  clubs   Club[]
+  sports  Sport[]
+  courses Course[]
+
+  // NEW: Real relationship to Colleges
+  targetColleges College[]
+  nationwideActs NationwideAct[]
+  focusPrograms Program[]
+}
+
+// --- NEW MODEL: PROGRAM ---
+model Program {
+  id          String   @id @default(cuid())
+  name        String   // e.g. "JROTC", "Fine Arts", "Welding"
+  description String?  // e.g. "Army JROTC Leadership Track"
+  
+  // Link to School (Required - Programs are school-specific)
+  schoolId    String
+  school      School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  
+  // Link to Students
+  students    Student[]
+
+  @@unique([name, schoolId]) // Prevent duplicate program names in the same school
+}
+
+// --- NEW MODEL ---
+model NationwideAct {
+  id    String @id @default(cuid())
+  name  String @unique // e.g. "JROTC", "FFA"
+  color String // e.g. "bg-slate-800 text-white" (Storing tailwind classes for UI consistency)
+
+  students Student[]
+}
+
+model College {
+  id   String @id @default(cuid())
+  name String @unique
+
+  // NEW: Category field (e.g., "University", "Technical", "Military")
+  type String
+
+  requirements String[]
+  suggestions  String[]
+
+  students Student[]
 }
 
 // --------------------------------------
@@ -108,49 +155,49 @@ model Student {
 // --------------------------------------
 
 model Club {
-  id          String    @id @default(cuid())
-  name        String    
-  category    String    // e.g. "Service", "Academic"
+  id          String  @id @default(cuid())
+  name        String
+  category    String // e.g. "Service", "Academic"
   description String?
-  
+
   // Link to School (Required)
-  schoolId    String
-  school      School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  schoolId String
+  school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
 
   // Students who joined this club
-  students    Student[] 
+  students Student[]
 
   // Unique name PER school (Two schools can both have "Beta Club")
   @@unique([name, schoolId])
 }
 
 model Sport {
-  id          String    @id @default(cuid())
-  name        String    
-  season      String    // "Fall", "Winter", "Spring"
-  gender      String    // "Men's", "Women's", "Co-ed"
-  
-  // Link to School (Required)
-  schoolId    String
-  school      School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  name   String
+  season String // "Fall", "Winter", "Spring"
+  gender String // "Men's", "Women's", "Co-ed"
 
-  students    Student[]
+  // Link to School (Required)
+  schoolId String
+  school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  students Student[]
 
   // Unique name PER school
   @@unique([name, schoolId])
 }
 
 model Course {
-  id          String    @id @default(cuid())
-  name        String    
-  department  String    // "Math", "English"
-  code        String?   // "MAT-101"
-  
-  // Link to School (Required)
-  schoolId    String
-  school      School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  id         String  @id @default(cuid())
+  name       String
+  department String // "Math", "English"
+  code       String? // "MAT-101"
 
-  students    Student[]
+  // Link to School (Required)
+  schoolId String
+  school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  students Student[]
 
   // Unique name PER school
   @@unique([name, schoolId])

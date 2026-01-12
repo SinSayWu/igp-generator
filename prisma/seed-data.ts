@@ -1,4 +1,46 @@
 // prisma/seed-data.ts
+export const schoolPrograms = [
+  { 
+    name: "JROTC (Air Force)", 
+    description: "Aerospace science and leadership education program." 
+  },
+  { 
+    name: "Fine Arts: Band", 
+    description: "Marching and Symphonic band pathway." 
+  },
+  { 
+    name: "Fine Arts: Orchestra", 
+    description: "String ensemble and music theory performance." 
+  },
+  { 
+    name: "Fine Arts: Visual Arts", 
+    description: "Drawing, painting, ceramics, and AP Studio Art." 
+  },
+  { 
+    name: "Physical Education / Weightlifting", 
+    description: "Advanced strength training and athletic conditioning." 
+  },
+  { 
+    name: "Health Science / Sports Med", 
+    description: "Pathway for nursing, sports medicine, and physical therapy." 
+  },
+  { 
+    name: "Engineering (PLTW)", 
+    description: "Project Lead The Way: Intro to Engineering Design and Principles." 
+  },
+  { 
+    name: "Agricultural Science", 
+    description: "Horticulture, animal science, and wildlife management." 
+  },
+  { 
+    name: "Business & Marketing", 
+    description: "Entrepreneurship, accounting, and marketing management." 
+  },
+  { 
+    name: "Computer Science", 
+    description: "Coding, cybersecurity, and software development track." 
+  }
+];
 
 export const clubs = [
   { name: "Interact Club", category: "Service", description: "Rotary-sponsored service club." },
@@ -136,4 +178,454 @@ export const courses = [
   { name: "Weight Training", department: "PE", code: "PE-102" },
   { name: "AFJROTC 1", department: "JROTC", code: "ROTC-101" },
   { name: "AFJROTC 2", department: "JROTC", code: "ROTC-102" },
+];
+
+export const colleges = [
+  // =======================================================
+  // SC PUBLIC UNIVERSITIES (Follow SC CHE Requirements)
+  // =======================================================
+  {
+    name: "Clemson University",
+    type: "University",
+    requirements: [
+      "4 units English (Literature/Composition)",
+      "4 units Math (Alg 1, Geom, Alg 2, +1 Higher)",
+      "3 units Lab Science (Bio, Chem, Phys)",
+      "2 units Foreign Language (Same language)",
+      "1 unit Fine Arts",
+      "1 unit PE or ROTC",
+      "3 units Social Science (US Hist, Gov/Econ)"
+    ],
+    suggestions: [
+      "Average Admitted GPA: 4.4+ (SC Uniform)",
+      "Engineering: Calculus is effectively required",
+      "3rd unit of Foreign Language strongly recommended",
+      "Pre-Business: Statistics recommended"
+    ]
+  },
+  {
+    name: "University of South Carolina (USC)",
+    type: "University",
+    requirements: [
+      "4 units English",
+      "4 units Math",
+      "3 units Lab Science",
+      "2 units Foreign Language",
+      "3 units Social Studies",
+      "1 unit Fine Arts"
+    ],
+    suggestions: [
+      "Honors College: 4-5 core AP/IB courses minimum",
+      "Capstone Scholars Avg GPA: 4.6",
+      "4th unit of Lab Science recommended for STEM",
+      "Leadership in 2+ extracurriculars"
+    ]
+  },
+  {
+    name: "Coastal Carolina University",
+    type: "University",
+    requirements: [
+      "4 units English",
+      "4 units Math",
+      "3 units Lab Science",
+      "2 units Foreign Language",
+      "3 units Social Science",
+      "1 unit Fine Arts"
+    ],
+    suggestions: [
+      "Marine Science: Bio and Chem required, Physics recommended",
+      "3.0+ Core GPA for assured admission",
+      "SAT 1100+ / ACT 22+ recommended for merit aid"
+    ]
+  },
+  {
+    name: "College of Charleston",
+    type: "University",
+    requirements: [
+      "4 units English",
+      "4 units Math",
+      "3 units Lab Science",
+      "2 units Foreign Language",
+      "3 units Social Science",
+      "1 unit Fine Arts"
+    ],
+    suggestions: [
+      "Strong writing essays emphasized",
+      "Dual Enrollment transfer credits highly accepted",
+      "Honors College: Top 10% of class rank"
+    ]
+  },
+  {
+    name: "The Citadel",
+    type: "Military",
+    requirements: [
+      "4 units English",
+      "4 units Math",
+      "3 units Lab Science",
+      "2 units Foreign Language",
+      "3 units Social Science",
+      "1 unit Fine Arts"
+    ],
+    suggestions: [
+      "Demonstrated physical fitness (Cadet PT test)",
+      "Leadership roles (Team Captain, JROTC Officer)",
+      "Engineering: Pre-Calculus or Calculus"
+    ]
+  },
+  {
+    name: "Winthrop University",
+    type: "University",
+    requirements: [
+      "4 units English",
+      "4 units Math",
+      "3 units Lab Science",
+      "2 units Foreign Language",
+      "3 units Social Science",
+      "1 unit Fine Arts"
+    ],
+    suggestions: [
+      "Visual/Performing Arts: Portfolio/Audition required",
+      "Teacher Education: 3.5+ GPA recommended"
+    ]
+  },
+  {
+    name: "South Carolina State University",
+    type: "University",
+    requirements: [
+      "4 units English",
+      "4 units Math",
+      "3 units Lab Science",
+      "2 units Foreign Language",
+      "3 units Social Science"
+    ],
+    suggestions: [
+      "Strong STEM background for Nuclear Engineering program",
+      "Summer enrichment programs viewed favorably"
+    ]
+  },
+  {
+    name: "USC Upstate",
+    type: "University",
+    requirements: [
+      "4 units English",
+      "4 units Math",
+      "3 units Lab Science",
+      "2 units Foreign Language",
+      "3 units Social Science"
+    ],
+    suggestions: [
+      "Nursing: Competitive admissions, high Science GPA needed",
+      "Education: 2.75+ GPA required"
+    ]
+  },
+  {
+    name: "Lander University",
+    type: "University",
+    requirements: [
+      "4 units English",
+      "4 units Math",
+      "3 units Lab Science",
+      "2 units Foreign Language",
+      "3 units Social Science"
+    ],
+    suggestions: [
+      "Nursing: Separate application required after freshman year",
+      "Montessori Education program requires interview"
+    ]
+  },
+  {
+    name: "Francis Marion University",
+    type: "University",
+    requirements: [
+      "4 units English",
+      "4 units Math",
+      "3 units Lab Science",
+      "2 units Foreign Language",
+      "3 units Social Science"
+    ],
+    suggestions: [
+      "Engineering Tech: Strong Math background",
+      "Health Physics: Physics and Chem recommended"
+    ]
+  },
+
+  // =======================================================
+  // SC PRIVATE COLLEGES
+  // =======================================================
+  {
+    name: "Furman University",
+    type: "University",
+    requirements: [
+      "4 units English",
+      "4 units Math (Alg 1, 2, Geom)",
+      "3 units Lab Science",
+      "2 units Foreign Language",
+      "3 units Social Studies"
+    ],
+    suggestions: [
+      "Most Admits have 4+ Honors/AP/IB credits per year",
+      "4th unit of Lab Science (Physics recommended)",
+      "3rd or 4th unit of Foreign Language",
+      "Demonstrated community service"
+    ]
+  },
+  {
+    name: "Wofford College",
+    type: "University",
+    requirements: [
+      "4 units English",
+      "4 units Math",
+      "3 units Lab Science",
+      "2 units Foreign Language",
+      "2 units Social Studies"
+    ],
+    suggestions: [
+      "Rigor: AP/IB curriculum strongly preferred",
+      "Leadership in athletics or student government",
+      "Interview highly recommended"
+    ]
+  },
+  {
+    name: "Presbyterian College",
+    type: "University",
+    requirements: [
+      "4 units English",
+      "4 units Math",
+      "2 units Lab Science",
+      "2 units Foreign Language",
+      "2 units Social Studies"
+    ],
+    suggestions: [
+      "Pharmacy pathway: Chemistry and Bio focus",
+      "Service-oriented extracurriculars valued"
+    ]
+  },
+  {
+    name: "Anderson University",
+    type: "University",
+    requirements: [
+      "4 units English",
+      "4 units Math",
+      "3 units Lab Science",
+      "2 units Foreign Language",
+      "3 units Social Studies"
+    ],
+    suggestions: [
+      "Christian commitment/service evidence",
+      "Nursing/Kinesiology: Competitive entry",
+      "Interview for top scholarships"
+    ]
+  },
+  {
+    name: "Charleston Southern University",
+    type: "University",
+    requirements: [
+      "4 units English",
+      "4 units Math",
+      "3 units Lab Science",
+      "2 units Foreign Language",
+      "3 units Social Studies"
+    ],
+    suggestions: [
+      "Aeronautics: FAA medical clearance required",
+      "Nursing: TEAS test scores required"
+    ]
+  },
+  {
+    name: "North Greenville University",
+    type: "University",
+    requirements: [
+      "High School Diploma",
+      "2.5 GPA Minimum"
+    ],
+    suggestions: [
+      "Faith statement/testimony often requested",
+      "Outdoor leadership experience valued"
+    ]
+  },
+
+  // =======================================================
+  // SC TECHNICAL & COMMUNITY COLLEGES
+  // =======================================================
+  {
+    name: "Tri-County Technical College",
+    type: "Technical",
+    requirements: [
+      "High School Diploma or GED",
+      "Placement Test (Accuplacer) or SAT/ACT exemption",
+      "Final High School Transcript"
+    ],
+    suggestions: [
+      "Bridge to Clemson: 2.5+ GPA required",
+      "Nursing: Biology & Chem with 'C' or higher",
+      "I-BEST programs available for extra support"
+    ]
+  },
+  {
+    name: "Greenville Technical College",
+    type: "Technical",
+    requirements: [
+      "High School Diploma or GED",
+      "Multiple Measures Placement (GPA + Math/English grades)"
+    ],
+    suggestions: [
+      "Health Sciences: Weighted admission (GPA + TEAS score)",
+      "Aircraft Maintenance: FAA requirements apply",
+      "Honors Program: 3.5+ GPA"
+    ]
+  },
+  {
+    name: "Midlands Technical College",
+    type: "Technical",
+    requirements: [
+      "High School Diploma or GED",
+      "Placement testing (Reading, English, Math)"
+    ],
+    suggestions: [
+      "Gamecock Gateway (Bridge to USC)",
+      "QuickJobs: 3-6 month certifications"
+    ]
+  },
+  {
+    name: "Spartanburg Community College",
+    type: "Technical",
+    requirements: [
+      "High School Diploma or GED",
+      "Residency Certification"
+    ],
+    suggestions: [
+      "Spark Academy: Free tuition for eligible local grads",
+      "BMW Scholars: Work/study program for manufacturing"
+    ]
+  },
+  {
+    name: "Trident Technical College",
+    type: "Technical",
+    requirements: [
+      "High School Diploma or GED",
+      "English/Math proficiency proof"
+    ],
+    suggestions: [
+      "Charleston Bridge to CofC",
+      "Culinary Institute: Separate application",
+      "Aeronautical Studies (Boeing partnership)"
+    ]
+  },
+
+  // =======================================================
+  // OUT-OF-STATE / ELITE (HIGH RIGOR)
+  // =======================================================
+  {
+    name: "Duke University",
+    type: "University",
+    requirements: [
+      "4 units English",
+      "4 units Math (Calculus highly recommended)",
+      "4 units Lab Science",
+      "4 units Foreign Language",
+      "3 units Social Studies"
+    ],
+    suggestions: [
+      "Rigor: Maximize AP/IB course load available",
+      "Engineering: Physics and Calculus required",
+      "5 core academic courses per year"
+    ]
+  },
+  {
+    name: "University of North Carolina (UNC Chapel Hill)",
+    type: "University",
+    requirements: [
+      "4 units English",
+      "4 units Math",
+      "3 units Lab Science",
+      "2 units Foreign Language",
+      "2 units Social Studies (US Hist)"
+    ],
+    suggestions: [
+      "Rigor: 5-8+ AP/IB courses typical for out-of-state admits",
+      "Strong commitment to service/leadership",
+      "Holistic review emphasizes essays"
+    ]
+  },
+  {
+    name: "Georgia Tech",
+    type: "University",
+    requirements: [
+      "4 units English",
+      "4 units Math (must include Pre-Calc)",
+      "4 units Lab Science",
+      "2 units Foreign Language",
+      "3 units Social Studies"
+    ],
+    suggestions: [
+      "Math: Calculus I required for almost all majors",
+      "Science: Physics heavily preferred for Engineering",
+      "Evidence of STEM innovation/projects"
+    ]
+  },
+  {
+    name: "University of Georgia (UGA)",
+    type: "University",
+    requirements: [
+      "4 units English",
+      "4 units Math",
+      "4 units Lab Science",
+      "2 units Foreign Language",
+      "3 units Social Studies"
+    ],
+    suggestions: [
+      "Rigor: 7-10 AP/IB/Dual courses typical",
+      "Math: AP Calculus or AP Stats recommended",
+      "Core GPA is recalculated (electives removed)"
+    ]
+  },
+  {
+    name: "University of Tennessee",
+    type: "University",
+    requirements: [
+      "4 units English",
+      "4 units Math",
+      "3 units Lab Science",
+      "2 units Foreign Language",
+      "1 unit US History"
+    ],
+    suggestions: [
+      "Volunteer Spirit: Service strongly valued",
+      "Nursing/Engineering: Early Action application recommended"
+    ]
+  },
+  {
+    name: "Vanderbilt University",
+    type: "University",
+    requirements: [
+      "4 units English",
+      "4 units Math (Calculus)",
+      "4 units Lab Science",
+      "4 units Foreign Language",
+      "3 units Social Studies"
+    ],
+    suggestions: [
+      "Rigor: Most challenging curriculum available",
+      "4th year of Foreign Language",
+      "Exceptional leadership or talent distinction"
+    ]
+  }
+];
+
+export const nationwideActs = [
+  { name: "JROTC / Military", color: "bg-slate-800 text-white" },
+  { name: "Band / Marching Band", color: "bg-red-600 text-white" },
+  { name: "Orchestra / Strings", color: "bg-orange-600 text-white" },
+  { name: "Chorus / Vocal", color: "bg-pink-600 text-white" },
+  { name: "FFA (Agriculture)", color: "bg-blue-700 text-white" },
+  { name: "DECA (Business/Marketing)", color: "bg-blue-600 text-white" },
+  { name: "FBLA (Future Business Leaders)", color: "bg-indigo-700 text-white" },
+  { name: "HOSA (Health Pros)", color: "bg-teal-700 text-white" },
+  { name: "SkillsUSA (Trade/Tech)", color: "bg-red-700 text-white" },
+  { name: "Beta Club", color: "bg-yellow-500 text-black" },
+  { name: "National Honor Society", color: "bg-blue-500 text-white" },
+  { name: "Student Council / Gov", color: "bg-purple-600 text-white" },
+  { name: "Boy / Girl Scouts", color: "bg-green-700 text-white" },
+  { name: "4-H", color: "bg-green-600 text-white" },
+  { name: "Robotics (FIRST / VEX)", color: "bg-gray-700 text-white" },
 ];
