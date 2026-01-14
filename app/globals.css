@@ -3,8 +3,8 @@
 /* THESE ARE THE VARIABLES THAT YOU CAN CHANGE TO CHANGE THE COLOR SCHEME AND STUFF */
 :root {
   --background: white;
-  --accent-background: #002860;
-  --accent-background-2: #0345a0;
+  --accent-background: #ffd8c4;
+  --accent-background-2: #ffc6a9;
 
   --foreground: #d70026;
   --foreground-2: #a70825;
@@ -316,26 +316,26 @@ ITS LOWK NOT THAT HARD ITS PRETTY SELF EXPLANATORY */
   border-radius: 10px;
 
   display: flex;
-  flex-wrap: wrap;        
+  flex-wrap: wrap;
   justify-content: center;
   align-items: center;
   gap: 50px;
 }
 
 .logo-wrapper {
-  width: auto;          
-  max-width: 475px;   
-  height: 80px;         
-  overflow: hidden;      
+  width: auto;
+  max-width: 475px;
+  height: 80px;
+  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .logo-wrapper img {
-  max-height: 100%;     
-  width: auto;           
-  object-fit: contain;  
+  max-height: 100%;
+  width: auto;
+  object-fit: contain;
   display: block;
 }
 

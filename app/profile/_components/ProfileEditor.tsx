@@ -35,22 +35,22 @@ interface SelectableItem {
 // Union type for the raw items we might pass to tables
 type RawActivityItem = Club | Sport | Course;
 
-export default function ProfileEditor({ 
-  userId, student, allClubs, allSports, allCourses, allColleges, allNationwideActs, allPrograms 
+export default function ProfileEditor({
+  userId, student, allClubs, allSports, allCourses, allColleges, allNationwideActs, allPrograms
 }: Props) {
   const [isPending, startTransition] = useTransition();
 
   // --- STATE ---
   const [plan, setPlan] = useState(student.postHighSchoolPlan || "");
   const [ncaa, setNcaa] = useState(student.interestedInNCAA);
-  
+
   // Nationwide Acts State
   const [selectedNationwideIds, setSelectedNationwideIds] = useState<string[]>(
     student.nationwideActs.map(act => act.id)
   );
 
   const handleNationwideToggle = (id: string) => {
-    setSelectedNationwideIds(prev => 
+    setSelectedNationwideIds(prev =>
       prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
     );
   };
@@ -61,7 +61,7 @@ export default function ProfileEditor({
   );
 
   const handleProgramToggle = (id: string) => {
-    setSelectedProgramIds(prev => 
+    setSelectedProgramIds(prev =>
       prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
     );
   };
@@ -72,7 +72,7 @@ export default function ProfileEditor({
   );
 
   const handleCollegeToggle = (id: string) => {
-    setSelectedCollegeIds(prev => 
+    setSelectedCollegeIds(prev =>
       prev.includes(id) ? prev.filter(cid => cid !== id) : [...prev, id]
     );
   };
@@ -100,10 +100,10 @@ export default function ProfileEditor({
 
   // STRICTLY TYPED Add Helper
   const addItem = (
-    id: string, 
-    sourceList: RawActivityItem[], 
-    currentList: SelectableItem[], 
-    setList: (items: SelectableItem[]) => void, 
+    id: string,
+    sourceList: RawActivityItem[],
+    currentList: SelectableItem[],
+    setList: (items: SelectableItem[]) => void,
     reset: (val: string) => void
   ) => {
     const raw = sourceList.find((i) => i.id === id);
@@ -115,8 +115,8 @@ export default function ProfileEditor({
 
   // STRICTLY TYPED Remove Helper
   const removeItem = (
-    id: string, 
-    currentList: SelectableItem[], 
+    id: string,
+    currentList: SelectableItem[],
     setList: (items: SelectableItem[]) => void
   ) => {
     setList(currentList.filter(i => i.id !== id));
@@ -136,22 +136,22 @@ export default function ProfileEditor({
       </div>
 
       <form action={handleSubmit} className="space-y-8">
-        
+
         {/* Hidden Inputs for Relations */}
         {myClubs.map(i => <input key={i.id} type="hidden" name="clubIds" value={i.id} />)}
         {mySports.map(i => <input key={i.id} type="hidden" name="sportIds" value={i.id} />)}
         {myCourses.map(i => <input key={i.id} type="hidden" name="courseIds" value={i.id} />)}
-        
+
         {/* Hidden Inputs for Nationwide Acts */}
         {selectedNationwideIds.map(id => <input key={id} type="hidden" name="nationwideActIds" value={id} />)}
-        
+
         {/* Hidden Inputs for Programs */}
         {selectedProgramIds.map(id => <input key={id} type="hidden" name="programIds" value={id} />)}
 
         {/* ================= SECTION 1: BIO ================= */}
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
           <h2 className="text-xl font-bold mb-4 text-gray-800">About Me</h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Grade Level</label>
@@ -173,21 +173,21 @@ export default function ProfileEditor({
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
           <h2 className="text-xl font-bold mb-4 text-gray-800">Pathways & Elective Focus</h2>
           <p className="text-sm text-gray-500 mb-4">Select the specialized programs or pathways you are currently pursuing at your school.</p>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {allPrograms.map((prog) => {
               const isSelected = selectedProgramIds.includes(prog.id);
               return (
-                <div 
+                <div
                   key={prog.id}
                   onClick={() => handleProgramToggle(prog.id)}
                   className={`
                     cursor-pointer p-4 rounded-lg border transition-all select-none
-                    ${isSelected ? "bg-indigo-50 border-indigo-500 shadow-sm" : "border-gray-200 hover:bg-gray-50"}
+                    ${isSelected ? "bg-[var(--button-color)] border-[var(--foreground-2)] shadow-sm" : "border-gray-200 hover:bg-gray-50"}
                   `}
                 >
                   <div className="flex items-start gap-3">
-                    <div className={`mt-1 w-5 h-5 rounded-full border flex items-center justify-center ${isSelected ? "bg-indigo-600 border-indigo-600" : "border-gray-400"}`}>
+                    <div className={`mt-1 w-5 h-5 rounded-full border flex items-center justify-center ${isSelected ? "bg-[var(--foreground-2)] border-[var(--foreground-2)]" : "border-gray-400"}`}>
                       {isSelected && (
                         <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
@@ -195,7 +195,7 @@ export default function ProfileEditor({
                       )}
                     </div>
                     <div>
-                      <h3 className={`font-bold ${isSelected ? "text-indigo-900" : "text-gray-800"}`}>{prog.name}</h3>
+                      <h3 className={`font-bold ${isSelected ? "text-[var(--foreground-2)]" : "text-gray-800"}`}>{prog.name}</h3>
                       {prog.description && <p className="text-xs text-gray-500 mt-1">{prog.description}</p>}
                     </div>
                   </div>
@@ -209,7 +209,7 @@ export default function ProfileEditor({
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
           <h2 className="text-xl font-bold mb-4 text-gray-800">Nationwide Organizations</h2>
           <p className="text-sm text-gray-500 mb-4">Select any major national organizations you are actively involved in.</p>
-          
+
           <div className="flex flex-wrap gap-3">
             {allNationwideActs.map((act) => {
               const isSelected = selectedNationwideIds.includes(act.id);
@@ -235,9 +235,9 @@ export default function ProfileEditor({
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
           <h2 className="text-xl font-bold mb-4 text-gray-800">Post-High School Plans</h2>
 
-          <select 
-            name="postHighSchoolPlan" 
-            value={plan} 
+          <select
+            name="postHighSchoolPlan"
+            value={plan}
             onChange={(e) => setPlan(e.target.value)}
             className="w-full border p-2 rounded-lg mb-6"
           >
@@ -250,37 +250,37 @@ export default function ProfileEditor({
 
           {/* COLLEGE SELECTION GRID */}
           {(plan === "College" || plan === "Vocational") && (
-            <div className="bg-blue-50 p-5 rounded-lg border border-blue-100">
-              <label className="block text-sm font-bold text-blue-900 mb-3">
+            <div className="bg-[var(--button-color)] p-5 rounded-lg border border-[var(--button-color-2)]">
+              <label className="block text-sm font-bold text-black mb-3">
                 Select Target Colleges
               </label>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {allColleges
                   // --- FILTERING LOGIC ---
                   .filter((college) => {
                     // 1. If Vocational, only show Technical colleges
                     if (plan === "Vocational") return college.type === "Technical";
-                    
+
                     // 2. If College, only show Universities
                     if (plan === "College") return college.type === "University";
-                    
+
                     // 3. Fallback (Show all if something weird happens)
                     return true;
                   })
                   .map((college) => {
                     const isChecked = selectedCollegeIds.includes(college.id);
                     return (
-                      <div key={college.id} className={`p-4 rounded-lg border transition-all ${isChecked ? "bg-white border-blue-500 shadow-sm" : "border-transparent hover:bg-white/50"}`}>
+                      <div key={college.id} className={`p-4 rounded-lg border transition-all ${isChecked ? "bg-white border-[var(--foreground-2)] shadow-sm" : "border-transparent hover:bg-white/50"}`}>
                         {/* Checkbox Line */}
                         <label className="flex items-center space-x-3 cursor-pointer">
-                          <input 
-                            type="checkbox" 
-                            name="collegeIds" 
+                          <input
+                            type="checkbox"
+                            name="collegeIds"
                             value={college.id}
                             checked={isChecked}
                             onChange={() => handleCollegeToggle(college.id)}
-                            className="h-5 w-5 rounded text-blue-600 focus:ring-blue-500"
+                            className="h-5 w-5 rounded text-[var(--foreground-2)] focus:ring-[var(--foreground-2)]"
                           />
                           <span className="font-semibold text-gray-800 text-lg">{college.name}</span>
                         </label>
@@ -288,7 +288,7 @@ export default function ProfileEditor({
                         {/* REQUIREMENTS & SUGGESTIONS DISPLAY */}
                         {isChecked && (
                           <div className="mt-3 ml-8 text-xs text-gray-600 space-y-3 border-l-2 border-gray-100 pl-3">
-                            
+
                             {/* 1. Absolute Requirements */}
                             <div>
                               <p className="font-bold text-red-700 uppercase tracking-wide mb-1 flex items-center gap-1">
@@ -305,8 +305,8 @@ export default function ProfileEditor({
                             {/* 2. Suggestions (Rigor) - Only show if they exist */}
                             {college.suggestions.length > 0 && (
                               <div>
-                                <p className="font-bold text-green-700 uppercase tracking-wide mb-1 flex items-center gap-1">
-                                  <span className="w-1.5 h-1.5 bg-green-500 rounded-full inline-block"></span>
+                                <p className="font-bold text-[var(--foreground-2)] uppercase tracking-wide mb-1 flex items-center gap-1">
+                                  <span className="w-1.5 h-1.5 bg-[var(--foreground-2)] rounded-full inline-block"></span>
                                   Rigor & Recommendations
                                 </p>
                                 <ul className="list-disc pl-4 space-y-0.5">
@@ -325,11 +325,11 @@ export default function ProfileEditor({
               </div>
 
               {/* NCAA Toggle */}
-              <div className="mt-6 pt-4 border-t border-blue-200 flex items-center space-x-3">
-                <input 
-                  type="checkbox" name="interestedInNCAA" 
+              <div className="mt-6 pt-4 border-t border-[var(--button-color-2)] flex items-center space-x-3">
+                <input
+                  type="checkbox" name="interestedInNCAA"
                   checked={ncaa} onChange={(e) => setNcaa(e.target.checked)}
-                  className="h-5 w-5 rounded text-blue-600"
+                  className="h-5 w-5 rounded text-[var(--foreground-2)]"
                 />
                 <span className="text-sm font-medium text-gray-800">I am interested in NCAA Sports Recruiting</span>
               </div>
@@ -338,34 +338,34 @@ export default function ProfileEditor({
         </div>
 
         {/* ================= SECTION 5: ACTIVITIES ================= */}
-        
-        <SectionTable 
-          title="Sports" items={mySports} allRawItems={allSports} 
-          selectedId={selSport} onSelect={setSelSport} 
-          onAdd={() => addItem(selSport, allSports, mySports, setMySports, setSelSport)} 
-          onRemove={(id) => removeItem(id, mySports, setMySports)} 
-          placeholder="Select a sport..." 
+
+        <SectionTable
+          title="Sports" items={mySports} allRawItems={allSports}
+          selectedId={selSport} onSelect={setSelSport}
+          onAdd={() => addItem(selSport, allSports, mySports, setMySports, setSelSport)}
+          onRemove={(id) => removeItem(id, mySports, setMySports)}
+          placeholder="Select a sport..."
         />
 
-        <SectionTable 
-          title="Clubs" items={myClubs} allRawItems={allClubs} 
-          selectedId={selClub} onSelect={setSelClub} 
-          onAdd={() => addItem(selClub, allClubs, myClubs, setMyClubs, setSelClub)} 
-          onRemove={(id) => removeItem(id, myClubs, setMyClubs)} 
-          placeholder="Select a club..." 
+        <SectionTable
+          title="Clubs" items={myClubs} allRawItems={allClubs}
+          selectedId={selClub} onSelect={setSelClub}
+          onAdd={() => addItem(selClub, allClubs, myClubs, setMyClubs, setSelClub)}
+          onRemove={(id) => removeItem(id, myClubs, setMyClubs)}
+          placeholder="Select a club..."
         />
 
-        <SectionTable 
-          title="Courses" items={myCourses} allRawItems={allCourses} 
-          selectedId={selCourse} onSelect={setSelCourse} 
-          onAdd={() => addItem(selCourse, allCourses, myCourses, setMyCourses, setSelCourse)} 
-          onRemove={(id) => removeItem(id, myCourses, setMyCourses)} 
-          placeholder="Add a course..." 
+        <SectionTable
+          title="Courses" items={myCourses} allRawItems={allCourses}
+          selectedId={selCourse} onSelect={setSelCourse}
+          onAdd={() => addItem(selCourse, allCourses, myCourses, setMyCourses, setSelCourse)}
+          onRemove={(id) => removeItem(id, myCourses, setMyCourses)}
+          placeholder="Add a course..."
         />
 
         {/* SAVE BUTTON */}
         <div className="fixed bottom-6 right-6 z-10">
-          <button type="submit" disabled={isPending} className={`flex items-center gap-2 px-8 py-4 rounded-full font-bold shadow-xl transition-all ${isPending ? "bg-blue-400" : "bg-blue-700 hover:scale-105"} text-white`}>
+          <button type="submit" disabled={isPending} className={`flex items-center gap-2 px-8 py-4 rounded-full font-bold shadow-xl transition-all ${isPending ? "bg-[var(--button-color-3)]" : "bg-[var(--button-color)] hover:scale-105"} text-black`}>
             {isPending ? "Saving..." : "Save Changes"}
           </button>
         </div>
