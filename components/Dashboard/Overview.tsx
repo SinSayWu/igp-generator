@@ -11,6 +11,18 @@ type Goal = {
   completed: boolean;
 };
 
+function getPriorityLabel(weight: number) {
+  if (weight === 3) return "High";
+  if (weight === 2) return "Medium";
+  return "Low";
+}
+
+function getPriorityColor(weight: number) {
+  if (weight === 3) return "text-red-600";
+  if (weight === 2) return "text-yellow-600";
+  return "text-green-600";
+}
+
 type OverviewProps = {
   user: {
     firstName: string;
@@ -21,11 +33,11 @@ type OverviewProps = {
 
 export default function Overview({ user }: OverviewProps) {
   const [goals, setGoals] = useState<Goal[]>([
-    { id: "g1", title: "Complete profile setup", weight: 5, completed: false },
-    { id: "g2", title: "Submit first college application", weight: 20, completed: false },
-    { id: "g3", title: "Join a club", weight: 15, completed: false },
-    { id: "g4", title: "Complete essay draft", weight: 10, completed: false },
-    { id: "g5", title: "Schedule shadowing", weight: 10, completed: false },
+    { id: "g1", title: "Complete profile setup", weight: 3, completed: false },
+    { id: "g2", title: "Submit first college application", weight: 2, completed: false },
+    { id: "g3", title: "Join a club", weight: 1, completed: false },
+    { id: "g4", title: "Complete essay draft", weight: 1, completed: false },
+    { id: "g5", title: "Schedule shadowing", weight: 3, completed: false },
   ]);
 
   const calculatedProgress = Math.round(
@@ -54,6 +66,11 @@ export default function Overview({ user }: OverviewProps) {
     setGoals(prev => prev.map(g => (g.id === id ? { ...g, completed: !g.completed } : g)));
   }
 
+const overviewGoals = [...goals]
+  .filter(g => !g.completed)          // optional, but recommended
+  .sort((a, b) => b.weight - a.weight)
+  .slice(0, 5);
+
   return (
     <DashboardShell user={user} progress={calculatedProgress}>
       <div className="grid gap-6" style={{ gridTemplateColumns: "30% 70%" }}>
@@ -72,7 +89,7 @@ export default function Overview({ user }: OverviewProps) {
 
         <div className="border rounded-lg p-6 flex flex-col gap-4">
           <h2 className="text-xl font-bold mb-4">Task Overview</h2>
-          {goals.map(goal => (
+          {overviewGoals.map(goal => (
             <div
               key={goal.id}
               className={`flex items-center justify-between border p-4 rounded ${
@@ -81,7 +98,9 @@ export default function Overview({ user }: OverviewProps) {
             >
               <div>
                 <p className="font-semibold">{goal.title}</p>
-                <p className="text-sm text-gray-600">Weight: {goal.weight}%</p>
+                <p className={`text-sm font-semibold ${getPriorityColor(goal.weight)}`}>
+                    Priority: {getPriorityLabel(goal.weight)}
+                  </p>
               </div>
               <button
                 onClick={() => toggleGoal(goal.id)}

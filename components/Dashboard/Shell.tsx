@@ -44,7 +44,7 @@ export default function DashboardShell({ user, progress, children }: DashboardSh
         Jobs
       </button>
       <button className="opacity-70 hover:opacity-100">
-        Calander
+        ChatBot
       </button>
       <button className="opacity-70 hover:opacity-100">
         Goals
@@ -66,7 +66,7 @@ export default function DashboardShell({ user, progress, children }: DashboardSh
       color: "black",
       borderTop: "2px solid var(--accent-background)" }}
       className="bg-white dark:bg-gray-100 p-4 text-center text-sm">
-       {/* Progress bar */}
+       {/* {/* Progress bar */}
   <div className="w-full">
     <div className="relative h-4 rounded-full bg-gray-200 overflow-hidden">
       {/* Filled portion */}
