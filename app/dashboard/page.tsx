@@ -3,6 +3,8 @@ import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import DashboardShell from "@/components/Dashboard/Shell";
+import Overview from "@/components/Dashboard/Overview"; // client component
+
 
 export default async function DashboardPage() {
   const cookieStore = await cookies();
@@ -22,5 +24,5 @@ export default async function DashboardPage() {
 
   if (!user) redirect("/");
 
-  return <DashboardShell user={user} />;
+  return <Overview user={{ firstName: user.firstName, lastName: user.lastName, role: user.role }} />;
 }
