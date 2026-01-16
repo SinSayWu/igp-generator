@@ -581,6 +581,9 @@ function SectionTable({
   );
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    // Stop propagation so we don't trigger the form's onChangeCapture (auto-save)
+    // just for selecting an item in the dropdown (before adding it).
+    e.stopPropagation();
     const newVal = e.target.value;
     onSelect(newVal);
   };
