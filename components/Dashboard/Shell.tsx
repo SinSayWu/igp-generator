@@ -92,7 +92,7 @@ export default function DashboardShell({ user, progress, children }: DashboardSh
                         }
                         onClick={() => setActiveTab("jobs")}
                     >
-                        Jobs
+                        Jobs & Internships
                     </button>
                     <button
                         className={
@@ -138,40 +138,7 @@ export default function DashboardShell({ user, progress, children }: DashboardSh
                 )}
             </main>
 
-            {/* Footer */}
-            <footer
-                style={{
-                    backgroundColor: "var(--background) ",
-                    color: "black",
-                    borderTop: "2px solid var(--accent-background)",
-                }}
-                className="bg-white dark:bg-gray-100 p-4 text-center text-sm"
-            >
-                {/* {/* Progress bar */}
-                <div className="w-full">
-                    <div className="relative h-4 rounded-full bg-gray-200 overflow-hidden">
-                        {/* Filled portion */}
-                        <div
-                            className="h-full transition-all duration-500"
-                            style={{
-                                width: `${progress}%`,
-                                backgroundColor: "var(--accent-background)",
-                            }}
-                        />
-
-                        {/* Notches every 10% */}
-                        {[...Array(11)].map((_, i) => (
-                            <div
-                                key={i}
-                                className="absolute top-0 h-full w-[2px] bg-white/70"
-                                style={{ left: `${i * 10}%` }}
-                            />
-                        ))}
-                    </div>
-
-                    <p className="text-sm mt-1 font-bold">Overall Progress: {progress}%</p>
-                </div>
-            </footer>
+           
         </div>
     );
 }

@@ -51,6 +51,12 @@ export default function ClassesPage() {
 
   return (
     <div className="flex flex-col gap-10">
+        <div className="flex flex-col gap-6">
+  <h2 className="text-2xl font-bold">Classes</h2>
+  <p className="text-gray-600">
+    Track your current and completed classes, view grades, and explore suggested future courses.
+  </p>
+</div>
 
         {/* Overview Bar */}
         <div className="grid grid-cols-3 gap-6 border rounded-lg p-6">

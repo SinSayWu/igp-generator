@@ -72,6 +72,12 @@ const overviewGoals = [...goals]
   .slice(0, 5);
 
   return (
+    <div className="flex flex-col gap-6">
+  <h2 className="text-2xl font-bold">Overview</h2>
+  <p className="text-gray-600">
+    See your top goals and tasks, track progress, and get a snapshot of your overall achievements.
+  </p>
+
       <div className="grid gap-6" style={{ gridTemplateColumns: "30% 70%" }}>
         <div className="border rounded-lg p-2 flex flex-col items-center justify-center">
           <div className="border-4 border-gray-300 rounded-lg p-2 w-full h-full flex overflow-hidden">
@@ -113,5 +119,7 @@ const overviewGoals = [...goals]
           ))}
         </div>
       </div>
+  </div>
   );
+
 }
