@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, ReactNode } from "react";
+import { useState, useTransition, ReactNode, useEffect, useRef, useCallback } from "react";
 import {
     Club,
     Sport,
@@ -79,11 +79,15 @@ export default function ProfileEditor({
     allPrograms,
 }: Props) {
     const [isPending, startTransition] = useTransition();
+    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+    const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const formRef = useRef<HTMLFormElement | null>(null);
 
     // 1. Core Profile State
     const [plan, setPlan] = useState(student.postHighSchoolPlan || "");
     const [ncaa, setNcaa] = useState(student.interestedInNCAA);
-    const [studyHalls, setStudyHalls] = useState(student.studyHallsPerYear || 0);
+    const [minStudyHalls, setMinStudyHalls] = useState(student.studyHallsPerYear || 0);
+    const [maxStudyHalls, setMaxStudyHalls] = useState(student.studyHallsPerYear || 0);
 
     // 2. Course Data State (Grades, Stress, etc.)
     const [courseData, setCourseData] = useState<
@@ -148,7 +152,11 @@ export default function ProfileEditor({
     // Helpers
     const toggleCourseExpand = (courseId: string) => {
         const newSet = new Set(expandedCourses);
-        newSet.has(courseId) ? newSet.delete(courseId) : newSet.add(courseId);
+        if (newSet.has(courseId)) {
+            newSet.delete(courseId);
+        } else {
+            newSet.add(courseId);
+        }
         setExpandedCourses(newSet);
     };
 
@@ -164,22 +172,71 @@ export default function ProfileEditor({
         if (raw && !currentList.some((i) => i.id === id)) {
             setList([...currentList, formatItem(raw, type)]);
             reset("");
+            scheduleAutoSave();
+
+            // Initialize course data for new courses
+            if (type === "course" && !courseData.has(id)) {
+                const newData = new Map(courseData);
+                newData.set(id, {
+                    grade: undefined,
+                    status: "IN_PROGRESS",
+                    confidence: undefined,
+                    stress: undefined,
+                });
+                setCourseData(newData);
+            }
         }
     };
 
     const removeItem = (
         id: string,
         currentList: SelectableItem[],
-        setList: (items: SelectableItem[]) => void
+        setList: (items: SelectableItem[]) => void,
+        type?: "club" | "sport" | "course"
     ) => {
         setList(currentList.filter((i) => i.id !== id));
+        scheduleAutoSave();
+
+        // Remove course data when removing a course
+        if (type === "course" && courseData.has(id)) {
+            const newData = new Map(courseData);
+            newData.delete(id);
+            setCourseData(newData);
+        }
     };
 
-    const handleSubmit = (formData: FormData) => {
-        startTransition(async () => {
-            await updateStudentProfile(userId, formData);
-        });
-    };
+    const handleSubmit = useCallback(
+        (formData: FormData) => {
+            startTransition(async () => {
+                await updateStudentProfile(userId, formData);
+                setHasUnsavedChanges(false);
+            });
+        },
+        [userId]
+    );
+
+    const scheduleAutoSave = useCallback(() => {
+        setHasUnsavedChanges(true);
+
+        if (saveTimeoutRef.current) {
+            clearTimeout(saveTimeoutRef.current);
+        }
+
+        saveTimeoutRef.current = setTimeout(() => {
+            const formEl = formRef.current;
+            if (!formEl) return;
+            handleSubmit(new FormData(formEl));
+        }, 2000);
+    }, [handleSubmit]);
+
+    // Cleanup timeout on unmount
+    useEffect(() => {
+        return () => {
+            if (saveTimeoutRef.current) {
+                clearTimeout(saveTimeoutRef.current);
+            }
+        };
+    }, []);
 
     // --- RENDER ---
     return (
@@ -199,7 +256,13 @@ export default function ProfileEditor({
                     </p>
                 </div>
 
-                <form action={handleSubmit} className="space-y-8">
+                <form
+                    ref={formRef}
+                    action={handleSubmit}
+                    onInputCapture={scheduleAutoSave}
+                    onChangeCapture={scheduleAutoSave}
+                    className="space-y-8"
+                >
                     {/* --- HIDDEN FORM DATA (Keep this purely functional) --- */}
                     <div className="hidden">
                         {myClubs.map((i) => (
@@ -219,7 +282,7 @@ export default function ProfileEditor({
                         ))}
                         <input type="hidden" name="postHighSchoolPlan" value={plan} />
                         <input type="hidden" name="interestedInNCAA" value={String(ncaa)} />
-                        <input type="hidden" name="studyHallsPerYear" value={studyHalls} />
+                        <input type="hidden" name="studyHallsPerYear" value={minStudyHalls} />
                         {/* Flatten subject interests for form submission if needed, or rely on component internal hidden inputs */}
                         {subjectInterests.map((s) => (
                             <input key={s} type="hidden" name="subjectInterests" value={s} />
@@ -232,13 +295,23 @@ export default function ProfileEditor({
                                     <input type="hidden" name="courseIds" value={i.id} />
                                     <input
                                         type="hidden"
-                                        name={`courseGrade_${i.id}`}
+                                        name="courseGrades"
                                         value={data?.grade || ""}
                                     />
                                     <input
                                         type="hidden"
-                                        name={`courseStatus_${i.id}`}
+                                        name="courseStatuses"
                                         value={data?.status || "IN_PROGRESS"}
+                                    />
+                                    <input
+                                        type="hidden"
+                                        name="courseConfidenceLevels"
+                                        value={data?.confidence || ""}
+                                    />
+                                    <input
+                                        type="hidden"
+                                        name="courseStressLevels"
+                                        value={data?.stress || ""}
                                     />
                                 </div>
                             );
@@ -255,18 +328,22 @@ export default function ProfileEditor({
                         <PathwaysSection
                             programs={allPrograms}
                             selectedProgramIds={selectedProgramIds}
-                            onToggle={(id) =>
+                            onToggle={(id) => {
+                                scheduleAutoSave();
                                 setSelectedProgramIds((prev) =>
                                     prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-                                )
-                            }
+                                );
+                            }}
                         />
                     </SectionCard>
 
                     <SectionCard>
                         <SubjectInterestsSection
                             subjectInterests={subjectInterests}
-                            onChange={setSubjectInterests}
+                            onChange={(next) => {
+                                scheduleAutoSave();
+                                setSubjectInterests(next);
+                            }}
                         />
                     </SectionCard>
 
@@ -274,11 +351,12 @@ export default function ProfileEditor({
                         <NationwideActsSection
                             acts={allNationwideActs}
                             selectedIds={selectedNationwideIds}
-                            onToggle={(id) =>
+                            onToggle={(id) => {
+                                scheduleAutoSave();
                                 setSelectedNationwideIds((prev) =>
                                     prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-                                )
-                            }
+                                );
+                            }}
                         />
                     </SectionCard>
 
@@ -289,24 +367,48 @@ export default function ProfileEditor({
                             ncaa={ncaa}
                             colleges={allColleges}
                             selectedCollegeIds={selectedCollegeIds}
-                            onPlanChange={setPlan}
-                            onCollegeToggle={(id) =>
+                            onPlanChange={(next) => {
+                                scheduleAutoSave();
+                                setPlan(next);
+                            }}
+                            onCollegeToggle={(id) => {
+                                scheduleAutoSave();
                                 setSelectedCollegeIds((prev) =>
                                     prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-                                )
-                            }
-                            onNcaaToggle={setNcaa}
+                                );
+                            }}
+                            onNcaaToggle={(next) => {
+                                scheduleAutoSave();
+                                setNcaa(next);
+                            }}
                         />
                     </SectionCard>
 
                     <SectionCard>
                         <StudyHallsSection
-                            studyHalls={studyHalls}
-                            minStudyHalls={student.studyHallsPerYear ? 1 : 0}
-                            maxStudyHalls={Math.max(2, student.studyHallsPerYear || 0)}
-                            onToggle={(checked) => setStudyHalls(checked ? 2 : 0)}
-                            onMinChange={() => {}} // Simplified for demo
-                            onMaxChange={() => {}} // Simplified for demo
+                            // StudyHallsSection uses `studyHalls > 0` as the "enabled" flag.
+                            // Use max/min so checked state actually reflects current range.
+                            studyHalls={Math.max(minStudyHalls, maxStudyHalls)}
+                            minStudyHalls={minStudyHalls}
+                            maxStudyHalls={maxStudyHalls}
+                            onToggle={(checked) => {
+                                scheduleAutoSave();
+                                if (checked) {
+                                    setMinStudyHalls(0);
+                                    setMaxStudyHalls(2);
+                                } else {
+                                    setMinStudyHalls(0);
+                                    setMaxStudyHalls(0);
+                                }
+                            }}
+                            onMinChange={(val) => {
+                                scheduleAutoSave();
+                                setMinStudyHalls(val);
+                            }}
+                            onMaxChange={(val) => {
+                                scheduleAutoSave();
+                                setMaxStudyHalls(val);
+                            }}
                         />
                     </SectionCard>
 
@@ -367,35 +469,27 @@ export default function ProfileEditor({
                                 "course"
                             )
                         }
-                        onRemove={(id) => removeItem(id, myCourses, setMyCourses)}
+                        onRemove={(id) => removeItem(id, myCourses, setMyCourses, "course")}
                         placeholder="Search and add a course..."
                         courseData={courseData}
-                        onCourseDataChange={setCourseData}
+                        onCourseDataChange={(data) => {
+                            scheduleAutoSave();
+                            setCourseData(data);
+                        }}
                         expandedCourses={expandedCourses}
                         onToggleCourseExpand={toggleCourseExpand}
                     />
 
-                    {/* --- FLOATING SAVE BAR --- */}
-                    <div className="fixed bottom-0 left-0 right-0 p-6 flex justify-center items-end pointer-events-none z-40">
-                        <div className="pointer-events-auto bg-white/90 backdrop-blur-md border border-slate-200 shadow-2xl rounded-full px-8 py-3 flex items-center gap-6 transform transition-all hover:scale-105">
-                            <span className="text-sm font-medium text-slate-500 hidden sm:inline">
-                                {isPending ? "Syncing changes..." : "Unsaved changes ready"}
-                            </span>
-                            <button
-                                type="submit"
-                                disabled={isPending}
-                                className={`
-                  px-8 py-2.5 rounded-full font-bold text-sm shadow-lg transition-all
-                  ${
-                      isPending
-                          ? "bg-slate-200 text-slate-500 cursor-not-allowed"
-                          : "bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-indigo-500/30 active:scale-95"
-                  }
-                `}
-                            >
+                    {/* --- FLOATING STATUS BAR --- */}
+                    {(hasUnsavedChanges || isPending) && (
+                        <div className="fixed bottom-0 left-0 right-0 p-6 flex justify-center items-end pointer-events-none z-40">
+                            <div className="pointer-events-auto bg-white/90 backdrop-blur-md border border-slate-200 shadow-2xl rounded-full px-8 py-3 flex items-center gap-3">
                                 {isPending ? (
-                                    <span className="flex items-center gap-2">
-                                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                                    <>
+                                        <svg
+                                            className="animate-spin h-5 w-5 text-indigo-600"
+                                            viewBox="0 0 24 24"
+                                        >
                                             <circle
                                                 className="opacity-25"
                                                 cx="12"
@@ -403,6 +497,7 @@ export default function ProfileEditor({
                                                 r="10"
                                                 stroke="currentColor"
                                                 strokeWidth="4"
+                                                fill="none"
                                             />
                                             <path
                                                 className="opacity-75"
@@ -410,14 +505,21 @@ export default function ProfileEditor({
                                                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                                             />
                                         </svg>
-                                        Saving...
-                                    </span>
+                                        <span className="text-sm font-medium text-slate-700">
+                                            Saving changes...
+                                        </span>
+                                    </>
                                 ) : (
-                                    "Save Changes"
+                                    <>
+                                        <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse" />
+                                        <span className="text-sm font-medium text-slate-700">
+                                            Unsaved changes
+                                        </span>
+                                    </>
                                 )}
-                            </button>
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </form>
             </div>
         </div>
@@ -515,8 +617,8 @@ function SectionTable({
                                                     className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
                                                         cData?.status === "COMPLETED"
                                                             ? "bg-green-500"
-                                                            : cData?.status === "DROPPED"
-                                                            ? "bg-red-400"
+                                                            : cData?.status === "NEXT_SEMESTER"
+                                                            ? "bg-yellow-400"
                                                             : "bg-blue-500"
                                                     }`}
                                                 />
@@ -570,8 +672,36 @@ function SectionTable({
                                     {isCourseSection && isExpanded && onCourseDataChange && (
                                         <div className="px-4 pb-4 pt-0 animate-fadeIn">
                                             <div className="h-px bg-indigo-100 w-full mb-4" />
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div>
+
+                                            {/* Status - Always shown first */}
+                                            <div className="mb-4">
+                                                <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
+                                                    Status
+                                                </label>
+                                                <select
+                                                    value={cData?.status || "IN_PROGRESS"}
+                                                    onChange={(e) => {
+                                                        const newData = new Map(courseData!);
+                                                        newData.set(item.id, {
+                                                            ...cData!,
+                                                            status: e.target.value,
+                                                        });
+                                                        onCourseDataChange(newData);
+                                                    }}
+                                                    className="w-full text-sm border-slate-200 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                                                >
+                                                    <option value="IN_PROGRESS">In Progress</option>
+                                                    <option value="COMPLETED">Completed</option>
+                                                    <option value="NEXT_SEMESTER">
+                                                        Next Semester
+                                                    </option>
+                                                </select>
+                                            </div>
+
+                                            {/* Grade - Only for COMPLETED or IN_PROGRESS */}
+                                            {(cData?.status === "COMPLETED" ||
+                                                cData?.status === "IN_PROGRESS") && (
+                                                <div className="mb-4">
                                                     <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
                                                         Grade
                                                     </label>
@@ -588,38 +718,119 @@ function SectionTable({
                                                         className="w-full text-sm border-slate-200 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
                                                     >
                                                         <option value="">--</option>
+                                                        <option value="A+">A+</option>
                                                         <option value="A">A</option>
+                                                        <option value="A-">A-</option>
+                                                        <option value="B+">B+</option>
                                                         <option value="B">B</option>
+                                                        <option value="B-">B-</option>
+                                                        <option value="C+">C+</option>
                                                         <option value="C">C</option>
+                                                        <option value="C-">C-</option>
+                                                        <option value="D+">D+</option>
                                                         <option value="D">D</option>
+                                                        <option value="D-">D-</option>
                                                         <option value="F">F</option>
                                                     </select>
                                                 </div>
-                                                <div>
+                                            )}
+
+                                            {/* Completed Grade Level - Only for COMPLETED */}
+                                            {cData?.status === "COMPLETED" && (
+                                                <div className="mb-4">
                                                     <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
-                                                        Status
+                                                        Completed in Grade
                                                     </label>
                                                     <select
-                                                        value={cData?.status || "IN_PROGRESS"}
+                                                        value={cData?.confidence || ""}
                                                         onChange={(e) => {
                                                             const newData = new Map(courseData!);
                                                             newData.set(item.id, {
                                                                 ...cData!,
-                                                                status: e.target.value,
+                                                                confidence: e.target.value,
                                                             });
                                                             onCourseDataChange(newData);
                                                         }}
                                                         className="w-full text-sm border-slate-200 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
                                                     >
-                                                        <option value="IN_PROGRESS">
-                                                            In Progress
+                                                        <option value="">--</option>
+                                                        <option value="middle">
+                                                            Middle School
                                                         </option>
-                                                        <option value="COMPLETED">Completed</option>
-                                                        <option value="PLANNED">Planned</option>
-                                                        <option value="DROPPED">Dropped</option>
+                                                        <option value="9">9th Grade</option>
+                                                        <option value="10">10th Grade</option>
+                                                        <option value="11">11th Grade</option>
+                                                        <option value="12">12th Grade</option>
                                                     </select>
                                                 </div>
-                                            </div>
+                                            )}
+
+                                            {/* Confidence and Stress Level - Only for IN_PROGRESS or NEXT_SEMESTER */}
+                                            {(cData?.status === "IN_PROGRESS" ||
+                                                cData?.status === "NEXT_SEMESTER") && (
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div>
+                                                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
+                                                            Confidence Level
+                                                        </label>
+                                                        <select
+                                                            value={cData?.confidence || ""}
+                                                            onChange={(e) => {
+                                                                const newData = new Map(
+                                                                    courseData!
+                                                                );
+                                                                newData.set(item.id, {
+                                                                    ...cData!,
+                                                                    confidence: e.target.value,
+                                                                });
+                                                                onCourseDataChange(newData);
+                                                            }}
+                                                            className="w-full text-sm border-slate-200 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                                                        >
+                                                            <option value="">--</option>
+                                                            <option value="VERY_LOW">
+                                                                Very Low
+                                                            </option>
+                                                            <option value="LOW">Low</option>
+                                                            <option value="NEUTRAL">Neutral</option>
+                                                            <option value="HIGH">High</option>
+                                                            <option value="VERY_HIGH">
+                                                                Very High
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
+                                                            Stress Level
+                                                        </label>
+                                                        <select
+                                                            value={cData?.stress || ""}
+                                                            onChange={(e) => {
+                                                                const newData = new Map(
+                                                                    courseData!
+                                                                );
+                                                                newData.set(item.id, {
+                                                                    ...cData!,
+                                                                    stress: e.target.value,
+                                                                });
+                                                                onCourseDataChange(newData);
+                                                            }}
+                                                            className="w-full text-sm border-slate-200 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                                                        >
+                                                            <option value="">--</option>
+                                                            <option value="VERY_LOW">
+                                                                Very Low
+                                                            </option>
+                                                            <option value="LOW">Low</option>
+                                                            <option value="NEUTRAL">Neutral</option>
+                                                            <option value="HIGH">High</option>
+                                                            <option value="VERY_HIGH">
+                                                                Very High
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </div>

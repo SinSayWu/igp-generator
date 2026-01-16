@@ -52,13 +52,13 @@ export function StudyHallsSection({
                             <div className="flex items-center gap-2">
                                 <input
                                     type="number"
-                                    min="1"
+                                    min="0"
                                     max="8"
                                     value={minStudyHalls}
                                     onChange={(e) => {
                                         const val = Math.max(
-                                            1,
-                                            Math.min(8, parseInt(e.target.value) || 1)
+                                            0,
+                                            Math.min(8, parseInt(e.target.value) || 0)
                                         );
                                         onMinChange(val);
                                     }}

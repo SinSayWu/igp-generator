@@ -16,10 +16,10 @@ export async function updateStudentProfile(userId: string, formData: FormData) {
 
     // NEW: Extract course data
     const courseIds = formData.getAll("courseIds") as string[];
-    const courseGrades = formData.getAll("courseGrade") as string[];
-    const courseStatuses = formData.getAll("courseStatus") as string[];
-    const courseConfidenceLevels = formData.getAll("courseConfidence") as string[];
-    const courseStressLevels = formData.getAll("courseStress") as string[];
+    const courseGrades = formData.getAll("courseGrades") as string[];
+    const courseStatuses = formData.getAll("courseStatuses") as string[];
+    const courseConfidenceLevels = formData.getAll("courseConfidenceLevels") as string[];
+    const courseStressLevels = formData.getAll("courseStressLevels") as string[];
 
     const interests = formData.getAll("interests") as string[];
     const subjectInterests = formData.getAll("subjectInterests") as string[];
