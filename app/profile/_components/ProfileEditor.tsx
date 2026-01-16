@@ -575,9 +575,21 @@ function SectionTable({
   expandedCourses,
   onToggleCourseExpand,
 }: SectionTableProps) {
+  // Filter out items that are already selected
   const availableItems = allRawItems.filter(
     (raw) => !items.some((existing) => existing.id === raw.id)
   );
+
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newVal = e.target.value;
+    onSelect(newVal);
+  };
+
+  const handleAddClick = () => {
+    if (selectedId) {
+      onAdd();
+    }
+  };
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-full">
@@ -623,10 +635,10 @@ function SectionTable({
                       {isCourseSection && (
                         <div
                           className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${cData?.status === "COMPLETED"
-                              ? "bg-green-500"
-                              : cData?.status === "NEXT_SEMESTER"
-                                ? "bg-yellow-400"
-                                : "bg-blue-500"
+                            ? "bg-green-500"
+                            : cData?.status === "NEXT_SEMESTER"
+                              ? "bg-yellow-400"
+                              : "bg-blue-500"
                             }`}
                         />
                       )}
@@ -852,7 +864,7 @@ function SectionTable({
             <div className="relative flex-1">
               <select
                 value={selectedId}
-                onChange={(e) => onSelect(e.target.value)}
+                onChange={handleSelectChange}
                 className="w-full pl-3 pr-8 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none bg-white transition-shadow"
               >
                 <option value="">{placeholder}</option>
@@ -888,7 +900,7 @@ function SectionTable({
 
             <button
               type="button"
-              onClick={onAdd}
+              onClick={handleAddClick}
               disabled={!selectedId}
               className={`
                 px-5 py-2.5 rounded-lg text-sm font-bold shadow-sm transition-all
