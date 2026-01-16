@@ -59,35 +59,41 @@ export default function Overview({ user }: OverviewProps) {
     100: "/Climb/100.png",
   };
 
+  const allStages = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
   const currentStage = Math.floor(calculatedProgress / 10) * 10;
-  const currentImage = imageMap[currentStage];
 
   function toggleGoal(id: string) {
     setGoals(prev => prev.map(g => (g.id === id ? { ...g, completed: !g.completed } : g)));
   }
 
-const overviewGoals = [...goals]
-  .filter(g => !g.completed)          // optional, but recommended
-  .sort((a, b) => b.weight - a.weight)
-  .slice(0, 5);
+  const overviewGoals = [...goals]
+    .sort((a, b) => b.weight - a.weight)
+    .slice(0, 5);
 
   return (
     <div className="flex flex-col gap-6">
-  <h2 className="text-2xl font-bold">Overview</h2>
-  <p className="text-gray-600">
-    See your top goals and tasks, track progress, and get a snapshot of your overall achievements.
-  </p>
+      <h2 className="text-2xl font-bold">Overview</h2>
+      <p className="text-gray-600">
+        See your top goals and tasks, track progress, and get a snapshot of your overall achievements.
+      </p>
 
       <div className="grid gap-6" style={{ gridTemplateColumns: "30% 70%" }}>
         <div className="border rounded-lg p-2 flex flex-col items-center justify-center">
-          <div className="border-4 border-gray-300 rounded-lg p-2 w-full h-full flex overflow-hidden">
-            <Image
-                src={currentImage}
-                alt={`Mountain Progress ${currentStage}%`}
-                width={400}
-                height={400}
-                className="object-cover rounded"
+          <div className="border-4 border-gray-300 rounded-lg p-2 w-full h-full flex overflow-hidden relative">
+            {allStages.map((stage) => (
+              <div
+                key={stage}
+                className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${currentStage === stage ? "opacity-100 z-10" : "opacity-0 z-0"
+                  }`}
+              >
+                <Image
+                  src={`/Climb/${stage}.png`}
+                  alt={`Mountain Progress ${stage}%`}
+                  fill
+                  className="object-cover rounded"
                 />
+              </div>
+            ))}
           </div>
           <p className="mt-2 font-semibold text-center"></p>
         </div>
@@ -97,21 +103,26 @@ const overviewGoals = [...goals]
           {overviewGoals.map(goal => (
             <div
               key={goal.id}
-              className={`flex items-center justify-between border p-4 rounded ${
-                goal.completed ? "bg-green-100" : ""
-              }`}
+              className={`flex items-center justify-between border p-4 rounded transition-all duration-300 ${goal.completed ? "bg-gray-50 opacity-60 relative" : ""
+                }`}
             >
-              <div>
+              {/* Strike-through line for completed items */}
+              {goal.completed && (
+                <div className="absolute inset-x-4 top-1/2 h-0.5 bg-gray-400 opacity-50 pointer-events-none" />
+              )}
+
+              <div className={`${goal.completed ? "opacity-50" : ""}`}>
                 <p className="font-semibold">{goal.title}</p>
                 <p className={`text-sm font-semibold ${getPriorityColor(goal.weight)}`}>
-                    Priority: {getPriorityLabel(goal.weight)}
-                  </p>
+                  Priority: {getPriorityLabel(goal.weight)}
+                </p>
               </div>
               <button
                 onClick={() => toggleGoal(goal.id)}
-                className={`px-4 py-2 font-bold rounded ${
-                  goal.completed ? "bg-gray-300 text-gray-600" : "bg-var(--button-color)"
-                }`}
+                className={`px-4 py-2 font-bold rounded z-20 ${goal.completed
+                    ? "bg-gray-200 text-gray-500 hover:bg-gray-300"
+                    : "bg-[var(--button-color)] hover:bg-[var(--button-color-2)]"
+                  }`}
               >
                 {goal.completed ? "Undo" : "Complete"}
               </button>
@@ -119,7 +130,7 @@ const overviewGoals = [...goals]
           ))}
         </div>
       </div>
-  </div>
+    </div>
   );
 
 }

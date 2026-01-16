@@ -92,7 +92,7 @@ export default async function AdminDashboard({ userId }: { userId: string }) {
           <div className="space-y-4 text-sm text-gray-600">
             <div className="flex justify-between border-b pb-2">
               <span>Database Status</span>
-              <span className="text-[var(--foreground-2)] font-medium">● Connected</span>
+              <span className="text-green-600 font-medium">● Connected</span>
             </div>
             <div className="flex justify-between border-b pb-2">
               <span>School Code (Student)</span>
