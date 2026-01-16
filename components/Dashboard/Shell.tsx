@@ -1,3 +1,9 @@
+"use client";
+
+import { useState } from "react";
+import Overview from "./Overview";
+import ClassesPage from "./Classes";
+
 type DashboardUser = {
   firstName: string;
   lastName: string;
@@ -11,45 +17,56 @@ type DashboardShellProps = {
 };
 
 export default function DashboardShell({ user, progress, children }: DashboardShellProps) {
+  const [activeTab, setActiveTab] = useState<"overview" | "classes" | "extracurriculars" | "schools" | "jobs" | "chatbot" | "goals">("overview");
+
   return (
     <div className="dashboard-wrapper min-h-screen flex flex-col">
       {/* Header */}
-      
       <header 
       style={{
         backgroundColor:"var(--background) ",
         color: "var(--foreground-2)",
         borderBottom: "2px solid var(--accent-background)" 
       }}
+      
       className="shadow p-4 flex justify-between items-center border-b-2 style={{var(--foreground-2) }}">
         
         {/*top row*/}
         <h1 className="text-3xl font-bold">Dashboard</h1>
          <div className="flex justify-between items-center"></div>
+    
     {/* Left: Navigation tabs */}
     <nav className="flex gap-6 text-xl font-bold">
-      <button className="border-b-2 border-[var(--accent-background)]">
-        Overview
+      <button className="border-b-2 border-[var(--accent-background)]"
+         onClick={() => setActiveTab("overview")}>
+         Overview
       </button>
-      <button className="opacity-70 hover:opacity-100"> 
+      <button className="opacity-70 hover:opacity-100"
+      onClick={() => setActiveTab("classes")}> 
         Classes
       </button>
-      <button className="opacity-70 hover:opacity-100">
+      <button className="opacity-70 hover:opacity-100"
+      onClick={() => setActiveTab("extracurriculars")}>
         Extracurriculars
       </button>
-      <button className="opacity-70 hover:opacity-100">
+      <button className="opacity-70 hover:opacity-100"
+      onClick={() => setActiveTab("schools")}>
         Schools
       </button>
-      <button className="opacity-70 hover:opacity-100">
+      <button className="opacity-70 hover:opacity-100"
+      onClick={() => setActiveTab("jobs")}>
         Jobs
       </button>
-      <button className="opacity-70 hover:opacity-100">
+      <button className="opacity-70 hover:opacity-100"
+      onClick={() => setActiveTab("chatbot")}>
         ChatBot
       </button>
-      <button className="opacity-70 hover:opacity-100">
+      <button className="opacity-70 hover:opacity-100"
+      onClick={() => setActiveTab("goals")}>
         Goals
       </button>
     </nav>
+
       <p className="text x1 font-bold">Welcome Back, {user.firstName}</p>
       
       </header>
@@ -57,7 +74,12 @@ export default function DashboardShell({ user, progress, children }: DashboardSh
       {/* Main content */}
       <main className=
       "flex-1 p-6 bg-white dark:bg-gray-100">
-        {children} {/* <-- panels from the page will render here */}
+        {activeTab === "overview" && <Overview user={user} />}
+        {activeTab === "classes" && <ClassesPage />}
+        {/*activeTab === "schools" && <SchoolsPage />}
+        {activeTab === "jobs" && <JobsPage />}
+        {activeTab === "goals" && <GoalsPage />}
+        {activeTab === "extracurriculars" && <ExtracurricularsPage />*/}
       </main>
 
       {/* Footer */}
