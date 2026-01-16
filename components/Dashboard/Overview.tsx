@@ -72,7 +72,6 @@ const overviewGoals = [...goals]
   .slice(0, 5);
 
   return (
-    <DashboardShell user={user} progress={calculatedProgress}>
       <div className="grid gap-6" style={{ gridTemplateColumns: "30% 70%" }}>
         <div className="border rounded-lg p-2 flex flex-col items-center justify-center">
           <div className="border-4 border-gray-300 rounded-lg p-2 w-full h-full flex overflow-hidden">
@@ -114,6 +113,5 @@ const overviewGoals = [...goals]
           ))}
         </div>
       </div>
-    </DashboardShell>
   );
 }

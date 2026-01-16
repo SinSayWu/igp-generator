@@ -1,7 +1,5 @@
 "use client";
 
-import DashboardShell from "@/components/Dashboard/Shell";
-
 type ClassItem = {
   id: string;
   name: string;
@@ -19,12 +17,6 @@ type SuggestedClass = {
 };
 
 export default function ClassesPage() {
-  const user = {
-    firstName: "user.firstName",
-    lastName: "user.lastName",
-    role: "student",
-  };
-
   const currentClasses: ClassItem[] = [
     { id: "c1", name: "AP Physics C", term: "Spring 2026", credits: 1, status: "current", grade: "A-" },
     { id: "c2", name: "AP Statistics", term: "Spring 2026", credits: 1, status: "current", grade: "A" },
@@ -58,8 +50,7 @@ export default function ClassesPage() {
   ];
 
   return (
-    <DashboardShell user={user} progress={0}>
-      <div className="flex flex-col gap-10">
+    <div className="flex flex-col gap-10">
 
         {/* Overview Bar */}
         <div className="grid grid-cols-3 gap-6 border rounded-lg p-6">
@@ -123,5 +114,4 @@ export default function ClassesPage() {
         </section>
 
       </div>
-</DashboardShell>
   )};

@@ -3,118 +3,175 @@
 import { useState } from "react";
 import Overview from "./Overview";
 import ClassesPage from "./Classes";
+import Extracurriculars from "./Extracurriculars";
+import Schools from "./Schools";
+import Jobs from "./Jobs";
+import Goals from "./Goals";
 
 type DashboardUser = {
-  firstName: string;
-  lastName: string;
-  role: string;
+    firstName: string;
+    lastName: string;
+    role: string;
 };
 
 type DashboardShellProps = {
-  user: DashboardUser;
-  progress: number; 
-  children?: React.ReactNode; // optional prop for inner content
+    user: DashboardUser;
+    progress: number;
+    children?: React.ReactNode; // optional prop for inner content
 };
 
 export default function DashboardShell({ user, progress, children }: DashboardShellProps) {
-  const [activeTab, setActiveTab] = useState<"overview" | "classes" | "extracurriculars" | "schools" | "jobs" | "chatbot" | "goals">("overview");
+    const [activeTab, setActiveTab] = useState<
+        "overview" | "classes" | "extracurriculars" | "schools" | "jobs" | "chatbot" | "goals"
+    >("overview");
 
-  return (
-    <div className="dashboard-wrapper min-h-screen flex flex-col">
-      {/* Header */}
-      <header 
-      style={{
-        backgroundColor:"var(--background) ",
-        color: "var(--foreground-2)",
-        borderBottom: "2px solid var(--accent-background)" 
-      }}
-      
-      className="shadow p-4 flex justify-between items-center border-b-2 style={{var(--foreground-2) }}">
-        
-        {/*top row*/}
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-         <div className="flex justify-between items-center"></div>
-    
-    {/* Left: Navigation tabs */}
-    <nav className="flex gap-6 text-xl font-bold">
-      <button className="border-b-2 border-[var(--accent-background)]"
-         onClick={() => setActiveTab("overview")}>
-         Overview
-      </button>
-      <button className="opacity-70 hover:opacity-100"
-      onClick={() => setActiveTab("classes")}> 
-        Classes
-      </button>
-      <button className="opacity-70 hover:opacity-100"
-      onClick={() => setActiveTab("extracurriculars")}>
-        Extracurriculars
-      </button>
-      <button className="opacity-70 hover:opacity-100"
-      onClick={() => setActiveTab("schools")}>
-        Schools
-      </button>
-      <button className="opacity-70 hover:opacity-100"
-      onClick={() => setActiveTab("jobs")}>
-        Jobs
-      </button>
-      <button className="opacity-70 hover:opacity-100"
-      onClick={() => setActiveTab("chatbot")}>
-        ChatBot
-      </button>
-      <button className="opacity-70 hover:opacity-100"
-      onClick={() => setActiveTab("goals")}>
-        Goals
-      </button>
-    </nav>
+    return (
+        <div className="dashboard-wrapper min-h-screen flex flex-col">
+            {/* Header */}
+            <header
+                style={{
+                    backgroundColor: "var(--background)",
+                    color: "var(--foreground-2)",
+                    borderBottom: "2px solid var(--accent-background)",
+                }}
+                className="shadow p-4 border-b-2"
+            >
+                {/* Top row with title and welcome message */}
+                <div className="flex justify-between items-center mb-4">
+                    <h1 className="text-3xl font-bold">Dashboard</h1>
+                    <p className="text-xl font-bold">Welcome Back, {user.firstName}</p>
+                </div>
 
-      <p className="text x1 font-bold">Welcome Back, {user.firstName}</p>
-      
-      </header>
+                {/* Navigation tabs */}
+                <nav className="flex gap-6 text-xl font-bold">
+                    <button
+                        className={
+                            activeTab === "overview"
+                                ? "border-b-2 border-[var(--accent-background)]"
+                                : "opacity-70 hover:opacity-100"
+                        }
+                        onClick={() => setActiveTab("overview")}
+                    >
+                        Overview
+                    </button>
+                    <button
+                        className={
+                            activeTab === "classes"
+                                ? "border-b-2 border-[var(--accent-background)]"
+                                : "opacity-70 hover:opacity-100"
+                        }
+                        onClick={() => setActiveTab("classes")}
+                    >
+                        Classes
+                    </button>
+                    <button
+                        className={
+                            activeTab === "extracurriculars"
+                                ? "border-b-2 border-[var(--accent-background)]"
+                                : "opacity-70 hover:opacity-100"
+                        }
+                        onClick={() => setActiveTab("extracurriculars")}
+                    >
+                        Extracurriculars
+                    </button>
+                    <button
+                        className={
+                            activeTab === "schools"
+                                ? "border-b-2 border-[var(--accent-background)]"
+                                : "opacity-70 hover:opacity-100"
+                        }
+                        onClick={() => setActiveTab("schools")}
+                    >
+                        Schools
+                    </button>
+                    <button
+                        className={
+                            activeTab === "jobs"
+                                ? "border-b-2 border-[var(--accent-background)]"
+                                : "opacity-70 hover:opacity-100"
+                        }
+                        onClick={() => setActiveTab("jobs")}
+                    >
+                        Jobs
+                    </button>
+                    <button
+                        className={
+                            activeTab === "chatbot"
+                                ? "border-b-2 border-[var(--accent-background)]"
+                                : "opacity-70 hover:opacity-100"
+                        }
+                        onClick={() => setActiveTab("chatbot")}
+                    >
+                        ChatBot
+                    </button>
+                    <button
+                        className={
+                            activeTab === "goals"
+                                ? "border-b-2 border-[var(--accent-background)]"
+                                : "opacity-70 hover:opacity-100"
+                        }
+                        onClick={() => setActiveTab("goals")}
+                    >
+                        Goals
+                    </button>
+                </nav>
+            </header>
 
-      {/* Main content */}
-      <main className=
-      "flex-1 p-6 bg-white dark:bg-gray-100">
-        {activeTab === "overview" && <Overview user={user} />}
-        {activeTab === "classes" && <ClassesPage />}
-        {/*activeTab === "schools" && <SchoolsPage />}
-        {activeTab === "jobs" && <JobsPage />}
-        {activeTab === "goals" && <GoalsPage />}
-        {activeTab === "extracurriculars" && <ExtracurricularsPage />*/}
-      </main>
+            {/* Main content */}
+            <main className="flex-1 p-6 bg-white dark:bg-gray-100">
+                {activeTab === "overview" && <Overview user={user} />}
+                {activeTab === "classes" && <ClassesPage />}
+                {activeTab === "extracurriculars" && <Extracurriculars />}
+                {activeTab === "schools" && <Schools />}
+                {activeTab === "jobs" && <Jobs />}
+                {activeTab === "goals" && <Goals />}
+                {activeTab === "chatbot" && (
+                    <div className="flex flex-col gap-6">
+                        <h2 className="text-2xl font-bold">AI ChatBot</h2>
+                        <p className="text-gray-600">
+                            Get personalized guidance and advice from our AI assistant.
+                        </p>
+                        <div className="border rounded-lg p-6 text-center text-gray-500">
+                            <p>ChatBot feature coming soon...</p>
+                        </div>
+                    </div>
+                )}
+            </main>
 
-      {/* Footer */}
-      <footer 
-      style={{backgroundColor:"var(--background) ",
-      color: "black",
-      borderTop: "2px solid var(--accent-background)" }}
-      className="bg-white dark:bg-gray-100 p-4 text-center text-sm">
-       {/* {/* Progress bar */}
-  <div className="w-full">
-    <div className="relative h-4 rounded-full bg-gray-200 overflow-hidden">
-      {/* Filled portion */}
-      <div
-        className="h-full transition-all duration-500"
-        style={{
-          width: `${progress}%`,
-          backgroundColor: "var(--accent-background)",
-        }}
-      />
+            {/* Footer */}
+            <footer
+                style={{
+                    backgroundColor: "var(--background) ",
+                    color: "black",
+                    borderTop: "2px solid var(--accent-background)",
+                }}
+                className="bg-white dark:bg-gray-100 p-4 text-center text-sm"
+            >
+                {/* {/* Progress bar */}
+                <div className="w-full">
+                    <div className="relative h-4 rounded-full bg-gray-200 overflow-hidden">
+                        {/* Filled portion */}
+                        <div
+                            className="h-full transition-all duration-500"
+                            style={{
+                                width: `${progress}%`,
+                                backgroundColor: "var(--accent-background)",
+                            }}
+                        />
 
-      {/* Notches every 10% */}
-      {[...Array(11)].map((_, i) => (
-        <div
-          key={i}
-          className="absolute top-0 h-full w-[2px] bg-white/70"
-          style={{ left: `${i * 10}%` }}
-        />
-      ))}
-    </div>
+                        {/* Notches every 10% */}
+                        {[...Array(11)].map((_, i) => (
+                            <div
+                                key={i}
+                                className="absolute top-0 h-full w-[2px] bg-white/70"
+                                style={{ left: `${i * 10}%` }}
+                            />
+                        ))}
+                    </div>
 
-    <p className="text-sm mt-1 font-bold">
-      Overall Progress: {progress}%
-    </p>
-  </div>
-      </footer>
-    </div>
-  );
+                    <p className="text-sm mt-1 font-bold">Overall Progress: {progress}%</p>
+                </div>
+            </footer>
+        </div>
+    );
 }

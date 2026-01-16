@@ -3,26 +3,29 @@ import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import DashboardShell from "@/components/Dashboard/Shell";
-import Overview from "@/components/Dashboard/Overview"; // client component
-
 
 export default async function DashboardPage() {
-  const cookieStore = await cookies();
-  const sessionId = cookieStore.get("session")?.value;
-  if (!sessionId) redirect("/");
+    const cookieStore = await cookies();
+    const sessionId = cookieStore.get("session")?.value;
+    if (!sessionId) redirect("/");
 
-  const session = await getSession(sessionId);
-  if (!session) redirect("/");
+    const session = await getSession(sessionId);
+    if (!session) redirect("/");
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.userId },
-    include: {
-      student: true,
-      admin: true,
-    },
-  });
+    const user = await prisma.user.findUnique({
+        where: { id: session.userId },
+        include: {
+            student: true,
+            admin: true,
+        },
+    });
 
-  if (!user) redirect("/");
+    if (!user) redirect("/");
 
-  return <Overview user={{ firstName: user.firstName, lastName: user.lastName, role: user.role }} />;
+    return (
+        <DashboardShell
+            user={{ firstName: user.firstName, lastName: user.lastName, role: user.role }}
+            progress={0}
+        />
+    );
 }
