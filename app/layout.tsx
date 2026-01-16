@@ -44,9 +44,9 @@ export default function RootLayout({
             lang="en"
             className={`${geistSans.variable} ${geistMono.variable} ${raleway.variable} ${poppins.variable}`}
         >
-            <body className="antialiased">
+            <body className="antialiased w-full overflow-x-hidden">
                 <Navbar />
-                {children}
+                <div className="w-full max-w-full">{children}</div>
             </body>
         </html>
     );

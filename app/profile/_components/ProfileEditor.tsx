@@ -1,18 +1,35 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { updateStudentProfile } from "@/app/actions/update-profile";
-// We import the specific types from Prisma so TS knows exactly what fields exist
-import { Club, Sport, Course, Student, College, NationwideAct, Program } from "@prisma/client";
+import { useState, useTransition, ReactNode } from "react";
+import {
+  Club,
+  Sport,
+  Course,
+  Student,
+  College,
+  NationwideAct,
+  Program,
+  StudentCourse,
+} from "@prisma/client";
 
-// --- TYPES ---
+import { updateStudentProfile } from "@/app/actions/update-profile";
+// Assuming these are your existing section components
+import { AboutMeSection } from "./sections/AboutMeSection";
+import { PathwaysSection } from "./sections/PathwaysSection";
+import { SubjectInterestsSection } from "./sections/SubjectInterestsSection";
+import { NationwideActsSection } from "./sections/NationwideActsSection";
+import { FutureePlansSection } from "./sections/FuturePlansSection";
+import { StudyHallsSection } from "./sections/StudyHallsSection";
+
+// --- TYPES & INTERFACES ---
+
 type StudentWithRelations = Student & {
   clubs: Club[];
   sports: Sport[];
-  courses: Course[];
+  studentCourses: (StudentCourse & { course: Course })[];
   targetColleges: College[];
   nationwideActs: NationwideAct[];
-  focusPrograms: Program[]; // <--- NEW RELATION
+  focusPrograms: Program[];
 };
 
 type Props = {
@@ -23,103 +40,150 @@ type Props = {
   allCourses: Course[];
   allColleges: College[];
   allNationwideActs: NationwideAct[];
-  allPrograms: Program[]; // <--- NEW PROP
+  allPrograms: Program[];
 };
 
 interface SelectableItem {
   id: string;
   name: string;
   detail?: string | null;
+  type?: "club" | "sport" | "course"; // Added for specific icon/badge styling
 }
 
-// Union type for the raw items we might pass to tables
 type RawActivityItem = Club | Sport | Course;
 
+// --- UTILITY COMPONENTS ---
+
+/**
+ * A reusable wrapper to ensure every section (even imported ones)
+ * looks consistent, clean, and "pixel-perfect".
+ */
+const SectionCard = ({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) => (
+  <div
+    className={`bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden transition-all hover:shadow-md ${className}`}
+  >
+    <div className="p-6 sm:p-8">{children}</div>
+  </div>
+);
+
+// --- MAIN COMPONENT ---
+
 export default function ProfileEditor({
-  userId, student, allClubs, allSports, allCourses, allColleges, allNationwideActs, allPrograms
+  userId,
+  student,
+  allClubs,
+  allSports,
+  allCourses,
+  allColleges,
+  allNationwideActs,
+  allPrograms,
 }: Props) {
   const [isPending, startTransition] = useTransition();
 
-  // --- STATE ---
+  // 1. Core Profile State
   const [plan, setPlan] = useState(student.postHighSchoolPlan || "");
   const [ncaa, setNcaa] = useState(student.interestedInNCAA);
+  const [studyHalls, setStudyHalls] = useState(student.studyHallsPerYear || 0);
 
-  // Nationwide Acts State
+  // 2. Course Data State (Grades, Stress, etc.)
+  const [courseData, setCourseData] = useState<
+    Map<
+      string,
+      { grade?: string; status: string; confidence?: string; stress?: string }
+    >
+  >(
+    new Map(
+      student.studentCourses.map((sc) => [
+        sc.courseId,
+        {
+          grade: sc.grade || undefined,
+          status: sc.status || "IN_PROGRESS",
+          confidence: sc.confidenceLevel || undefined,
+          stress: sc.stressLevel || undefined,
+        },
+      ])
+    )
+  );
+
+  // 3. Selection States
+  const [subjectInterests, setSubjectInterests] = useState<string[]>(
+    student.subjectInterests || []
+  );
   const [selectedNationwideIds, setSelectedNationwideIds] = useState<string[]>(
-    student.nationwideActs.map(act => act.id)
+    student.nationwideActs.map((act) => act.id)
   );
-
-  const handleNationwideToggle = (id: string) => {
-    setSelectedNationwideIds(prev =>
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-    );
-  };
-
-  // Program/Pathways State
   const [selectedProgramIds, setSelectedProgramIds] = useState<string[]>(
-    student.focusPrograms.map(p => p.id)
+    student.focusPrograms.map((p) => p.id)
   );
-
-  const handleProgramToggle = (id: string) => {
-    setSelectedProgramIds(prev =>
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-    );
-  };
-
-  // College Selection State
   const [selectedCollegeIds, setSelectedCollegeIds] = useState<string[]>(
-    student.targetColleges.map(c => c.id)
+    student.targetColleges.map((c) => c.id)
   );
 
-  const handleCollegeToggle = (id: string) => {
-    setSelectedCollegeIds(prev =>
-      prev.includes(id) ? prev.filter(cid => cid !== id) : [...prev, id]
-    );
+  // 4. Activity Lists & Logic
+  const formatItem = (
+    item: RawActivityItem,
+    type: "club" | "sport" | "course"
+  ): SelectableItem => {
+    let detail: string | null = null;
+    if ("category" in item) detail = item.category;
+    else if ("season" in item) detail = item.season;
+    else if ("department" in item) detail = item.department;
+
+    return { id: item.id, name: item.name, detail, type };
   };
 
-  // --- ACTIVITY TABLE HELPERS ---
-  const getDetail = (item: RawActivityItem): string | null => {
-    if ("category" in item) return item.category;
-    if ("season" in item) return item.season;
-    if ("department" in item) return item.department;
-    return null;
-  };
+  const [myClubs, setMyClubs] = useState<SelectableItem[]>(
+    student.clubs.map((i) => formatItem(i, "club"))
+  );
+  const [mySports, setMySports] = useState<SelectableItem[]>(
+    student.sports.map((i) => formatItem(i, "sport"))
+  );
+  const [myCourses, setMyCourses] = useState<SelectableItem[]>(
+    student.studentCourses.map((i) => formatItem(i.course, "course"))
+  );
 
-  const formatItem = (item: RawActivityItem): SelectableItem => {
-    return { id: item.id, name: item.name, detail: getDetail(item) };
-  };
-
-  const [myClubs, setMyClubs] = useState<SelectableItem[]>(student.clubs.map(formatItem));
-  const [mySports, setMySports] = useState<SelectableItem[]>(student.sports.map(formatItem));
-  const [myCourses, setMyCourses] = useState<SelectableItem[]>(student.courses.map(formatItem));
-
-  // Dropdown states for activities
   const [selClub, setSelClub] = useState("");
   const [selSport, setSelSport] = useState("");
   const [selCourse, setSelCourse] = useState("");
 
-  // STRICTLY TYPED Add Helper
+  const [expandedCourses, setExpandedCourses] = useState<Set<string>>(
+    new Set()
+  );
+
+  // Helpers
+  const toggleCourseExpand = (courseId: string) => {
+    const newSet = new Set(expandedCourses);
+    newSet.has(courseId) ? newSet.delete(courseId) : newSet.add(courseId);
+    setExpandedCourses(newSet);
+  };
+
   const addItem = (
     id: string,
     sourceList: RawActivityItem[],
     currentList: SelectableItem[],
     setList: (items: SelectableItem[]) => void,
-    reset: (val: string) => void
+    reset: (val: string) => void,
+    type: "club" | "sport" | "course"
   ) => {
     const raw = sourceList.find((i) => i.id === id);
-    if (raw && !currentList.some(i => i.id === id)) {
-      setList([...currentList, formatItem(raw)]);
+    if (raw && !currentList.some((i) => i.id === id)) {
+      setList([...currentList, formatItem(raw, type)]);
       reset("");
     }
   };
 
-  // STRICTLY TYPED Remove Helper
   const removeItem = (
     id: string,
     currentList: SelectableItem[],
     setList: (items: SelectableItem[]) => void
   ) => {
-    setList(currentList.filter(i => i.id !== id));
+    setList(currentList.filter((i) => i.id !== id));
   };
 
   const handleSubmit = (formData: FormData) => {
@@ -128,302 +192,529 @@ export default function ProfileEditor({
     });
   };
 
+  // --- RENDER ---
   return (
-    <div className="max-w-4xl mx-auto p-6 pb-24">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Student Profile</h1>
-        <p className="text-gray-600">Update your IGP, interests, and future plans.</p>
-      </div>
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-800 pb-40">
+      {/* Decorative Top Bar */}
+      <div className="h-2 w-full bg-gradient-to-r from-blue-600 to-indigo-600 fixed top-0 z-50" />
 
-      <form action={handleSubmit} className="space-y-8">
-
-        {/* Hidden Inputs for Relations */}
-        {myClubs.map(i => <input key={i.id} type="hidden" name="clubIds" value={i.id} />)}
-        {mySports.map(i => <input key={i.id} type="hidden" name="sportIds" value={i.id} />)}
-        {myCourses.map(i => <input key={i.id} type="hidden" name="courseIds" value={i.id} />)}
-
-        {/* Hidden Inputs for Nationwide Acts */}
-        {selectedNationwideIds.map(id => <input key={id} type="hidden" name="nationwideActIds" value={id} />)}
-
-        {/* Hidden Inputs for Programs */}
-        {selectedProgramIds.map(id => <input key={id} type="hidden" name="programIds" value={id} />)}
-
-        {/* ================= SECTION 1: BIO ================= */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-          <h2 className="text-xl font-bold mb-4 text-gray-800">About Me</h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Grade Level</label>
-              <select name="gradeLevel" defaultValue={student.gradeLevel || 9} className="w-full border p-2 rounded-lg">
-                <option value="9">Freshman (9th)</option>
-                <option value="10">Sophomore (10th)</option>
-                <option value="11">Junior (11th)</option>
-                <option value="12">Senior (12th)</option>
-              </select>
-            </div>
-            <div className="md:col-span-2">
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Bio</label>
-              <textarea name="bio" defaultValue={student.bio || ""} className="w-full border p-2 rounded-lg h-24" placeholder="Tell us about yourself..." />
-            </div>
-          </div>
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Header Section */}
+        <div className="mb-10 text-center sm:text-left">
+          <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 mb-3">
+            Your Student Profile
+          </h1>
+          <p className="text-lg text-slate-500 max-w-2xl">
+            Design your future. Update your IGP, track your activities, and plan
+            your path to college and career success.
+          </p>
         </div>
 
-        {/* ================= SECTION 2: PATHWAYS & PROGRAMS (NEW) ================= */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-          <h2 className="text-xl font-bold mb-4 text-gray-800">Pathways & Elective Focus</h2>
-          <p className="text-sm text-gray-500 mb-4">Select the specialized programs or pathways you are currently pursuing at your school.</p>
+        <form action={handleSubmit} className="space-y-8">
+          {/* --- HIDDEN FORM DATA (Keep this purely functional) --- */}
+          <div className="hidden">
+            {myClubs.map((i) => (
+              <input key={i.id} type="hidden" name="clubIds" value={i.id} />
+            ))}
+            {mySports.map((i) => (
+              <input key={i.id} type="hidden" name="sportIds" value={i.id} />
+            ))}
+            {selectedNationwideIds.map((id) => (
+              <input
+                key={id}
+                type="hidden"
+                name="nationwideActIds"
+                value={id}
+              />
+            ))}
+            {selectedProgramIds.map((id) => (
+              <input key={id} type="hidden" name="programIds" value={id} />
+            ))}
+            {selectedCollegeIds.map((id) => (
+              <input key={id} type="hidden" name="collegeIds" value={id} />
+            ))}
+            <input type="hidden" name="postHighSchoolPlan" value={plan} />
+            <input type="hidden" name="interestedInNCAA" value={String(ncaa)} />
+            <input type="hidden" name="studyHallsPerYear" value={studyHalls} />
+            {/* Flatten subject interests for form submission if needed, or rely on component internal hidden inputs */}
+            {subjectInterests.map((s) => (
+              <input key={s} type="hidden" name="subjectInterests" value={s} />
+            ))}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {allPrograms.map((prog) => {
-              const isSelected = selectedProgramIds.includes(prog.id);
+            {myCourses.map((i) => {
+              const data = courseData.get(i.id);
               return (
-                <div
-                  key={prog.id}
-                  onClick={() => handleProgramToggle(prog.id)}
-                  className={`
-                    cursor-pointer p-4 rounded-lg border transition-all select-none
-                    ${isSelected ? "bg-[var(--button-color)] border-[var(--foreground-2)] shadow-sm" : "border-gray-200 hover:bg-gray-50"}
-                  `}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className={`mt-1 w-5 h-5 rounded-full border flex items-center justify-center ${isSelected ? "bg-[var(--foreground-2)] border-[var(--foreground-2)]" : "border-gray-400"}`}>
-                      {isSelected && (
-                        <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                        </svg>
-                      )}
-                    </div>
-                    <div>
-                      <h3 className={`font-bold ${isSelected ? "text-[var(--foreground-2)]" : "text-gray-800"}`}>{prog.name}</h3>
-                      {prog.description && <p className="text-xs text-gray-500 mt-1">{prog.description}</p>}
-                    </div>
-                  </div>
+                <div key={i.id}>
+                  <input type="hidden" name="courseIds" value={i.id} />
+                  <input
+                    type="hidden"
+                    name={`courseGrade_${i.id}`}
+                    value={data?.grade || ""}
+                  />
+                  <input
+                    type="hidden"
+                    name={`courseStatus_${i.id}`}
+                    value={data?.status || "IN_PROGRESS"}
+                  />
                 </div>
               );
             })}
           </div>
-        </div>
 
-        {/* ================= SECTION 3: NATIONWIDE PROGRAMS ================= */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-          <h2 className="text-xl font-bold mb-4 text-gray-800">Nationwide Organizations</h2>
-          <p className="text-sm text-gray-500 mb-4">Select any major national organizations you are actively involved in.</p>
+          {/* --- MAIN SECTIONS WRAPPED IN CARDS --- */}
 
-          <div className="flex flex-wrap gap-3">
-            {allNationwideActs.map((act) => {
-              const isSelected = selectedNationwideIds.includes(act.id);
-              return (
-                <button
-                  key={act.id}
-                  type="button"
-                  onClick={() => handleNationwideToggle(act.id)}
-                  className={`
-                    px-4 py-2 rounded-full text-sm font-bold transition-all
-                    ${isSelected ? act.color + " shadow-md scale-105" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}
-                  `}
-                >
-                  {act.name}
-                  {isSelected && <span className="ml-2">✓</span>}
-                </button>
-              );
-            })}
+          <SectionCard>
+            <AboutMeSection student={student} />
+          </SectionCard>
+
+          <SectionCard>
+            <PathwaysSection
+              programs={allPrograms}
+              selectedProgramIds={selectedProgramIds}
+              onToggle={(id) =>
+                setSelectedProgramIds((prev) =>
+                  prev.includes(id)
+                    ? prev.filter((x) => x !== id)
+                    : [...prev, id]
+                )
+              }
+            />
+          </SectionCard>
+
+          <SectionCard>
+            <SubjectInterestsSection
+              subjectInterests={subjectInterests}
+              onChange={setSubjectInterests}
+            />
+          </SectionCard>
+
+          <SectionCard>
+            <NationwideActsSection
+              acts={allNationwideActs}
+              selectedIds={selectedNationwideIds}
+              onToggle={(id) =>
+                setSelectedNationwideIds((prev) =>
+                  prev.includes(id)
+                    ? prev.filter((x) => x !== id)
+                    : [...prev, id]
+                )
+              }
+            />
+          </SectionCard>
+
+          {/* Note: Ensure FuturePlansSection uses <h3> for headers so they pop inside the card */}
+          <SectionCard className="border-l-4 border-l-indigo-500">
+            <FutureePlansSection
+              plan={plan}
+              ncaa={ncaa}
+              colleges={allColleges}
+              selectedCollegeIds={selectedCollegeIds}
+              onPlanChange={setPlan}
+              onCollegeToggle={(id) =>
+                setSelectedCollegeIds((prev) =>
+                  prev.includes(id)
+                    ? prev.filter((x) => x !== id)
+                    : [...prev, id]
+                )
+              }
+              onNcaaToggle={setNcaa}
+            />
+          </SectionCard>
+
+          <SectionCard>
+            <StudyHallsSection
+              studyHalls={studyHalls}
+              minStudyHalls={student.studyHallsPerYear ? 1 : 0}
+              maxStudyHalls={Math.max(2, student.studyHallsPerYear || 0)}
+              onToggle={(checked) => setStudyHalls(checked ? 2 : 0)}
+              onMinChange={() => {}} // Simplified for demo
+              onMaxChange={() => {}} // Simplified for demo
+            />
+          </SectionCard>
+
+          {/* --- ACTIVITIES & COURSES SECTION --- */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <SectionTable
+              title="Sports"
+              icon="🏆"
+              items={mySports}
+              allRawItems={allSports}
+              selectedId={selSport}
+              onSelect={setSelSport}
+              onAdd={() =>
+                addItem(
+                  selSport,
+                  allSports,
+                  mySports,
+                  setMySports,
+                  setSelSport,
+                  "sport"
+                )
+              }
+              onRemove={(id) => removeItem(id, mySports, setMySports)}
+              placeholder="Select a sport..."
+            />
+
+            <SectionTable
+              title="Clubs & Activities"
+              icon="🎭"
+              items={myClubs}
+              allRawItems={allClubs}
+              selectedId={selClub}
+              onSelect={setSelClub}
+              onAdd={() =>
+                addItem(
+                  selClub,
+                  allClubs,
+                  myClubs,
+                  setMyClubs,
+                  setSelClub,
+                  "club"
+                )
+              }
+              onRemove={(id) => removeItem(id, myClubs, setMyClubs)}
+              placeholder="Select a club..."
+            />
           </div>
-        </div>
 
-        {/* ================= SECTION 4: FUTURE PLANS ================= */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-          <h2 className="text-xl font-bold mb-4 text-gray-800">Post-High School Plans</h2>
+          {/* Full width for courses */}
+          <SectionTable
+            title="Academic Courses"
+            icon="📚"
+            isCourseSection
+            items={myCourses}
+            allRawItems={allCourses}
+            selectedId={selCourse}
+            onSelect={setSelCourse}
+            onAdd={() =>
+              addItem(
+                selCourse,
+                allCourses,
+                myCourses,
+                setMyCourses,
+                setSelCourse,
+                "course"
+              )
+            }
+            onRemove={(id) => removeItem(id, myCourses, setMyCourses)}
+            placeholder="Search and add a course..."
+            courseData={courseData}
+            onCourseDataChange={setCourseData}
+            expandedCourses={expandedCourses}
+            onToggleCourseExpand={toggleCourseExpand}
+          />
 
-          <select
-            name="postHighSchoolPlan"
-            value={plan}
-            onChange={(e) => setPlan(e.target.value)}
-            className="w-full border p-2 rounded-lg mb-6"
-          >
-            <option value="">-- Select a Plan --</option>
-            <option value="College">Four-Year College / University</option>
-            <option value="Vocational">Technical College / Vocational</option>
-            <option value="Workforce">Workforce</option>
-            <option value="Military">Military</option>
-          </select>
-
-          {/* COLLEGE SELECTION GRID */}
-          {(plan === "College" || plan === "Vocational") && (
-            <div className="bg-[var(--button-color)] p-5 rounded-lg border border-[var(--button-color-2)]">
-              <label className="block text-sm font-bold text-black mb-3">
-                Select Target Colleges
-              </label>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {allColleges
-                  // --- FILTERING LOGIC ---
-                  .filter((college) => {
-                    // 1. If Vocational, only show Technical colleges
-                    if (plan === "Vocational") return college.type === "Technical";
-
-                    // 2. If College, only show Universities
-                    if (plan === "College") return college.type === "University";
-
-                    // 3. Fallback (Show all if something weird happens)
-                    return true;
-                  })
-                  .map((college) => {
-                    const isChecked = selectedCollegeIds.includes(college.id);
-                    return (
-                      <div key={college.id} className={`p-4 rounded-lg border transition-all ${isChecked ? "bg-white border-[var(--foreground-2)] shadow-sm" : "border-transparent hover:bg-white/50"}`}>
-                        {/* Checkbox Line */}
-                        <label className="flex items-center space-x-3 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            name="collegeIds"
-                            value={college.id}
-                            checked={isChecked}
-                            onChange={() => handleCollegeToggle(college.id)}
-                            className="h-5 w-5 rounded text-[var(--foreground-2)] focus:ring-[var(--foreground-2)]"
-                          />
-                          <span className="font-semibold text-gray-800 text-lg">{college.name}</span>
-                        </label>
-
-                        {/* REQUIREMENTS & SUGGESTIONS DISPLAY */}
-                        {isChecked && (
-                          <div className="mt-3 ml-8 text-xs text-gray-600 space-y-3 border-l-2 border-gray-100 pl-3">
-
-                            {/* 1. Absolute Requirements */}
-                            <div>
-                              <p className="font-bold text-red-700 uppercase tracking-wide mb-1 flex items-center gap-1">
-                                <span className="w-1.5 h-1.5 bg-red-500 rounded-full inline-block"></span>
-                                Minimum Requirements
-                              </p>
-                              <ul className="list-disc pl-4 space-y-0.5">
-                                {college.requirements.map((req, i) => (
-                                  <li key={i}>{req}</li>
-                                ))}
-                              </ul>
-                            </div>
-
-                            {/* 2. Suggestions (Rigor) - Only show if they exist */}
-                            {college.suggestions.length > 0 && (
-                              <div>
-                                <p className="font-bold text-[var(--foreground-2)] uppercase tracking-wide mb-1 flex items-center gap-1">
-                                  <span className="w-1.5 h-1.5 bg-[var(--foreground-2)] rounded-full inline-block"></span>
-                                  Rigor & Recommendations
-                                </p>
-                                <ul className="list-disc pl-4 space-y-0.5">
-                                  {college.suggestions.map((sug, i) => (
-                                    <li key={i}>{sug}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-              </div>
-
-              {/* NCAA Toggle */}
-              <div className="mt-6 pt-4 border-t border-[var(--button-color-2)] flex items-center space-x-3">
-                <input
-                  type="checkbox" name="interestedInNCAA"
-                  checked={ncaa} onChange={(e) => setNcaa(e.target.checked)}
-                  className="h-5 w-5 rounded text-[var(--foreground-2)]"
-                />
-                <span className="text-sm font-medium text-gray-800">I am interested in NCAA Sports Recruiting</span>
-              </div>
+          {/* --- FLOATING SAVE BAR --- */}
+          <div className="fixed bottom-0 left-0 right-0 p-6 flex justify-center items-end pointer-events-none z-40">
+            <div className="pointer-events-auto bg-white/90 backdrop-blur-md border border-slate-200 shadow-2xl rounded-full px-8 py-3 flex items-center gap-6 transform transition-all hover:scale-105">
+              <span className="text-sm font-medium text-slate-500 hidden sm:inline">
+                {isPending ? "Syncing changes..." : "Unsaved changes ready"}
+              </span>
+              <button
+                type="submit"
+                disabled={isPending}
+                className={`
+                  px-8 py-2.5 rounded-full font-bold text-sm shadow-lg transition-all
+                  ${
+                    isPending
+                      ? "bg-slate-200 text-slate-500 cursor-not-allowed"
+                      : "bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-indigo-500/30 active:scale-95"
+                  }
+                `}
+              >
+                {isPending ? (
+                  <span className="flex items-center gap-2">
+                    <svg
+                      className="animate-spin h-4 w-4"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                      />
+                    </svg>
+                    Saving...
+                  </span>
+                ) : (
+                  "Save Changes"
+                )}
+              </button>
             </div>
-          )}
-        </div>
-
-        {/* ================= SECTION 5: ACTIVITIES ================= */}
-
-        <SectionTable
-          title="Sports" items={mySports} allRawItems={allSports}
-          selectedId={selSport} onSelect={setSelSport}
-          onAdd={() => addItem(selSport, allSports, mySports, setMySports, setSelSport)}
-          onRemove={(id) => removeItem(id, mySports, setMySports)}
-          placeholder="Select a sport..."
-        />
-
-        <SectionTable
-          title="Clubs" items={myClubs} allRawItems={allClubs}
-          selectedId={selClub} onSelect={setSelClub}
-          onAdd={() => addItem(selClub, allClubs, myClubs, setMyClubs, setSelClub)}
-          onRemove={(id) => removeItem(id, myClubs, setMyClubs)}
-          placeholder="Select a club..."
-        />
-
-        <SectionTable
-          title="Courses" items={myCourses} allRawItems={allCourses}
-          selectedId={selCourse} onSelect={setSelCourse}
-          onAdd={() => addItem(selCourse, allCourses, myCourses, setMyCourses, setSelCourse)}
-          onRemove={(id) => removeItem(id, myCourses, setMyCourses)}
-          placeholder="Add a course..."
-        />
-
-        {/* SAVE BUTTON */}
-        <div className="fixed bottom-6 right-6 z-10">
-          <button type="submit" disabled={isPending} className={`flex items-center gap-2 px-8 py-4 rounded-full font-bold shadow-xl transition-all ${isPending ? "bg-[var(--button-color-3)]" : "bg-[var(--button-color)] hover:scale-105"} text-black`}>
-            {isPending ? "Saving..." : "Save Changes"}
-          </button>
-        </div>
-      </form>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
 
-// --- REUSABLE TABLE COMPONENT (STRICTLY TYPED) ---
+// --- POLISHED SECTION TABLE COMPONENT ---
+
 interface SectionTableProps {
   title: string;
+  icon?: string;
+  isCourseSection?: boolean;
   items: SelectableItem[];
-  allRawItems: RawActivityItem[]; // Uses the Union Type defined above
+  allRawItems: RawActivityItem[];
   selectedId: string;
   onSelect: (id: string) => void;
   onAdd: () => void;
   onRemove: (id: string) => void;
   placeholder: string;
+  courseData?: Map<
+    string,
+    { grade?: string; status: string; confidence?: string; stress?: string }
+  >;
+  onCourseDataChange?: (
+    data: Map<
+      string,
+      { grade?: string; status: string; confidence?: string; stress?: string }
+    >
+  ) => void;
+  expandedCourses?: Set<string>;
+  onToggleCourseExpand?: (courseId: string) => void;
 }
 
-function SectionTable({ title, items, allRawItems, selectedId, onSelect, onAdd, onRemove, placeholder }: SectionTableProps) {
-  // Filter out items already selected
-  const availableItems = allRawItems.filter((raw) => !items.some((existing) => existing.id === raw.id));
-
-  // Type-safe helper to get the extra info string
-  const getDetail = (item: RawActivityItem) => {
-    if ("category" in item) return item.category;
-    if ("season" in item) return item.season;
-    if ("department" in item) return item.department;
-    return "";
-  };
+function SectionTable({
+  title,
+  icon,
+  isCourseSection = false,
+  items,
+  allRawItems,
+  selectedId,
+  onSelect,
+  onAdd,
+  onRemove,
+  placeholder,
+  courseData,
+  onCourseDataChange,
+  expandedCourses,
+  onToggleCourseExpand,
+}: SectionTableProps) {
+  const availableItems = allRawItems.filter(
+    (raw) => !items.some((existing) => existing.id === raw.id)
+  );
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-      <h2 className="text-xl font-bold mb-4 text-gray-800">{title}</h2>
-      {items.length > 0 && (
-        <div className="border rounded-lg overflow-hidden mb-4">
-          <table className="w-full text-left">
-            <tbody className="divide-y divide-gray-100">
-              {items.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900">{item.name}</td>
-                  <td className="px-4 py-3 text-sm text-gray-500">{item.detail}</td>
-                  <td className="px-4 py-3 text-right">
-                    <button type="button" onClick={() => onRemove(item.id)} className="text-red-600 text-sm font-medium hover:underline">Remove</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-full">
+      {/* Header */}
+      <div className="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+        <h3 className="font-bold text-lg text-slate-800 flex items-center gap-2">
+          {icon && <span>{icon}</span>} {title}
+        </h3>
+        {items.length > 0 && (
+          <span className="bg-indigo-100 text-indigo-700 text-xs font-bold px-2.5 py-0.5 rounded-full">
+            {items.length} Added
+          </span>
+        )}
+      </div>
+
+      <div className="p-6 flex-1 flex flex-col gap-6">
+        {/* List of Items */}
+        <div className="space-y-3">
+          {items.length === 0 ? (
+            <div className="border-2 border-dashed border-slate-200 rounded-lg p-8 text-center text-slate-400 text-sm">
+              No {title.toLowerCase()} added yet.
+            </div>
+          ) : (
+            items.map((item) => {
+              const cData = courseData?.get(item.id);
+              const isExpanded = expandedCourses?.has(item.id);
+
+              return (
+                <div
+                  key={item.id}
+                  className={`
+                    border rounded-lg transition-all duration-200
+                    ${
+                      isExpanded
+                        ? "border-indigo-200 bg-indigo-50/30 ring-1 ring-indigo-200"
+                        : "border-slate-200 hover:border-indigo-300 bg-white"
+                    }
+                  `}
+                >
+                  {/* Item Row */}
+                  <div className="flex items-center justify-between p-3">
+                    <div className="flex items-center gap-3 overflow-hidden">
+                      {/* Status Indicator Dot (mostly for courses) */}
+                      {isCourseSection && (
+                        <div
+                          className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
+                            cData?.status === "COMPLETED"
+                              ? "bg-green-500"
+                              : cData?.status === "DROPPED"
+                              ? "bg-red-400"
+                              : "bg-blue-500"
+                          }`}
+                        />
+                      )}
+                      <div className="min-w-0">
+                        <p className="font-semibold text-slate-800 text-sm truncate">
+                          {item.name}
+                        </p>
+                        {item.detail && (
+                          <span className="inline-block mt-1 px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] uppercase tracking-wide font-bold rounded-sm">
+                            {item.detail}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {isCourseSection && onToggleCourseExpand && (
+                        <button
+                          type="button"
+                          onClick={() => onToggleCourseExpand(item.id)}
+                          className="text-xs font-medium text-indigo-600 hover:bg-indigo-50 px-3 py-1.5 rounded transition"
+                        >
+                          {isExpanded ? "Done" : "Details"}
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => onRemove(item.id)}
+                        className="text-slate-400 hover:text-red-500 hover:bg-red-50 p-1.5 rounded transition"
+                        title="Remove"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Expanded Course Editor */}
+                  {isCourseSection && isExpanded && onCourseDataChange && (
+                    <div className="px-4 pb-4 pt-0 animate-fadeIn">
+                      <div className="h-px bg-indigo-100 w-full mb-4" />
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
+                            Grade
+                          </label>
+                          <select
+                            value={cData?.grade || ""}
+                            onChange={(e) => {
+                              const newData = new Map(courseData!);
+                              newData.set(item.id, {
+                                ...cData!,
+                                grade: e.target.value,
+                              });
+                              onCourseDataChange(newData);
+                            }}
+                            className="w-full text-sm border-slate-200 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                          >
+                            <option value="">--</option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                            <option value="F">F</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
+                            Status
+                          </label>
+                          <select
+                            value={cData?.status || "IN_PROGRESS"}
+                            onChange={(e) => {
+                              const newData = new Map(courseData!);
+                              newData.set(item.id, {
+                                ...cData!,
+                                status: e.target.value,
+                              });
+                              onCourseDataChange(newData);
+                            }}
+                            className="w-full text-sm border-slate-200 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                          >
+                            <option value="IN_PROGRESS">In Progress</option>
+                            <option value="COMPLETED">Completed</option>
+                            <option value="PLANNED">Planned</option>
+                            <option value="DROPPED">Dropped</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
         </div>
-      )}
-      <div className="flex gap-2">
-        <select value={selectedId} onChange={(e) => onSelect(e.target.value)} className="flex-1 border p-2 rounded-lg text-sm">
-          <option value="">{placeholder}</option>
-          {availableItems.map((item) => <option key={item.id} value={item.id}>{item.name} ({getDetail(item)})</option>)}
-        </select>
-        <button type="button" onClick={onAdd} disabled={!selectedId} className="bg-gray-800 text-white px-4 rounded-lg text-sm font-medium disabled:opacity-50">Add</button>
+
+        {/* Input Area */}
+        <div className="mt-auto pt-4 border-t border-slate-100">
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <select
+                value={selectedId}
+                onChange={(e) => onSelect(e.target.value)}
+                className="w-full pl-3 pr-8 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none bg-white transition-shadow"
+              >
+                <option value="">{placeholder}</option>
+                {availableItems.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name}{" "}
+                    {item.department || item.category
+                      ? `(${item.department || item.category})`
+                      : ""}
+                  </option>
+                ))}
+              </select>
+              {/* Custom Chevron */}
+              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-slate-500">
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={onAdd}
+              disabled={!selectedId}
+              className={`
+                px-5 py-2.5 rounded-lg text-sm font-bold shadow-sm transition-all
+                ${
+                  selectedId
+                    ? "bg-slate-800 text-white hover:bg-slate-900 hover:shadow-md active:scale-95"
+                    : "bg-slate-100 text-slate-400 cursor-not-allowed"
+                }
+              `}
+            >
+              Add
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

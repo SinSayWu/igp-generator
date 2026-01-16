@@ -37,6 +37,20 @@ enum UserRole {
   ADMIN
 }
 
+enum CourseStatus {
+  COMPLETED
+  IN_PROGRESS
+  NEXT_SEMESTER
+}
+
+enum ConfidenceLevel {
+  VERY_LOW
+  LOW
+  NEUTRAL
+  HIGH
+  VERY_HIGH
+}
+
 // --------------------------------------
 // USERS & AUTH
 // --------------------------------------
@@ -84,15 +98,19 @@ model Administrator {
 
 model Student {
   // ... (Grade, GPA, Bio, etc. remain the same) ...
-  gradeLevel     Int
-  graduationYear Int
-  bio            String?
-  interests      String[]
+  gradeLevel       Int
+  graduationYear   Int
+  bio              String?
+  interests        String[]
+  subjectInterests String[] // e.g., "Science", "Math", "English", "History"
 
   // Future Plans
   postHighSchoolPlan String?
   careerInterest     String?
   interestedInNCAA   Boolean @default(false)
+
+  // Study Halls
+  studyHallsPerYear Int? @default(0)
 
   // RELATIONSHIPS
   userId String @id
@@ -102,28 +120,30 @@ model Student {
   schoolId String?
 
   // Activities
-  clubs   Club[]
-  sports  Sport[]
-  courses Course[]
+  clubs  Club[]
+  sports Sport[]
+
+  // NEW: Course relationship through junction table
+  studentCourses StudentCourse[]
 
   // NEW: Real relationship to Colleges
   targetColleges College[]
   nationwideActs NationwideAct[]
-  focusPrograms Program[]
+  focusPrograms  Program[]
 }
 
 // --- NEW MODEL: PROGRAM ---
 model Program {
-  id          String   @id @default(cuid())
-  name        String   // e.g. "JROTC", "Fine Arts", "Welding"
-  description String?  // e.g. "Army JROTC Leadership Track"
-  
+  id          String  @id @default(cuid())
+  name        String // e.g. "JROTC", "Fine Arts", "Welding"
+  description String? // e.g. "Army JROTC Leadership Track"
+
   // Link to School (Required - Programs are school-specific)
-  schoolId    String
-  school      School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  
+  schoolId String
+  school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
   // Link to Students
-  students    Student[]
+  students Student[]
 
   @@unique([name, schoolId]) // Prevent duplicate program names in the same school
 }
@@ -197,8 +217,31 @@ model Course {
   schoolId String
   school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
 
-  students Student[]
+  // NEW: Course relationship through junction table
+  students StudentCourse[]
 
   // Unique name PER school
   @@unique([name, schoolId])
+}
+
+// NEW: Junction table for Student-Course with grades and status
+model StudentCourse {
+  id String @id @default(cuid())
+
+  // Foreign keys
+  studentId String
+  courseId  String
+
+  // Course information
+  grade           String? // "A", "B+", "C", etc.
+  status          CourseStatus @default(IN_PROGRESS)
+  confidenceLevel String? // "VERY_LOW", "LOW", "NEUTRAL", "HIGH", "VERY_HIGH" - only for IN_PROGRESS and NEXT_SEMESTER
+  stressLevel     String? // "VERY_LOW", "LOW", "NEUTRAL", "HIGH", "VERY_HIGH" - only for IN_PROGRESS and NEXT_SEMESTER
+
+  // Relations
+  student Student @relation(fields: [studentId], references: [userId], onDelete: Cascade)
+  course  Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  // Composite unique constraint - one entry per student per course
+  @@unique([studentId, courseId])
 }
