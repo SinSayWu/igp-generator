@@ -41,6 +41,7 @@ enum CourseStatus {
   COMPLETED
   IN_PROGRESS
   NEXT_SEMESTER
+  PLANNED
 }
 
 enum ConfidenceLevel {
@@ -100,6 +101,7 @@ model Student {
   // ... (Grade, GPA, Bio, etc. remain the same) ...
   gradeLevel       Int
   graduationYear   Int
+  age              Int?
   bio              String?
   interests        String[]
   subjectInterests String[] // e.g., "Science", "Math", "English", "History"
@@ -129,7 +131,6 @@ model Student {
 
   // NEW: Real relationship to Colleges
   targetColleges College[]
-  nationwideActs NationwideAct[]
   focusPrograms  Program[]
 }
 
@@ -147,15 +148,6 @@ model Program {
   students Student[]
 
   @@unique([name, schoolId]) // Prevent duplicate program names in the same school
-}
-
-// --- NEW MODEL ---
-model NationwideAct {
-  id    String @id @default(cuid())
-  name  String @unique // e.g. "JROTC", "FFA"
-  color String // e.g. "bg-slate-800 text-white" (Storing tailwind classes for UI consistency)
-
-  students Student[]
 }
 
 model College {
@@ -176,10 +168,12 @@ model College {
 // --------------------------------------
 
 model Club {
-  id          String  @id @default(cuid())
-  name        String
-  category    String // e.g. "Service", "Academic"
-  description String?
+  id             String  @id @default(cuid())
+  name           String
+  category       String // e.g. "Service", "Academic"
+  description    String?
+  teacherLeader  String?
+  studentLeaders String?
 
   // Link to School (Required)
   schoolId String
@@ -214,6 +208,15 @@ model Course {
   department String // "Math", "English"
   code       String? // "MAT-101"
 
+  level           String? // "AP", "H", "CP"
+  credits         Float? // 1.0, 0.5
+  availableGrades Int[] // [9, 10, 11, 12]
+  requirements    String[] // ["FINE_ARTS_CREDIT"]
+  countsForGrad   Boolean  @default(true)
+  prerequisites   String? // "ART-DRAWING-1"
+  bundleId        String? // "BUNDLE-..."
+  programTag      String? // "BAND" 
+
   // Link to School (Required)
   schoolId String
   school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
@@ -238,6 +241,7 @@ model StudentCourse {
   status          CourseStatus @default(IN_PROGRESS)
   confidenceLevel String? // "VERY_LOW", "LOW", "NEUTRAL", "HIGH", "VERY_HIGH" - only for IN_PROGRESS and NEXT_SEMESTER
   stressLevel     String? // "VERY_LOW", "LOW", "NEUTRAL", "HIGH", "VERY_HIGH" - only for IN_PROGRESS and NEXT_SEMESTER
+  gradeLevel      Int? // The grade (9, 10, 11, 12) when this course was/will be taken
 
   // Relations
   student Student @relation(fields: [studentId], references: [userId], onDelete: Cascade)

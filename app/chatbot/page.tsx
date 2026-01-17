@@ -1,14 +1,19 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import { getUserName } from "@/app/actions/get-user-name";
+import { getCurrentSchedule } from "@/app/actions/get-current-schedule";
 
 type Message = {
     role: "user" | "assistant" | "system";
     content: string;
+    hasSchedule?: boolean;
 };
 
+type ScheduleItem = string | { name: string; status: string; id?: string };
+
 type Schedule = {
-    [grade: string]: string[];
+    [grade: string]: ScheduleItem[];
 };
 
 type CourseData = {
@@ -24,7 +29,7 @@ export default function ChatbotPage() {
         {
             role: "assistant",
             content:
-                "Hello! I'm your IGP guidance counselor. I can help you plan your high school schedule. I see you are Bob Boberstein. Shall we generate a schedule for your high school years?",
+                "Hello! I'm your IGP guidance counselor. I can help you plan your high school schedule. Checking your profile...",
         },
     ]);
     const [input, setInput] = useState("");
@@ -36,6 +41,23 @@ export default function ChatbotPage() {
     const [courseMap, setCourseMap] = useState<Record<string, CourseData>>({});
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    // Fetch user name
+    useEffect(() => {
+        getUserName().then((name) => {
+            const displayName = name || "Student";
+            setMessages((prev) => {
+                const newMsgs = [...prev];
+                if (newMsgs.length > 0 && newMsgs[0].role === "assistant") {
+                    newMsgs[0] = {
+                        ...newMsgs[0],
+                        content: `Hello! I'm your IGP guidance counselor. I can help you plan your high school schedule. I see you are ${displayName}. Shall we generate a schedule for your high school years?`,
+                    };
+                }
+                return newMsgs;
+            });
+        });
+    }, []);
 
     // Fetch course data on mount
     useEffect(() => {
@@ -51,6 +73,13 @@ export default function ChatbotPage() {
                 }
             })
             .catch((err) => console.error("Failed to load classes", err));
+
+        // Load existing schedule
+        getCurrentSchedule().then((savedSchedule) => {
+            if (savedSchedule) {
+                setSchedule(savedSchedule);
+            }
+        });
     }, []);
 
     const scrollToBottom = () => {
@@ -121,7 +150,7 @@ export default function ChatbotPage() {
 
             const messageContent =
                 foundSchedule && !debugMode
-                    ? "✅ Schedule generated successfully! Check the table on the right."
+                    ? displayContent // ALWAYS show the explanation/summary now
                     : displayContent;
 
             // Store the original full reasoning in a separate property if we wanted,
@@ -185,7 +214,7 @@ export default function ChatbotPage() {
 
                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
                     {messages.map((m, i) => {
-                        const isHiddenReasoning = (m as any).hasSchedule && !debugMode;
+                        const isHiddenReasoning = m.hasSchedule && !debugMode;
                         return (
                             <div
                                 key={i}
@@ -264,109 +293,144 @@ export default function ChatbotPage() {
 
                     {schedule && (
                         <div className="bg-white rounded-xl shadow-lg border border-slate-200">
-                            <div className="grid grid-cols-4 divide-x divide-slate-200 border-b border-slate-200 bg-slate-50 rounded-t-xl">
+                            {/* Header */}
+                            <div className="flex divide-x divide-slate-200 border-b border-slate-200 bg-slate-50 rounded-t-xl">
                                 {["9th Grade", "10th Grade", "11th Grade", "12th Grade"].map(
                                     (grade) => (
                                         <div
                                             key={grade}
-                                            className="p-4 text-center font-bold text-slate-700 uppercase tracking-wide text-sm"
+                                            className="flex-1 p-4 text-center font-bold text-slate-700 uppercase tracking-wide text-sm"
                                         >
                                             {grade}
                                         </div>
                                     )
                                 )}
                             </div>
-                            <div className="grid grid-cols-4 divide-x divide-slate-200">
-                                {[9, 10, 11, 12].map((grade) => (
-                                    <div key={grade} className="divide-y divide-slate-100">
-                                        {(schedule[grade.toString()] || Array(8).fill("")).map(
-                                            (courseName, idx) => {
-                                                // Handle course bundles split by " / "
-                                                const parts = courseName
-                                                    ? courseName.split(" / ")
-                                                    : [courseName];
+                            {/* Columns */}
+                            <div className="flex divide-x divide-slate-200">
+                                {[9, 10, 11, 12].map((grade) => {
+                                    const gradeCourses = schedule[grade.toString()] || [];
+                                    return (
+                                        <div
+                                            key={grade}
+                                            className="flex-1 divide-y divide-slate-100"
+                                        >
+                                            {gradeCourses.map((item, idx) => {
+                                                // Normalize item to object
+                                                const courseObj =
+                                                    typeof item === "string"
+                                                        ? { name: item, status: "PLANNED" }
+                                                        : item;
+
+                                                const { name, status } = courseObj;
+
+                                                // Handle course bundles split by " / " (mostly for AI generated strings)
+                                                const parts = name ? name.split(" / ") : [name];
+
+                                                // Determine base style
+                                                let statusClass =
+                                                    "hover:bg-indigo-50 border-transparent"; // Default/Planned
+                                                let badge = null;
+
+                                                if (status === "COMPLETED") {
+                                                    statusClass =
+                                                        "bg-emerald-50/50 hover:bg-emerald-100 border-emerald-400";
+                                                    badge = (
+                                                        <span className="absolute top-1 right-1 text-[8px] font-bold text-emerald-600 bg-emerald-100 px-1 rounded">
+                                                            DONE
+                                                        </span>
+                                                    );
+                                                } else if (status === "IN_PROGRESS") {
+                                                    statusClass =
+                                                        "bg-blue-50/50 hover:bg-blue-100 border-blue-400";
+                                                    badge = (
+                                                        <span className="absolute top-1 right-1 text-[8px] font-bold text-blue-600 bg-blue-100 px-1 rounded">
+                                                            NOW
+                                                        </span>
+                                                    );
+                                                }
 
                                                 return (
                                                     <div
                                                         key={idx}
-                                                        className="p-4 h-16 flex items-center justify-center text-center text-sm hover:bg-indigo-50 transition-colors"
+                                                        className={`relative p-2 h-16 flex items-center justify-center text-center text-sm transition-colors border-l-4 ${statusClass}`}
                                                     >
-                                                        {parts.map((part, pIdx) => {
-                                                            if (!part)
+                                                        {badge}
+                                                        <div className="flex flex-wrap items-center justify-center gap-1 w-full">
+                                                            {parts.map((part, pIdx) => {
+                                                                if (!part)
+                                                                    return (
+                                                                        <span
+                                                                            key={pIdx}
+                                                                            className="text-slate-400 italic font-medium text-xs"
+                                                                        >
+                                                                            Study Hall
+                                                                        </span>
+                                                                    );
+
+                                                                // Look up info
+                                                                const info = courseMap[part];
+
                                                                 return (
                                                                     <span
                                                                         key={pIdx}
-                                                                        className="text-slate-300 italic"
+                                                                        className="relative group inline-block"
                                                                     >
-                                                                        Free Slot
+                                                                        <span className="cursor-help border-b border-dotted border-slate-400/50 hover:border-slate-600">
+                                                                            {part}
+                                                                        </span>
+                                                                        {pIdx <
+                                                                            parts.length - 1 && (
+                                                                            <span className="mx-1 text-slate-400">
+                                                                                /
+                                                                            </span>
+                                                                        )}
+
+                                                                        {/* Tooltip */}
+                                                                        {info && (
+                                                                            <div className="absolute hidden group-hover:block z-50 w-64 p-3 bg-slate-800 text-white text-xs rounded-lg shadow-xl bottom-full mb-2 left-1/2 -translate-x-1/2 pointer-events-none text-left">
+                                                                                <div className="font-bold mb-1 text-indigo-300">
+                                                                                    {info.name}
+                                                                                </div>
+                                                                                <div className="flex gap-2 mb-1">
+                                                                                    <span className="bg-slate-700 px-1.5 rounded">
+                                                                                        {info.lvl}
+                                                                                    </span>
+                                                                                    <span className="bg-slate-700 px-1.5 rounded">
+                                                                                        {info.cr} cr
+                                                                                    </span>
+                                                                                </div>
+                                                                                {info.pre && (
+                                                                                    <div className="text-slate-400">
+                                                                                        Pre:{" "}
+                                                                                        {info.pre}
+                                                                                    </div>
+                                                                                )}
+                                                                            </div>
+                                                                        )}
                                                                     </span>
                                                                 );
-
-                                                            // Look up info
-                                                            const info = courseMap[part];
-
-                                                            return (
-                                                                <span
-                                                                    key={pIdx}
-                                                                    className="relative group mx-1"
-                                                                >
-                                                                    <span className="cursor-help border-b border-dotted border-slate-400">
-                                                                        {part}
-                                                                    </span>
-                                                                    {pIdx < parts.length - 1 &&
-                                                                        " / "}
-
-                                                                    {/* Tooltip */}
-                                                                    {info && (
-                                                                        <div className="absolute hidden group-hover:block z-50 w-64 p-3 bg-slate-800 text-white text-xs rounded-lg shadow-xl -mt-28 left-1/2 -translate-x-1/2 pointer-events-none text-left">
-                                                                            <div className="font-bold mb-1 text-indigo-300">
-                                                                                {info.name}
-                                                                            </div>
-                                                                            <div className="flex gap-2 mb-1">
-                                                                                <span className="bg-slate-700 px-1.5 rounded">
-                                                                                    {info.lvl}
-                                                                                </span>
-                                                                                <span className="bg-slate-700 px-1.5 rounded">
-                                                                                    {info.cr} cr
-                                                                                </span>
-                                                                            </div>
-                                                                            {info.pre && (
-                                                                                <div className="text-slate-400">
-                                                                                    Pre: {info.pre}
-                                                                                </div>
-                                                                            )}
-                                                                        </div>
-                                                                    )}
-                                                                </span>
-                                                            );
-                                                        })}
+                                                            })}
+                                                        </div>
                                                     </div>
                                                 );
-                                            }
-                                        )}
-                                        {/* Fill up to 8 slots if array is short via UI rendering if needed, 
-                                            but array map handles what's passed. 
-                                            We should ensure 8 slots visually if possible. */}
-                                        {Array.from({
-                                            length: Math.max(
-                                                0,
-                                                8 - (schedule[grade.toString()]?.length || 0)
-                                            ),
-                                        }).map((_, idx) => (
-                                            <div
-                                                key={`empty-${idx}`}
-                                                className="p-4 h-16 flex items-center justify-center text-center text-sm border-t border-slate-100"
-                                            >
-                                                <span className="text-slate-300 text-xs">
-                                                    Slot{" "}
-                                                    {(schedule[grade.toString()]?.length || 0) +
-                                                        idx +
-                                                        1}
-                                                </span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                ))}
+                                            })}
+                                            {/* Fill up to 8 slots */}
+                                            {Array.from({
+                                                length: Math.max(0, 8 - gradeCourses.length),
+                                            }).map((_, idx) => (
+                                                <div
+                                                    key={`empty-${idx}`}
+                                                    className="p-4 h-16 flex items-center justify-center text-center text-sm"
+                                                >
+                                                    <span className="text-slate-400 text-xs italic">
+                                                        Study Hall
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </div>
                     )}

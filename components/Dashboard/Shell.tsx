@@ -16,6 +16,7 @@ type StudentCourseData = {
     courseId: string;
     grade: string | null;
     status: string;
+    gradeLevel: number | null;
     course: {
         id: string;
         name: string;
@@ -47,6 +48,7 @@ type DashboardUser = {
     role: string;
     student?: {
         schoolId: string | null;
+        gradeLevel: number; // Added
         postHighSchoolPlan: string | null;
         interestedInNCAA: boolean;
         _count: {
@@ -62,11 +64,20 @@ type DashboardUser = {
     } | null;
 };
 
-type DashboardShellProps = {
-    user: DashboardUser;
+type CourseCatalogItem = {
+    id: string;
+    name: string;
+    department: string;
+    credits: number | null;
+    level: string | null;
 };
 
-export default function DashboardShell({ user }: DashboardShellProps) {
+type DashboardShellProps = {
+    user: DashboardUser;
+    courseCatalog?: CourseCatalogItem[];
+};
+
+export default function DashboardShell({ user, courseCatalog = [] }: DashboardShellProps) {
     const tabs = useMemo(() => {
         const isStudent = user.role === "STUDENT";
         const student = user.student ?? null;
@@ -162,7 +173,11 @@ export default function DashboardShell({ user }: DashboardShellProps) {
             <main className="flex-1 p-6 bg-white dark:bg-gray-100">
                 {safeActiveTab === "overview" && <Overview user={user} />}
                 {safeActiveTab === "classes" && (
-                    <ClassesPage courses={user.student?.studentCourses ?? []} />
+                    <ClassesPage
+                        courses={user.student?.studentCourses ?? []}
+                        courseCatalog={courseCatalog}
+                        currentGrade={user.student?.gradeLevel ?? 9}
+                    />
                 )}
                 {safeActiveTab === "extracurriculars" && (
                     <Extracurriculars

@@ -1,23 +1,14 @@
 "use client";
 
 import { useState, useTransition, ReactNode, useEffect, useRef, useCallback } from "react";
-import {
-    Club,
-    Sport,
-    Course,
-    Student,
-    College,
-    NationwideAct,
-    Program,
-    StudentCourse,
-} from "@prisma/client";
+import { Club, Sport, Course, Student, College, Program, StudentCourse } from "@prisma/client";
 
 import { updateStudentProfile } from "@/app/actions/update-profile";
+import { deleteAccount } from "@/app/actions/delete-account";
 // Assuming these are your existing section components
 import { AboutMeSection } from "./sections/AboutMeSection";
 import { PathwaysSection } from "./sections/PathwaysSection";
 import { SubjectInterestsSection } from "./sections/SubjectInterestsSection";
-import { NationwideActsSection } from "./sections/NationwideActsSection";
 import { FutureePlansSection } from "./sections/FuturePlansSection";
 import { StudyHallsSection } from "./sections/StudyHallsSection";
 
@@ -28,7 +19,6 @@ type StudentWithRelations = Student & {
     sports: Sport[];
     studentCourses: (StudentCourse & { course: Course })[];
     targetColleges: College[];
-    nationwideActs: NationwideAct[];
     focusPrograms: Program[];
 };
 
@@ -39,7 +29,6 @@ type Props = {
     allSports: Sport[];
     allCourses: Course[];
     allColleges: College[];
-    allNationwideActs: NationwideAct[];
     allPrograms: Program[];
 };
 
@@ -75,7 +64,6 @@ export default function ProfileEditor({
     allSports,
     allCourses,
     allColleges,
-    allNationwideActs,
     allPrograms,
 }: Props) {
     const [isPending, startTransition] = useTransition();
@@ -83,6 +71,18 @@ export default function ProfileEditor({
     const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const formRef = useRef<HTMLFormElement | null>(null);
     const isFirstRender = useRef(true);
+
+    const handleDeleteAccount = async () => {
+        if (
+            window.confirm(
+                "Are you sure you want to delete your account? This action cannot be undone."
+            )
+        ) {
+            startTransition(async () => {
+                await deleteAccount();
+            });
+        }
+    };
 
     // 1. Core Profile State
     const [plan, setPlan] = useState(student.postHighSchoolPlan || "");
@@ -117,9 +117,6 @@ export default function ProfileEditor({
     const [subjectInterests, setSubjectInterests] = useState<string[]>(
         Array.from(new Set(student.subjectInterests || []))
     );
-    const [selectedNationwideIds, setSelectedNationwideIds] = useState<string[]>(
-        student.nationwideActs.map((act) => act.id)
-    );
     const [selectedProgramIds, setSelectedProgramIds] = useState<string[]>(
         student.focusPrograms.map((p) => p.id)
     );
@@ -133,9 +130,21 @@ export default function ProfileEditor({
         type: "club" | "sport" | "course"
     ): SelectableItem => {
         let detail: string | null = null;
-        if ("category" in item) detail = item.category;
-        else if ("season" in item) detail = item.season;
-        else if ("department" in item) detail = item.department;
+        if ("category" in item) {
+            detail = item.category;
+            // @ts-ignore
+            if (item.teacherLeader) {
+                // @ts-ignore
+                detail += ` • Sponsor: ${item.teacherLeader}`;
+            }
+        } else if ("season" in item) detail = item.season;
+        else if ("department" in item) {
+            // Enhanced Course Detail: "Math | AP | 1.0cr"
+            const parts = [item.department];
+            if (item.level) parts.push(item.level);
+            if (item.credits) parts.push(`${item.credits}cr`);
+            detail = parts.join(" • ");
+        }
 
         return { id: item.id, name: item.name, detail, type };
     };
@@ -195,12 +204,11 @@ export default function ProfileEditor({
 
                 // Validate required fields
                 if (status === "COMPLETED") {
-                    if (!grade || !confidence) return;
+                    if (!grade) return;
                 } else if (status === "IN_PROGRESS") {
-                    if (!grade || !confidence || !stress) return;
-                } else if (status === "NEXT_SEMESTER") {
-                    if (!confidence || !stress) return;
+                    if (!grade) return;
                 }
+                // NEXT_SEMESTER has no required fields anymore
 
                 setList([...currentList, formatItem(raw, type)]);
                 reset("");
@@ -311,7 +319,6 @@ export default function ProfileEditor({
         maxStudyHalls,
         courseData,
         subjectInterests,
-        selectedNationwideIds,
         selectedProgramIds,
         selectedCollegeIds,
         myClubs,
@@ -345,9 +352,6 @@ export default function ProfileEditor({
                         ))}
                         {mySports.map((i) => (
                             <input key={i.id} type="hidden" name="sportIds" value={i.id} />
-                        ))}
-                        {selectedNationwideIds.map((id) => (
-                            <input key={id} type="hidden" name="nationwideActIds" value={id} />
                         ))}
                         {selectedProgramIds.map((id) => (
                             <input key={id} type="hidden" name="programIds" value={id} />
@@ -417,18 +421,6 @@ export default function ProfileEditor({
                             subjectInterests={subjectInterests}
                             onChange={(next) => {
                                 setSubjectInterests(next);
-                            }}
-                        />
-                    </SectionCard>
-
-                    <SectionCard>
-                        <NationwideActsSection
-                            acts={allNationwideActs}
-                            selectedIds={selectedNationwideIds}
-                            onToggle={(id) => {
-                                setSelectedNationwideIds((prev) =>
-                                    prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-                                );
                             }}
                         />
                     </SectionCard>
@@ -550,6 +542,27 @@ export default function ProfileEditor({
                         onToggleCourseExpand={toggleCourseExpand}
                     />
 
+                    {/* --- DANGER ZONE --- */}
+                    <div className="mt-12 border-t border-slate-200 pt-8">
+                        <h3 className="text-lg font-bold text-red-600 mb-4">Danger Zone</h3>
+                        <div className="bg-red-50 border border-red-200 rounded-xl p-6 flex items-center justify-between">
+                            <div>
+                                <h4 className="font-semibold text-red-900">Delete Account</h4>
+                                <p className="text-sm text-red-700 mt-1">
+                                    Permanently remove your account and all associated data. This
+                                    action cannot be undone.
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={handleDeleteAccount}
+                                className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-sm transition-colors text-sm"
+                            >
+                                Delete Account
+                            </button>
+                        </div>
+                    </div>
+
                     {/* --- FLOATING STATUS BAR --- */}
                     {(hasUnsavedChanges || isPending) && (
                         <div className="fixed bottom-0 left-0 right-0 p-6 flex justify-center items-end pointer-events-none z-40">
@@ -664,18 +677,65 @@ function SectionTable({
         (raw) => !items.some((existing) => existing.id === raw.id)
     );
 
+    // --- Searchable Dropdown State ---
+    const [searchTerm, setSearchTerm] = useState("");
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // Sync input with selectedId
+    useEffect(() => {
+        if (!isCourseSection) return;
+        if (selectedId) {
+            const item = allRawItems.find((i) => i.id === selectedId);
+            if (item && item.name !== searchTerm) {
+                setSearchTerm(item.name);
+            }
+        } else {
+            setSearchTerm("");
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedId, isCourseSection]); // Depend on allRawItems if needed, but selectedId triggers usually enough
+
+    // Close dropdown on outside click
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const filteredItems = availableItems.filter((item) => {
+        if (!searchTerm) return true;
+        const lowerSearch = searchTerm.toLowerCase();
+        const detail =
+            ("department" in item && item.department) ||
+            ("category" in item && item.category) ||
+            ("season" in item && item.season) ||
+            "";
+        const code = "code" in item ? String(item.code || "") : "";
+
+        return (
+            item.name.toLowerCase().includes(lowerSearch) ||
+            String(detail).toLowerCase().includes(lowerSearch) ||
+            code.toLowerCase().includes(lowerSearch)
+        );
+    });
+
     const isPendingValid = () => {
         if (!isCourseSection || !pendingCourseData) return true;
-        const { status, grade, confidence, stress } = pendingCourseData;
+        const { status, grade } = pendingCourseData; // confidence and stress removed from required check
 
-        if (status === "COMPLETED") return !!grade && !!confidence;
-        if (status === "IN_PROGRESS") return !!grade && !!confidence && !!stress;
-        if (status === "NEXT_SEMESTER") return !!confidence && !!stress;
+        if (status === "COMPLETED") return !!grade; // Removed confidence check (used for 'Completed in Grade')
+        if (status === "IN_PROGRESS") return !!grade; // Removed confidence && stress check
+        // if (status === "NEXT_SEMESTER") return !!confidence && !!stress; // Removed entire condition as fields are optimal
 
         return true;
     };
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-full">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-full">
             {/* Header */}
             <div className="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between items-center">
                 <h3 className="font-bold text-lg text-slate-800 flex items-center gap-2">
@@ -723,7 +783,9 @@ function SectionTable({
                                                             ? "bg-green-500"
                                                             : cData?.status === "NEXT_SEMESTER"
                                                               ? "bg-yellow-400"
-                                                              : "bg-blue-500"
+                                                              : cData?.status === "PLANNED"
+                                                                ? "bg-purple-400"
+                                                                : "bg-blue-500"
                                                     }`}
                                                 />
                                             )}
@@ -802,6 +864,7 @@ function SectionTable({
                                                         <option value="NEXT_SEMESTER">
                                                             Next Semester
                                                         </option>
+                                                        <option value="PLANNED">Planned</option>
                                                     </select>
                                                 </div>
 
@@ -852,11 +915,9 @@ function SectionTable({
                                                 {cData?.status === "COMPLETED" && (
                                                     <div>
                                                         <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
-                                                            Completed in Grade{" "}
-                                                            <span className="text-red-500">*</span>
+                                                            Completed in Grade
                                                         </label>
                                                         <select
-                                                            required
                                                             value={cData?.confidence || ""}
                                                             onChange={(e) => {
                                                                 const newData = new Map(
@@ -890,13 +951,9 @@ function SectionTable({
                                                     <>
                                                         <div>
                                                             <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
-                                                                Confidence Level{" "}
-                                                                <span className="text-red-500">
-                                                                    *
-                                                                </span>
+                                                                Confidence Level
                                                             </label>
                                                             <select
-                                                                required
                                                                 value={cData?.confidence || ""}
                                                                 onChange={(e) => {
                                                                     const newData = new Map(
@@ -928,13 +985,9 @@ function SectionTable({
                                                         </div>
                                                         <div>
                                                             <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
-                                                                Stress Level{" "}
-                                                                <span className="text-red-500">
-                                                                    *
-                                                                </span>
+                                                                Stress Level
                                                             </label>
                                                             <select
-                                                                required
                                                                 value={cData?.stress || ""}
                                                                 onChange={(e) => {
                                                                     const newData = new Map(
@@ -1009,6 +1062,7 @@ function SectionTable({
                                                 <option value="IN_PROGRESS">In Progress</option>
                                                 <option value="COMPLETED">Completed</option>
                                                 <option value="NEXT_SEMESTER">Next Semester</option>
+                                                <option value="PLANNED">Planned</option>
                                             </select>
                                         </div>
 
@@ -1082,11 +1136,9 @@ function SectionTable({
                                             <>
                                                 <div>
                                                     <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
-                                                        Confidence{" "}
-                                                        <span className="text-red-500">*</span>
+                                                        Confidence
                                                     </label>
                                                     <select
-                                                        required
                                                         value={pendingCourseData.confidence}
                                                         onChange={(e) =>
                                                             onPendingCourseDataChange({
@@ -1106,11 +1158,9 @@ function SectionTable({
                                                 </div>
                                                 <div>
                                                     <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
-                                                        Stress{" "}
-                                                        <span className="text-red-500">*</span>
+                                                        Stress
                                                     </label>
                                                     <select
-                                                        required
                                                         value={pendingCourseData.stress}
                                                         onChange={(e) =>
                                                             onPendingCourseDataChange({
@@ -1135,41 +1185,124 @@ function SectionTable({
                             )}
 
                         <div className="flex gap-2">
-                            <div className="relative flex-1">
-                                <select
-                                    value={selectedId}
-                                    onChange={(e) => onSelect(e.target.value)}
-                                    className="w-full pl-3 pr-8 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none bg-white transition-shadow"
-                                >
-                                    <option value="">{placeholder}</option>
-                                    {availableItems.map((item) => {
-                                        const detail =
-                                            ("department" in item && item.department) ||
-                                            ("category" in item && item.category) ||
-                                            ("season" in item && item.season);
-                                        return (
-                                            <option key={item.id} value={item.id}>
-                                                {item.name} {detail ? `(${detail})` : ""}
-                                            </option>
-                                        );
-                                    })}
-                                </select>
-                                {/* Custom Chevron */}
-                                <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-slate-500">
-                                    <svg
-                                        className="w-4 h-4"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth="2"
-                                            d="M19 9l-7 7-7-7"
+                            <div className="relative flex-1" ref={dropdownRef}>
+                                {isCourseSection ? (
+                                    <>
+                                        <input
+                                            type="text"
+                                            value={searchTerm}
+                                            onChange={(e) => {
+                                                setSearchTerm(e.target.value);
+                                                if (selectedId) onSelect("");
+                                                setIsDropdownOpen(true);
+                                            }}
+                                            onFocus={() => setIsDropdownOpen(true)}
+                                            placeholder={placeholder}
+                                            className="w-full pl-3 pr-8 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow"
                                         />
-                                    </svg>
-                                </div>
+                                        {isDropdownOpen && (
+                                            <div className="absolute z-50 left-0 right-0 bottom-full mb-1 max-h-60 overflow-y-auto bg-white border border-slate-200 rounded-lg shadow-lg">
+                                                {filteredItems.length === 0 ? (
+                                                    <div className="p-3 text-sm text-slate-500 text-center">
+                                                        No matches found
+                                                    </div>
+                                                ) : (
+                                                    filteredItems.map((item) => {
+                                                        let detail: string | null = null;
+                                                        if ("department" in item) {
+                                                            const parts = [item.department];
+                                                            if (item.level) parts.push(item.level);
+                                                            if (item.credits)
+                                                                parts.push(`${item.credits}cr`);
+                                                            detail = parts.join(" • ");
+                                                        } else {
+                                                            // @ts-ignore
+                                                            if ("category" in item) {
+                                                                detail = item.category;
+                                                                // @ts-ignore
+                                                                if (item.teacherLeader)
+                                                                    detail += ` • Sponsor: ${item.teacherLeader}`;
+                                                            } else if ("season" in item) {
+                                                                detail = item.season;
+                                                            }
+                                                        }
+                                                        return (
+                                                            <button
+                                                                key={item.id}
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    onSelect(item.id);
+                                                                    setSearchTerm(item.name);
+                                                                    setIsDropdownOpen(false);
+                                                                }}
+                                                                className="w-full text-left px-4 py-2 text-sm hover:bg-slate-50 flex items-center justify-between group"
+                                                            >
+                                                                <span className="font-medium text-slate-700 group-hover:text-indigo-700">
+                                                                    {item.name}
+                                                                </span>
+                                                                {detail && (
+                                                                    <span className="text-xs text-slate-400 group-hover:text-indigo-400">
+                                                                        {detail}
+                                                                    </span>
+                                                                )}
+                                                            </button>
+                                                        );
+                                                    })
+                                                )}
+                                            </div>
+                                        )}
+                                    </>
+                                ) : (
+                                    <>
+                                        <select
+                                            value={selectedId}
+                                            onChange={(e) => onSelect(e.target.value)}
+                                            className="w-full pl-3 pr-8 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none bg-white transition-shadow"
+                                        >
+                                            <option value="">{placeholder}</option>
+                                            {availableItems.map((item) => {
+                                                let detail: string | null = null;
+                                                if ("department" in item) {
+                                                    const parts = [item.department];
+                                                    if (item.level) parts.push(item.level);
+                                                    if (item.credits)
+                                                        parts.push(`${item.credits}cr`);
+                                                    detail = parts.join(" • ");
+                                                } else {
+                                                    // @ts-ignore
+                                                    if ("category" in item) {
+                                                        detail = item.category;
+                                                        // @ts-ignore
+                                                        if (item.teacherLeader)
+                                                            detail += ` • Sponsor: ${item.teacherLeader}`;
+                                                    } else if ("season" in item) {
+                                                        detail = item.season;
+                                                    }
+                                                }
+                                                return (
+                                                    <option key={item.id} value={item.id}>
+                                                        {item.name} {detail ? `(${detail})` : ""}
+                                                    </option>
+                                                );
+                                            })}
+                                        </select>
+                                        <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-slate-500">
+                                            <svg
+                                                className="w-4 h-4"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth="2"
+                                                    d="M19 9l-7 7-7-7"
+                                                />
+                                            </svg>
+                                        </div>
+                                    </>
+                                )}
                             </div>
 
                             <button

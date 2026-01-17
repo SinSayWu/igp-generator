@@ -23,6 +23,8 @@ export default async function DashboardPage() {
             student: {
                 select: {
                     schoolId: true,
+                    gradeLevel: true, // <--- Added this to get student's current grade
+                    age: true, // Added for onboarding check
                     postHighSchoolPlan: true,
                     interestedInNCAA: true,
                     _count: {
@@ -40,6 +42,7 @@ export default async function DashboardPage() {
                             courseId: true,
                             grade: true,
                             status: true,
+                            gradeLevel: true,
                             course: {
                                 select: {
                                     id: true,
@@ -77,14 +80,38 @@ export default async function DashboardPage() {
 
     if (!user) redirect("/");
 
+    // NEW: Fetch full course catalog for the student's school
+    const courseCatalog = await prisma.course.findMany({
+        where: { schoolId: user.student?.schoolId ?? undefined },
+        orderBy: { name: "asc" },
+        select: {
+            id: true,
+            name: true,
+            department: true,
+            credits: true,
+            level: true,
+            availableGrades: true,
+        },
+    });
+
+    if (user.role === "STUDENT") {
+        if (!user.student?.age) {
+            redirect("/onboarding");
+        }
+    }
+
     return (
         <DashboardShell
             user={{
                 firstName: user.firstName,
                 lastName: user.lastName,
                 role: String(user.role),
-                student: user.student,
+                student: {
+                    ...user.student,
+                    gradeLevel: user.student?.gradeLevel ?? 9, // Fallback
+                },
             }}
+            courseCatalog={courseCatalog}
         />
     );
 }

@@ -27,7 +27,6 @@ export default async function StudentProfileForm({ userId }: { userId: string })
                 },
             },
             targetColleges: true,
-            nationwideActs: true,
             focusPrograms: true,
         },
     });
@@ -65,10 +64,6 @@ export default async function StudentProfileForm({ userId }: { userId: string })
         orderBy: { name: "asc" },
     });
 
-    const allNationwideActs = await prisma.nationwideAct.findMany({
-        orderBy: { name: "asc" },
-    });
-
     // --- STEP 3: Render ProfileEditor with all data ---
     // ProfileEditor is a client component that handles UI, state, and form submission
     return (
@@ -79,7 +74,6 @@ export default async function StudentProfileForm({ userId }: { userId: string })
             allSports={allSports}
             allCourses={allCourses}
             allColleges={allColleges}
-            allNationwideActs={allNationwideActs}
             allPrograms={schoolPrograms}
         />
     );

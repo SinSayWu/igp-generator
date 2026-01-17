@@ -14,7 +14,7 @@
   { "id":"REQ-CS", "name":"Computer Science", "cr":1.0, "req":["COMPUTER_SCIENCE_CREDIT"], "must":[], "notes":"1 unit (Fundamentals, AP CS, etc.)." },
   { "id":"REQ-LANG-CATE", "name":"World Language or CATE", "cr":1.0, "req":["WORLD_LANGUAGE_CREDIT","CATE_CREDIT"], "must":[], "notes":"SC grad: 1 unit World Language OR CATE. Many colleges want 2–3 units same language." },
 
-  { "id":"REQ-FINANCE", "name":"Personal Finance", "cr":0.5, "req":["PERSONAL_FINANCE_CREDIT"], "must":[], "notes":"Mandatory for Class of 2027+. If not applicable, set cr to 0.0." },
+  { "id":"REQ-FINANCE", "name":"Personal Finance", "cr":0.5, "req":["PERSONAL_FINANCE_CREDIT"], "must":[], "notes":"Mandatory" },
 
   { "id":"REQ-ELECTIVES", "name":"General Electives", "cr":6.5, "req":["ELECTIVE_CREDIT"], "must":[], "notes":"Extra credits can roll into electives. Adjust to hit 24 total credits (often 7.0 for older cohorts)." }
 ]

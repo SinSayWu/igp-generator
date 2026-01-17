@@ -9,7 +9,6 @@ export async function updateStudentProfile(userId: string, formData: FormData) {
     const clubIds = formData.getAll("clubIds") as string[];
     const sportIds = formData.getAll("sportIds") as string[];
     const collegeIds = formData.getAll("collegeIds") as string[];
-    const nationwideActIds = formData.getAll("nationwideActIds") as string[];
 
     // NEW: Extract Program IDs
     const programIds = formData.getAll("programIds") as string[];
@@ -75,17 +74,42 @@ export async function updateStudentProfile(userId: string, formData: FormData) {
             // NEW: Handle courses through StudentCourse junction table
             studentCourses: {
                 deleteMany: {}, // Remove all existing course entries
-                create: courseIds.map((courseId, index) => ({
-                    courseId,
-                    grade: courseGrades[index] || null,
-                    status: (courseStatuses[index] || "IN_PROGRESS") as CourseStatus,
-                    confidenceLevel: courseConfidenceLevels[index] || null,
-                    stressLevel: courseStressLevels[index] || null,
-                })),
+                create: courseIds.map((courseId, index) => {
+                    const status = (courseStatuses[index] || "IN_PROGRESS") as CourseStatus;
+                    const confidence = courseConfidenceLevels[index] || null;
+
+                    // Logic to determine gradeLevel (year taken)
+                    let courseGradeLevel: number | null = null;
+
+                    if (status === "COMPLETED" && confidence) {
+                        // The UI stores the completed grade (e.g. "9", "10") in the confidence field
+                        if (confidence === "middle") {
+                            courseGradeLevel = 8;
+                        } else {
+                            const parsed = parseInt(confidence);
+                            if (!isNaN(parsed)) {
+                                courseGradeLevel = parsed;
+                            }
+                        }
+                    } else if (status === "IN_PROGRESS" || status === "NEXT_SEMESTER") {
+                        // Assume current grade level for active courses
+                        if (gradeLevel) {
+                            courseGradeLevel = gradeLevel;
+                        }
+                    }
+
+                    return {
+                        courseId,
+                        grade: courseGrades[index] || null,
+                        status: status,
+                        confidenceLevel: confidence,
+                        stressLevel: courseStressLevels[index] || null,
+                        gradeLevel: courseGradeLevel,
+                    };
+                }),
             },
 
             targetColleges: { set: [], connect: collegeIds.map((id) => ({ id })) },
-            nationwideActs: { set: [], connect: nationwideActIds.map((id) => ({ id })) },
 
             // NEW: Update Programs
             focusPrograms: {

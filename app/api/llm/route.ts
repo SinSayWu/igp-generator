@@ -1,13 +1,9 @@
-import Groq from "groq-sdk";
+import OpenAI from "openai";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-function buildSystemPrompt(context: {
-    grade?: string;
-    difficulty?: string;
-    interests?: string[];
-}) {
+function buildSystemPrompt(context: { grade?: string; difficulty?: string; interests?: string[] }) {
     return `
 You are an academic planning assistant for a U.S. high school student.
 
@@ -30,15 +26,12 @@ Guidelines:
 
 export async function POST(req: Request) {
     try {
-        const apiKey = process.env.GROQ_API_KEY;
+        const apiKey = process.env.GPT_API_KEY;
         if (!apiKey) {
-            return Response.json(
-                { error: "GROQ_API_KEY is not set" },
-                { status: 500 }
-            );
+            return Response.json({ error: "GPT_API_KEY is not set" }, { status: 500 });
         }
 
-        const groq = new Groq({ apiKey });
+        const openai = new OpenAI({ apiKey });
 
         const body = await req.json();
         const messages = Array.isArray(body.messages) ? body.messages : [];
@@ -46,24 +39,17 @@ export async function POST(req: Request) {
 
         const systemPrompt = buildSystemPrompt(context);
 
-        const completion = await groq.chat.completions.create({
-            model: "openai/gpt-oss-120b",
-            messages: [
-                { role: "system", content: systemPrompt },
-                ...messages,
-            ],
+        const completion = await openai.chat.completions.create({
+            model: "gpt-4o",
+            messages: [{ role: "system", content: systemPrompt }, ...messages],
             temperature: 0.3,
         });
 
         return Response.json({
             reply: completion.choices[0].message.content,
         });
-
     } catch (err) {
         console.error("LLM route error:", err);
-        return Response.json(
-            { error: "Chat request failed" },
-            { status: 500 }
-        );
+        return Response.json({ error: "Chat request failed" }, { status: 500 });
     }
 }

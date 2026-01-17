@@ -3,13 +3,13 @@
 **Task:** 
 1. Review the "Draft Schedule" provided below.
 2. Check it rigorously against the **Course Catalog** and **Graduation Requirements**.
-3. Fix ANY errors (prerequisites, credit counts, repeated courses, missing requirements).
+3. Fix ANY errors (prerequisites, credit counts, repeated courses from `completed_courses`, missing requirements).
 4. Output the FINAL, verified schedule.
 
 **Input Data:**
 1. **Course Catalog:** {{CLASSES}}
 2. **Graduation Requirements:** {{GRADUATION_REQS}}
-3. **Student Profile:** {{STUDENTS}}
+3. **Student Profile:** {{STUDENTS}} (Contains `completed_courses` - USE THIS to prevent duplicates)
 
 **Draft Schedule to Audit:**
 {{DRAFT_OUTPUT}}
@@ -31,10 +31,10 @@
     *   Valid: ["Full Year", "Half A / Half B", ...]
     *   Invalid: ["Full Year", "Half A", "Half B", ...] (if this makes 9 items)
 
-**3. Graduation Check (Non-Negotiable)**
-*   **Audit every single requirement** in `Graduation Requirements`.
-*   Ensure the sum of `completed_courses` + `scheduled_courses` meets or exceeds the required credits for EACH category (English: 4, Math: 4, Science: 3, Social Studies: 3, PE: 1, Health: 0.5, Computer Science: 1, Foreign Language: 1, Fine Arts: 1).
-*   **Correction Strategy:** If *any* requirement is unmet by 12th grade, you MUST delete a low-priority elective and insert the required course. **PRIORITIZE GRADUATION OVER INTERESTS.**
+**3. Graduation Check (Progress Monitoring)**
+*   **Audit requirements** against the planned years.
+*   **Note:** If the plan only covers the next academic year (e.g. 10th grade only), you are NOT expected to fulfill all graduation requirements.
+*   **Correction Strategy:** Ensure critical "Next Step" courses are present (e.g. English 2 after English 1). Do not force 12th grade credits into a 10th grade schedule.
 
 **4. Empty Slot & Filler Protocol**
 *   **No Empty Strings:** The schedule MUST have 8 filled slots per grade. Never output "Free Slot" or "TBD".
@@ -46,14 +46,15 @@
 
 **5. Rigor & Consistency Check**
 *   **Level Consistency:** Verify the `student.difficulty` (e.g., Honors, AP) is respected. Do not schedule CP classes if the student requested AP/Honors and prerequisites are met.
-*   **Exact Naming (Critical):** Check every course title against the Catalog character-for-character. If the draft says "Algebra 1" but the catalog says "Algebra 1 CP", YOU MUST CORRECT IT.
+*   **Exact Naming (Critical):** Check every course title against the `name` field in the Catalog character-for-character. If the draft says "English 1" but the catalog name is "English 1 CP", YOU MUST CORRECT IT to "English 1 CP".
 *   **Hallucination Check:** If a course name does not exist in the Catalog, find the closest valid match. If none exists, replace with "Study Hall".
 
-**6. Duplicate Elimination (Critical)**
-*   **Transcript Check:** Ensure NO course in the schedule appears in `student.completed_courses` or `student.transcript`.
+**6. Immutable History & Duplicate Check (Critical)**
+*   **Respect the Past:** If the output includes grades that the student has *already completed* (e.g., student is rising 11th grader, so 9th and 10th are done), those years in the JSON **MUST MATCH THE TRANSCRIPT EXACTLY**. Do not "optimize" or "rewrite" the past.
+*   **No Future Duplicates:** For *future* years (years not yet taken), ensure NO course appears that is already in `student.completed_courses`.
 *   **Self-Reference Check:** Ensure NO course appears more than once in the entire 4-year plan.
 *   **Cross-Grade Check:** A course scheduled in 10th grade cannot also be in 11th grade.
-*   **Correction:** If a duplicate is found, keep the earliest valid instance and replace the later duplicate with a valid next-level course or different elective.
+*   **Correction:** If a duplicate is found in a FUTURE slot, replace it with the next logical course. If the PAST slot differs from the transcript, **revert it to the transcript version**.
 
 ---
 
@@ -62,6 +63,7 @@
 **Step 1: Audit Report & Analysis**
 *   **Validation Status:** Briefly state if the draft was valid or if errors were found.
 *   **Corrections:** List specific corrections made (e.g., "Moved Calculus to 12th Grade").
+*   **Student Summary (Required):** Provide a friendly summary of the major changes or the logic behind this schedule. If the user asked for a change (reprompt), explain the pros and cons here. This section will be shown to the student.
 *   **Context Preservation:** If the Draft Schedule included "Pros/Cons" or reasoning for a specific student request, **you MUST summarize or restate that reasoning here**. Do not silence the counselor's advice. Verify the reasoning is distinct from the validation.
 
 **Step 2: JSON Payload**

@@ -1,31 +1,31 @@
 [
   {
-    "id": "Bob Boberstein",
-    "grade": 8,
-    "difficulty": "Honors/Advanced",
-    "interests": ["Computer Science", "Math", "Biology"],
-    "completed_courses": ["ENG-ENGLISH1-H","MATH-ALG1-H"],
+    "id": "Jane Janerstein",
+    "grade": 9,
+    "difficulty": "CP/Honors",
+    "interests": ["Art", "Music", "History"],
+    "completed_courses": ["ENG-ENGLISH1-H","MATH-ALG1-CP"],
     "transcript": [
       {
         "course_id": "ENG-ENGLISH1-H",
-        "final_grade": 95,
-        "confidence": "Low",
-        "stress": "Low"
+        "final_grade": 90,
+        "confidence": "High",
+        "stress": "Very Low"
       },
       {
         "course_id": "MATH-ALG1-H",
-        "final_grade": 99,
-        "confidence": "Very High",
-        "stress": "Low"
+        "final_grade": 79,
+        "confidence": "Low",
+        "stress": "High"
       }
     ],
     "study_hall_preferences": {
-      "interested": false,
-      "min_per_year": 0,
+      "interested": true,
+      "min_per_year": 1,
       "max_per_year": 2
     },
     "program_intent": {
-      "band": true,
+      "band": false,
       "orchestra": false,
       "visual_arts": false,
       "jrotc": false,
@@ -37,8 +37,8 @@
       "University of South Carolina"
     ],
     "additional_factors": {
-      "postsecondary_goal": "STEM_major",
-      "bio": "I am very interested in STEM and like to be challenged"
+      "postsecondary_goal": "History Teacher",
+      "bio": "I love history and reading stories"
     }
   }
 ]
