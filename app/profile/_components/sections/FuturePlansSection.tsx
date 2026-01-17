@@ -28,7 +28,6 @@ export function FutureePlansSection({
             </h2>
 
             <select
-                name="postHighSchoolPlan"
                 value={plan}
                 onChange={(e) => onPlanChange(e.target.value)}
                 className="w-full border p-2 rounded mb-6 focus:ring-2 focus:border-transparent transition bg-white text-sm"
@@ -75,7 +74,6 @@ export function FutureePlansSection({
                                         <label className="flex items-center space-x-2 cursor-pointer">
                                             <input
                                                 type="checkbox"
-                                                name="collegeIds"
                                                 value={college.id}
                                                 checked={isChecked}
                                                 onChange={() => onCollegeToggle(college.id)}
@@ -130,7 +128,6 @@ export function FutureePlansSection({
                     >
                         <input
                             type="checkbox"
-                            name="interestedInNCAA"
                             checked={ncaa}
                             onChange={(e) => onNcaaToggle(e.target.checked)}
                             className="w-4 h-4 rounded"

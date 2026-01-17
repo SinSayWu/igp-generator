@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import DashboardShell from "@/components/Dashboard/Shell";
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardPage() {
     const cookieStore = await cookies();
     const sessionId = cookieStore.get("session")?.value;
@@ -14,9 +16,25 @@ export default async function DashboardPage() {
 
     const user = await prisma.user.findUnique({
         where: { id: session.userId },
-        include: {
-            student: true,
-            admin: true,
+        select: {
+            firstName: true,
+            lastName: true,
+            role: true,
+            student: {
+                select: {
+                    schoolId: true,
+                    postHighSchoolPlan: true,
+                    interestedInNCAA: true,
+                    _count: {
+                        select: {
+                            clubs: true,
+                            sports: true,
+                            studentCourses: true,
+                            targetColleges: true,
+                        },
+                    },
+                },
+            },
         },
     });
 
@@ -24,8 +42,12 @@ export default async function DashboardPage() {
 
     return (
         <DashboardShell
-            user={{ firstName: user.firstName, lastName: user.lastName, role: user.role }}
-            progress={0}
+            user={{
+                firstName: user.firstName,
+                lastName: user.lastName,
+                role: String(user.role),
+                student: user.student,
+            }}
         />
     );
 }

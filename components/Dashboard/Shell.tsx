@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Overview from "./Overview";
 import ClassesPage from "./Classes";
 import Extracurriculars from "./Extracurriculars";
@@ -8,22 +8,78 @@ import Schools from "./Schools";
 import Jobs from "./Jobs";
 import Goals from "./Goals";
 
+type TabId = "overview" | "classes" | "extracurriculars" | "schools" | "jobs" | "chatbot" | "goals";
+
 type DashboardUser = {
     firstName: string;
     lastName: string;
     role: string;
+    student?: {
+        schoolId: string | null;
+        postHighSchoolPlan: string | null;
+        interestedInNCAA: boolean;
+        _count: {
+            clubs: number;
+            sports: number;
+            studentCourses: number;
+            targetColleges: number;
+        };
+    } | null;
 };
 
 type DashboardShellProps = {
     user: DashboardUser;
-    progress: number;
-    children?: React.ReactNode; // optional prop for inner content
 };
 
-export default function DashboardShell({ user, progress, children }: DashboardShellProps) {
-    const [activeTab, setActiveTab] = useState<
-        "overview" | "classes" | "extracurriculars" | "schools" | "jobs" | "chatbot" | "goals"
-    >("overview");
+export default function DashboardShell({ user }: DashboardShellProps) {
+    const tabs = useMemo(() => {
+        const isStudent = user.role === "STUDENT";
+        const student = user.student ?? null;
+
+        const studentCounts = student?._count ?? {
+            clubs: 0,
+            sports: 0,
+            studentCourses: 0,
+            targetColleges: 0,
+        };
+
+        const plan = student?.postHighSchoolPlan ?? null;
+        const showSchools = isStudent && (plan === "College" || plan === "Vocational");
+
+        const result: Array<{ id: TabId; label: string; badge?: number }> = [
+            { id: "overview", label: "Overview" },
+        ];
+
+        if (isStudent && student) {
+            result.push({ id: "classes", label: "Classes", badge: studentCounts.studentCourses });
+            result.push({
+                id: "extracurriculars",
+                label: "Extracurriculars",
+                badge: studentCounts.clubs + studentCounts.sports,
+            });
+            if (showSchools) {
+                result.push({
+                    id: "schools",
+                    label: "Schools",
+                    badge: studentCounts.targetColleges,
+                });
+            }
+            result.push({ id: "jobs", label: "Jobs & Internships" });
+            result.push({ id: "chatbot", label: "ChatBot" });
+            result.push({ id: "goals", label: "Goals" });
+        } else {
+            // Non-students/admins get a slimmer set until the admin dashboard is implemented.
+            result.push({ id: "chatbot", label: "ChatBot" });
+        }
+
+        return result;
+    }, [user.role, user.student]);
+
+    const [activeTab, setActiveTab] = useState<TabId>(tabs[0]?.id ?? "overview");
+
+    const safeActiveTab = useMemo<TabId>(() => {
+        return tabs.some((t) => t.id === activeTab) ? activeTab : (tabs[0]?.id ?? "overview");
+    }, [activeTab, tabs]);
 
     return (
         <div className="dashboard-wrapper min-h-screen flex flex-col">
@@ -44,88 +100,38 @@ export default function DashboardShell({ user, progress, children }: DashboardSh
 
                 {/* Navigation tabs */}
                 <nav className="flex gap-6 text-xl font-bold">
-                    <button
-                        className={
-                            activeTab === "overview"
-                                ? "border-b-2 border-[var(--accent-background)]"
-                                : "opacity-70 hover:opacity-100"
-                        }
-                        onClick={() => setActiveTab("overview")}
-                    >
-                        Overview
-                    </button>
-                    <button
-                        className={
-                            activeTab === "classes"
-                                ? "border-b-2 border-[var(--accent-background)]"
-                                : "opacity-70 hover:opacity-100"
-                        }
-                        onClick={() => setActiveTab("classes")}
-                    >
-                        Classes
-                    </button>
-                    <button
-                        className={
-                            activeTab === "extracurriculars"
-                                ? "border-b-2 border-[var(--accent-background)]"
-                                : "opacity-70 hover:opacity-100"
-                        }
-                        onClick={() => setActiveTab("extracurriculars")}
-                    >
-                        Extracurriculars
-                    </button>
-                    <button
-                        className={
-                            activeTab === "schools"
-                                ? "border-b-2 border-[var(--accent-background)]"
-                                : "opacity-70 hover:opacity-100"
-                        }
-                        onClick={() => setActiveTab("schools")}
-                    >
-                        Schools
-                    </button>
-                    <button
-                        className={
-                            activeTab === "jobs"
-                                ? "border-b-2 border-[var(--accent-background)]"
-                                : "opacity-70 hover:opacity-100"
-                        }
-                        onClick={() => setActiveTab("jobs")}
-                    >
-                        Jobs & Internships
-                    </button>
-                    <button
-                        className={
-                            activeTab === "chatbot"
-                                ? "border-b-2 border-[var(--accent-background)]"
-                                : "opacity-70 hover:opacity-100"
-                        }
-                        onClick={() => setActiveTab("chatbot")}
-                    >
-                        ChatBot
-                    </button>
-                    <button
-                        className={
-                            activeTab === "goals"
-                                ? "border-b-2 border-[var(--accent-background)]"
-                                : "opacity-70 hover:opacity-100"
-                        }
-                        onClick={() => setActiveTab("goals")}
-                    >
-                        Goals
-                    </button>
+                    {tabs.map((tab) => (
+                        <button
+                            key={tab.id}
+                            className={
+                                safeActiveTab === tab.id
+                                    ? "border-b-2 border-[var(--accent-background)]"
+                                    : "opacity-70 hover:opacity-100"
+                            }
+                            onClick={() => setActiveTab(tab.id)}
+                        >
+                            <span className="inline-flex items-center gap-2">
+                                <span>{tab.label}</span>
+                                {typeof tab.badge === "number" && (
+                                    <span className="text-sm font-bold px-2 py-0.5 rounded-full bg-[var(--accent-background)] text-[var(--foreground)]">
+                                        {tab.badge}
+                                    </span>
+                                )}
+                            </span>
+                        </button>
+                    ))}
                 </nav>
             </header>
 
             {/* Main content */}
             <main className="flex-1 p-6 bg-white dark:bg-gray-100">
-                {activeTab === "overview" && <Overview user={user} />}
-                {activeTab === "classes" && <ClassesPage />}
-                {activeTab === "extracurriculars" && <Extracurriculars />}
-                {activeTab === "schools" && <Schools />}
-                {activeTab === "jobs" && <Jobs />}
-                {activeTab === "goals" && <Goals />}
-                {activeTab === "chatbot" && (
+                {safeActiveTab === "overview" && <Overview user={user} />}
+                {safeActiveTab === "classes" && <ClassesPage />}
+                {safeActiveTab === "extracurriculars" && <Extracurriculars />}
+                {safeActiveTab === "schools" && <Schools />}
+                {safeActiveTab === "jobs" && <Jobs />}
+                {safeActiveTab === "goals" && <Goals />}
+                {safeActiveTab === "chatbot" && (
                     <div className="flex flex-col gap-6">
                         <h2 className="text-2xl font-bold">AI ChatBot</h2>
                         <p className="text-gray-600">
@@ -137,8 +143,6 @@ export default function DashboardShell({ user, progress, children }: DashboardSh
                     </div>
                 )}
             </main>
-
-           
         </div>
     );
 }

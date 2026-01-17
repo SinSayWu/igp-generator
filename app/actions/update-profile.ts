@@ -24,28 +24,44 @@ export async function updateStudentProfile(userId: string, formData: FormData) {
     const interests = formData.getAll("interests") as string[];
     const subjectInterests = formData.getAll("subjectInterests") as string[];
     const rawGrade = formData.get("gradeLevel");
-    const gradeLevel = rawGrade ? parseInt(rawGrade as string) : 9;
-    const bio = formData.get("bio") as string;
-    const postHighSchoolPlan = formData.get("postHighSchoolPlan") as string;
-    const careerInterest = formData.get("careerInterest") as string;
-    const interestedInNCAA = formData.get("interestedInNCAA") === "on";
+    const gradeLevel = rawGrade ? parseInt(rawGrade as string) : undefined;
+
+    const bioRaw = formData.get("bio");
+    const bio = typeof bioRaw === "string" ? bioRaw : undefined;
+
+    const postHighSchoolPlanRaw = formData.get("postHighSchoolPlan");
+    const postHighSchoolPlan =
+        typeof postHighSchoolPlanRaw === "string"
+            ? postHighSchoolPlanRaw.length
+                ? postHighSchoolPlanRaw
+                : null
+            : undefined;
+
+    const careerInterestRaw = formData.get("careerInterest");
+    const careerInterest = typeof careerInterestRaw === "string" ? careerInterestRaw : undefined;
+
+    const interestedInNCAARaw = formData.get("interestedInNCAA");
+    const interestedInNCAA =
+        interestedInNCAARaw == null
+            ? undefined
+            : interestedInNCAARaw === "on" || interestedInNCAARaw === "true";
 
     // NEW: Extract study halls
     const rawStudyHalls = formData.get("studyHallsPerYear");
-    const studyHallsPerYear = rawStudyHalls ? parseInt(rawStudyHalls as string) : 0;
+    const studyHallsPerYear = rawStudyHalls ? parseInt(rawStudyHalls as string) : undefined;
 
     // 3. Update Database
     await prisma.student.update({
         where: { userId },
         data: {
-            gradeLevel,
-            bio,
+            ...(gradeLevel == null ? {} : { gradeLevel }),
+            ...(bio === undefined ? {} : { bio }),
             interests,
             subjectInterests,
-            postHighSchoolPlan,
-            careerInterest,
-            interestedInNCAA,
-            studyHallsPerYear,
+            ...(postHighSchoolPlan === undefined ? {} : { postHighSchoolPlan }),
+            ...(careerInterest === undefined ? {} : { careerInterest }),
+            ...(interestedInNCAA === undefined ? {} : { interestedInNCAA }),
+            ...(studyHallsPerYear == null ? {} : { studyHallsPerYear }),
 
             // Relations
             clubs: { set: [], connect: clubIds.map((id) => ({ id })) },
