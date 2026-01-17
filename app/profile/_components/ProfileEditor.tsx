@@ -633,10 +633,24 @@ function SectionTable({
     expandedCourses,
     onToggleCourseExpand,
 }: SectionTableProps) {
-  const availableItems = allRawItems.filter(
-    (raw) => !items.some((existing) => existing.id === raw.id)
-  );
+    const availableItems = allRawItems.filter(
+        (raw) => !items.some((existing) => existing.id === raw.id)
+    );
 
+<<<<<<< Updated upstream
+=======
+    const isPendingValid = () => {
+        if (!isCourseSection || !pendingCourseData) return true;
+        const { status, grade, confidence, stress } = pendingCourseData;
+
+        if (status === "COMPLETED") return !!grade && !!confidence;
+        if (status === "IN_PROGRESS") return !!grade && !!confidence && !!stress;
+        if (status === "NEXT_SEMESTER") return !!confidence && !!stress;
+
+        return true;
+    };
+
+>>>>>>> Stashed changes
     return (
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-full">
             {/* Header */}
@@ -701,6 +715,7 @@ function SectionTable({
                                                 )}
                                             </div>
                                         </div>
+<<<<<<< Updated upstream
               return (
                 <div
                   key={item.id}
@@ -1012,25 +1027,461 @@ function SectionTable({
                   />
                 </svg>
               </div>
-            </div>
+=======
 
-            <button
-              type="button"
-              onClick={onAdd}
-              disabled={!selectedId}
-              className={`
-                px-5 py-2.5 rounded-lg text-sm font-bold shadow-sm transition-all
-                ${selectedId
-                  ? "bg-slate-800 text-white hover:bg-slate-900 hover:shadow-md active:scale-95"
-                  : "bg-slate-100 text-slate-400 cursor-not-allowed"
-                }
-              `}
-            >
-              Add
-            </button>
-          </div>
+                                        <div className="flex items-center gap-2">
+                                            {isCourseSection && onToggleCourseExpand && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => onToggleCourseExpand(item.id)}
+                                                    className="text-xs font-medium text-indigo-600 hover:bg-indigo-50 px-3 py-1.5 rounded transition"
+                                                >
+                                                    {isExpanded ? "Done" : "Details"}
+                                                </button>
+                                            )}
+                                            <button
+                                                type="button"
+                                                onClick={() => onRemove(item.id)}
+                                                className="text-slate-400 hover:text-red-500 hover:bg-red-50 p-1.5 rounded transition"
+                                                title="Remove"
+                                            >
+                                                <svg
+                                                    className="w-4 h-4"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth="2"
+                                                        d="M6 18L18 6M6 6l12 12"
+                                                    />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Expanded Course Editor */}
+                                    {isCourseSection && isExpanded && onCourseDataChange && (
+                                        <div className="px-4 pb-4 pt-0 animate-fadeIn">
+                                            <div className="h-px bg-indigo-100 w-full mb-4" />
+
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                {/* Status - Always shown */}
+                                                <div className="col-span-1 sm:col-span-2">
+                                                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
+                                                        Status
+                                                    </label>
+                                                    <select
+                                                        value={cData?.status || "IN_PROGRESS"}
+                                                        onChange={(e) => {
+                                                            const newData = new Map(courseData!);
+                                                            newData.set(item.id, {
+                                                                ...cData!,
+                                                                status: e.target.value,
+                                                            });
+                                                            onCourseDataChange(newData);
+                                                        }}
+                                                        className="w-full text-sm border-slate-200 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                                                    >
+                                                        <option value="IN_PROGRESS">
+                                                            In Progress
+                                                        </option>
+                                                        <option value="COMPLETED">Completed</option>
+                                                        <option value="NEXT_SEMESTER">
+                                                            Next Semester
+                                                        </option>
+                                                    </select>
+                                                </div>
+
+                                                {/* Grade - Only for COMPLETED or IN_PROGRESS */}
+                                                {(cData?.status === "COMPLETED" ||
+                                                    cData?.status === "IN_PROGRESS") && (
+                                                    <div>
+                                                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
+                                                            Grade{" "}
+                                                            <span className="text-red-500">*</span>
+                                                        </label>
+                                                        <select
+                                                            required
+                                                            value={cData?.grade || ""}
+                                                            onChange={(e) => {
+                                                                const newData = new Map(
+                                                                    courseData!
+                                                                );
+                                                                newData.set(item.id, {
+                                                                    ...cData!,
+                                                                    grade: e.target.value,
+                                                                });
+                                                                onCourseDataChange(newData);
+                                                            }}
+                                                            className="w-full text-sm border-slate-200 rounded-md focus:ring-indigo-500 focus:border-indigo-500 invalid:border-red-300 invalid:text-red-600"
+                                                        >
+                                                            <option value="">
+                                                                -- Select Grade --
+                                                            </option>
+                                                            <option value="A+">A+</option>
+                                                            <option value="A">A</option>
+                                                            <option value="A-">A-</option>
+                                                            <option value="B+">B+</option>
+                                                            <option value="B">B</option>
+                                                            <option value="B-">B-</option>
+                                                            <option value="C+">C+</option>
+                                                            <option value="C">C</option>
+                                                            <option value="C-">C-</option>
+                                                            <option value="D+">D+</option>
+                                                            <option value="D">D</option>
+                                                            <option value="D-">D-</option>
+                                                            <option value="F">F</option>
+                                                        </select>
+                                                    </div>
+                                                )}
+
+                                                {/* Completed Grade Level - Only for COMPLETED */}
+                                                {cData?.status === "COMPLETED" && (
+                                                    <div>
+                                                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
+                                                            Completed in Grade{" "}
+                                                            <span className="text-red-500">*</span>
+                                                        </label>
+                                                        <select
+                                                            required
+                                                            value={cData?.confidence || ""}
+                                                            onChange={(e) => {
+                                                                const newData = new Map(
+                                                                    courseData!
+                                                                );
+                                                                newData.set(item.id, {
+                                                                    ...cData!,
+                                                                    confidence: e.target.value,
+                                                                });
+                                                                onCourseDataChange(newData);
+                                                            }}
+                                                            className="w-full text-sm border-slate-200 rounded-md focus:ring-indigo-500 focus:border-indigo-500 invalid:border-red-300 invalid:text-red-600"
+                                                        >
+                                                            <option value="">
+                                                                -- Select Level --
+                                                            </option>
+                                                            <option value="middle">
+                                                                Middle School
+                                                            </option>
+                                                            <option value="9">9th Grade</option>
+                                                            <option value="10">10th Grade</option>
+                                                            <option value="11">11th Grade</option>
+                                                            <option value="12">12th Grade</option>
+                                                        </select>
+                                                    </div>
+                                                )}
+
+                                                {/* Confidence and Stress Level - Only for IN_PROGRESS or NEXT_SEMESTER */}
+                                                {(cData?.status === "IN_PROGRESS" ||
+                                                    cData?.status === "NEXT_SEMESTER") && (
+                                                    <>
+                                                        <div>
+                                                            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
+                                                                Confidence Level{" "}
+                                                                <span className="text-red-500">
+                                                                    *
+                                                                </span>
+                                                            </label>
+                                                            <select
+                                                                required
+                                                                value={cData?.confidence || ""}
+                                                                onChange={(e) => {
+                                                                    const newData = new Map(
+                                                                        courseData!
+                                                                    );
+                                                                    newData.set(item.id, {
+                                                                        ...cData!,
+                                                                        confidence: e.target.value,
+                                                                    });
+                                                                    onCourseDataChange(newData);
+                                                                }}
+                                                                className="w-full text-sm border-slate-200 rounded-md focus:ring-indigo-500 focus:border-indigo-500 invalid:border-red-300 invalid:text-red-600"
+                                                            >
+                                                                <option value="">
+                                                                    -- Select --
+                                                                </option>
+                                                                <option value="VERY_LOW">
+                                                                    Very Low
+                                                                </option>
+                                                                <option value="LOW">Low</option>
+                                                                <option value="NEUTRAL">
+                                                                    Neutral
+                                                                </option>
+                                                                <option value="HIGH">High</option>
+                                                                <option value="VERY_HIGH">
+                                                                    Very High
+                                                                </option>
+                                                            </select>
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
+                                                                Stress Level{" "}
+                                                                <span className="text-red-500">
+                                                                    *
+                                                                </span>
+                                                            </label>
+                                                            <select
+                                                                required
+                                                                value={cData?.stress || ""}
+                                                                onChange={(e) => {
+                                                                    const newData = new Map(
+                                                                        courseData!
+                                                                    );
+                                                                    newData.set(item.id, {
+                                                                        ...cData!,
+                                                                        stress: e.target.value,
+                                                                    });
+                                                                    onCourseDataChange(newData);
+                                                                }}
+                                                                className="w-full text-sm border-slate-200 rounded-md focus:ring-indigo-500 focus:border-indigo-500 invalid:border-red-300 invalid:text-red-600"
+                                                            >
+                                                                <option value="">
+                                                                    -- Select --
+                                                                </option>
+                                                                <option value="VERY_LOW">
+                                                                    Very Low
+                                                                </option>
+                                                                <option value="LOW">Low</option>
+                                                                <option value="NEUTRAL">
+                                                                    Neutral
+                                                                </option>
+                                                                <option value="HIGH">High</option>
+                                                                <option value="VERY_HIGH">
+                                                                    Very High
+                                                                </option>
+                                                            </select>
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })
+                    )}
+                </div>
+
+                {/* Input Area */}
+                <div className="mt-auto pt-4 border-t border-slate-100">
+                    <div className="flex flex-col gap-4">
+                        {/* Course Details Form - Show only when a course is selected */}
+                        {isCourseSection &&
+                            selectedId &&
+                            pendingCourseData &&
+                            onPendingCourseDataChange && (
+                                <div className="bg-slate-50 rounded-xl p-4 border border-indigo-100 animate-fadeIn space-y-4">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <span className="text-xs font-bold text-indigo-600 uppercase tracking-wider bg-indigo-50 px-2 py-1 rounded">
+                                            Course Details Required
+                                        </span>
+                                        <div className="h-px bg-indigo-100 flex-1"></div>
+                                    </div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        {/* Status - Always shown */}
+                                        <div className="col-span-1 sm:col-span-2">
+                                            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
+                                                Status
+                                            </label>
+                                            <select
+                                                value={pendingCourseData.status}
+                                                onChange={(e) =>
+                                                    onPendingCourseDataChange({
+                                                        ...pendingCourseData,
+                                                        status: e.target.value,
+                                                    })
+                                                }
+                                                className="w-full text-sm border-slate-200 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                                            >
+                                                <option value="IN_PROGRESS">In Progress</option>
+                                                <option value="COMPLETED">Completed</option>
+                                                <option value="NEXT_SEMESTER">Next Semester</option>
+                                            </select>
+                                        </div>
+
+                                        {/* Grade - Only for COMPLETED or IN_PROGRESS */}
+                                        {(pendingCourseData.status === "COMPLETED" ||
+                                            pendingCourseData.status === "IN_PROGRESS") && (
+                                            <div>
+                                                <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
+                                                    Grade <span className="text-red-500">*</span>
+                                                </label>
+                                                <select
+                                                    required
+                                                    value={pendingCourseData.grade}
+                                                    onChange={(e) =>
+                                                        onPendingCourseDataChange({
+                                                            ...pendingCourseData,
+                                                            grade: e.target.value,
+                                                        })
+                                                    }
+                                                    className="w-full text-sm border-slate-200 rounded-md focus:ring-indigo-500 focus:border-indigo-500 invalid:border-red-300 invalid:text-red-600"
+                                                >
+                                                    <option value="">-- Select Grade --</option>
+                                                    <option value="A+">A+</option>
+                                                    <option value="A">A</option>
+                                                    <option value="A-">A-</option>
+                                                    <option value="B+">B+</option>
+                                                    <option value="B">B</option>
+                                                    <option value="B-">B-</option>
+                                                    <option value="C+">C+</option>
+                                                    <option value="C">C</option>
+                                                    <option value="C-">C-</option>
+                                                    <option value="D+">D+</option>
+                                                    <option value="D">D</option>
+                                                    <option value="D-">D-</option>
+                                                    <option value="F">F</option>
+                                                </select>
+                                            </div>
+                                        )}
+
+                                        {/* Completed in Grade (stored in confidence) - Only for COMPLETED */}
+                                        {pendingCourseData.status === "COMPLETED" && (
+                                            <div>
+                                                <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
+                                                    Completed in Grade{" "}
+                                                    <span className="text-red-500">*</span>
+                                                </label>
+                                                <select
+                                                    required
+                                                    value={pendingCourseData.confidence}
+                                                    onChange={(e) =>
+                                                        onPendingCourseDataChange({
+                                                            ...pendingCourseData,
+                                                            confidence: e.target.value,
+                                                        })
+                                                    }
+                                                    className="w-full text-sm border-slate-200 rounded-md focus:ring-indigo-500 focus:border-indigo-500 invalid:border-red-300 invalid:text-red-600"
+                                                >
+                                                    <option value="">-- Select Level --</option>
+                                                    <option value="middle">Middle School</option>
+                                                    <option value="9">9th Grade</option>
+                                                    <option value="10">10th Grade</option>
+                                                    <option value="11">11th Grade</option>
+                                                    <option value="12">12th Grade</option>
+                                                </select>
+                                            </div>
+                                        )}
+
+                                        {/* Confidence & Stress - Only for IN_PROGRESS or NEXT_SEMESTER */}
+                                        {(pendingCourseData.status === "IN_PROGRESS" ||
+                                            pendingCourseData.status === "NEXT_SEMESTER") && (
+                                            <>
+                                                <div>
+                                                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
+                                                        Confidence{" "}
+                                                        <span className="text-red-500">*</span>
+                                                    </label>
+                                                    <select
+                                                        required
+                                                        value={pendingCourseData.confidence}
+                                                        onChange={(e) =>
+                                                            onPendingCourseDataChange({
+                                                                ...pendingCourseData,
+                                                                confidence: e.target.value,
+                                                            })
+                                                        }
+                                                        className="w-full text-sm border-slate-200 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                                                    >
+                                                        <option value="">-- Select --</option>
+                                                        <option value="VERY_LOW">Very Low</option>
+                                                        <option value="LOW">Low</option>
+                                                        <option value="NEUTRAL">Neutral</option>
+                                                        <option value="HIGH">High</option>
+                                                        <option value="VERY_HIGH">Very High</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
+                                                        Stress{" "}
+                                                        <span className="text-red-500">*</span>
+                                                    </label>
+                                                    <select
+                                                        required
+                                                        value={pendingCourseData.stress}
+                                                        onChange={(e) =>
+                                                            onPendingCourseDataChange({
+                                                                ...pendingCourseData,
+                                                                stress: e.target.value,
+                                                            })
+                                                        }
+                                                        className="w-full text-sm border-slate-200 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                                                    >
+                                                        <option value="">-- Select --</option>
+                                                        <option value="VERY_LOW">Very Low</option>
+                                                        <option value="LOW">Low</option>
+                                                        <option value="NEUTRAL">Neutral</option>
+                                                        <option value="HIGH">High</option>
+                                                        <option value="VERY_HIGH">Very High</option>
+                                                    </select>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                        <div className="flex gap-2">
+                            <div className="relative flex-1">
+                                <select
+                                    value={selectedId}
+                                    onChange={(e) => onSelect(e.target.value)}
+                                    className="w-full pl-3 pr-8 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none bg-white transition-shadow"
+                                >
+                                    <option value="">{placeholder}</option>
+                                    {availableItems.map((item) => {
+                                        const detail =
+                                            ("department" in item && item.department) ||
+                                            ("category" in item && item.category) ||
+                                            ("season" in item && item.season);
+                                        return (
+                                            <option key={item.id} value={item.id}>
+                                                {item.name} {detail ? `(${detail})` : ""}
+                                            </option>
+                                        );
+                                    })}
+                                </select>
+                                {/* Custom Chevron */}
+                                <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-slate-500">
+                                    <svg
+                                        className="w-4 h-4"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M19 9l-7 7-7-7"
+                                        />
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={onAdd}
+                                disabled={!selectedId || !isPendingValid()}
+                                className={`
+                    px-5 py-2.5 rounded-lg text-sm font-bold shadow-sm transition-all
+                    ${
+                        selectedId && isPendingValid()
+                            ? "bg-slate-800 text-white hover:bg-slate-900 hover:shadow-md active:scale-95"
+                            : "bg-slate-100 text-slate-400 cursor-not-allowed"
+                    }
+                  `}
+                            >
+                                Add
+                            </button>
+                        </div>
+                    </div>
+                </div>
+>>>>>>> Stashed changes
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }
