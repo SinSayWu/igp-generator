@@ -96,4 +96,5 @@ export async function updateStudentProfile(userId: string, formData: FormData) {
     });
 
     revalidatePath("/profile");
+    revalidatePath("/dashboard", "layout");
 }

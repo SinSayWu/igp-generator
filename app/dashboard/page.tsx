@@ -33,6 +33,43 @@ export default async function DashboardPage() {
                             targetColleges: true,
                         },
                     },
+                    // Full data for dashboard tabs
+                    studentCourses: {
+                        select: {
+                            id: true,
+                            courseId: true,
+                            grade: true,
+                            status: true,
+                            course: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    department: true,
+                                },
+                            },
+                        },
+                    },
+                    clubs: {
+                        select: {
+                            id: true,
+                            name: true,
+                            category: true,
+                        },
+                    },
+                    sports: {
+                        select: {
+                            id: true,
+                            name: true,
+                            season: true,
+                        },
+                    },
+                    targetColleges: {
+                        select: {
+                            id: true,
+                            name: true,
+                            type: true,
+                        },
+                    },
                 },
             },
         },

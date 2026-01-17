@@ -10,6 +10,37 @@ import Goals from "./Goals";
 
 type TabId = "overview" | "classes" | "extracurriculars" | "schools" | "jobs" | "chatbot" | "goals";
 
+// Types for student data
+type StudentCourseData = {
+    id: string;
+    courseId: string;
+    grade: string | null;
+    status: string;
+    course: {
+        id: string;
+        name: string;
+        department: string;
+    };
+};
+
+type ClubData = {
+    id: string;
+    name: string;
+    category: string;
+};
+
+type SportData = {
+    id: string;
+    name: string;
+    season: string;
+};
+
+type CollegeData = {
+    id: string;
+    name: string;
+    type: string;
+};
+
 type DashboardUser = {
     firstName: string;
     lastName: string;
@@ -24,6 +55,10 @@ type DashboardUser = {
             studentCourses: number;
             targetColleges: number;
         };
+        studentCourses: StudentCourseData[];
+        clubs: ClubData[];
+        sports: SportData[];
+        targetColleges: CollegeData[];
     } | null;
 };
 
@@ -126,9 +161,18 @@ export default function DashboardShell({ user }: DashboardShellProps) {
             {/* Main content */}
             <main className="flex-1 p-6 bg-white dark:bg-gray-100">
                 {safeActiveTab === "overview" && <Overview user={user} />}
-                {safeActiveTab === "classes" && <ClassesPage />}
-                {safeActiveTab === "extracurriculars" && <Extracurriculars />}
-                {safeActiveTab === "schools" && <Schools />}
+                {safeActiveTab === "classes" && (
+                    <ClassesPage courses={user.student?.studentCourses ?? []} />
+                )}
+                {safeActiveTab === "extracurriculars" && (
+                    <Extracurriculars
+                        clubs={user.student?.clubs ?? []}
+                        sports={user.student?.sports ?? []}
+                    />
+                )}
+                {safeActiveTab === "schools" && (
+                    <Schools colleges={user.student?.targetColleges ?? []} />
+                )}
                 {safeActiveTab === "jobs" && <Jobs />}
                 {safeActiveTab === "goals" && <Goals />}
                 {safeActiveTab === "chatbot" && (
