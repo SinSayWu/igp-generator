@@ -49,13 +49,20 @@
 *   **Exact Naming (Critical):** Check every course title against the Catalog character-for-character. If the draft says "Algebra 1" but the catalog says "Algebra 1 CP", YOU MUST CORRECT IT.
 *   **Hallucination Check:** If a course name does not exist in the Catalog, find the closest valid match. If none exists, replace with "Study Hall".
 
+**6. Duplicate Elimination (Critical)**
+*   **Transcript Check:** Ensure NO course in the schedule appears in `student.completed_courses` or `student.transcript`.
+*   **Self-Reference Check:** Ensure NO course appears more than once in the entire 4-year plan.
+*   **Cross-Grade Check:** A course scheduled in 10th grade cannot also be in 11th grade.
+*   **Correction:** If a duplicate is found, keep the earliest valid instance and replace the later duplicate with a valid next-level course or different elective.
+
 ---
 
 ### Response Format
 
-**Step 1: Audit Report**
-*   Briefly state if the draft was valid or if errors were found.
-*   List specific corrections made (e.g., "Moved Calculus to 12th Grade because Pre-Calc was missing in 11th").
+**Step 1: Audit Report & Analysis**
+*   **Validation Status:** Briefly state if the draft was valid or if errors were found.
+*   **Corrections:** List specific corrections made (e.g., "Moved Calculus to 12th Grade").
+*   **Context Preservation:** If the Draft Schedule included "Pros/Cons" or reasoning for a specific student request, **you MUST summarize or restate that reasoning here**. Do not silence the counselor's advice. Verify the reasoning is distinct from the validation.
 
 **Step 2: JSON Payload**
 Return ONLY valid JSON inside a code block.

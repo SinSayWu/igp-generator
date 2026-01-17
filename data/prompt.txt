@@ -13,9 +13,10 @@
 ### Phase 1: Context & Constraint Analysis
 Before generating the schedule, you must internalize the following rules:
 
-**1. The Immutable Catalog Rule**
-* You must ONLY use `course_id` strings exactly as they appear in the Course Catalog.
-* Do not invent courses. Do not infer courses that are not in the list.
+**1. The Immutable Catalog Rule (Cross-Reference)**
+*   You must ONLY use `course_id`/titles exactly as they appear in the Course Catalog.
+*   **Cross-Reference:** Before finalizing ANY slot, look up the course in the provided `Course Catalog` JSON. If it's not there, do not use it. Check for exact spelling.
+*   Do not invent courses. Do not infer courses that are not in the list.
 
 **2. The Slotting & Credit Rule**
 * Each year must contain exactly **8 slots**.

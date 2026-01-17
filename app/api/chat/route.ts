@@ -23,6 +23,23 @@ export async function POST(req: Request) {
             .replace("{{GRADUATION_REQS}}", graduationReqs)
             .replace("{{STUDENTS}}", students);
 
+        // Detect if this is a "reprompt" (conversational update)
+        // We look for the [SYSTEM INJECTION] tag we added in the frontend
+        const isConversationalUpdate = messages.some(
+            (m: any) => m.content && m.content.includes("[SYSTEM INJECTION]")
+        );
+
+        // Modify prompt for updates to ensure Pros/Cons analysis
+        let finalMessages = [{ role: "system", content: systemPrompt }, ...messages];
+
+        if (isConversationalUpdate) {
+            finalMessages.push({
+                role: "system",
+                content:
+                    "IMPORTANT: You are in update mode. The user wants to modify the existing schedule. 1. Stick to the original schedule as much as possible, only changing what is requested. 2. Evaluate the user's request: explicitly list the PROS and CONS of this change in your explanation. 3. Output the fully updated JSON schedule.",
+            });
+        }
+
         // 3. Step 1: Generate Draft Schedule (The Creator)
         const draftResponse = await fetch("https://api.openai.com/v1/chat/completions", {
             method: "POST",
@@ -32,7 +49,7 @@ export async function POST(req: Request) {
             },
             body: JSON.stringify({
                 model: "gpt-5.2",
-                messages: [{ role: "system", content: systemPrompt }, ...messages],
+                messages: finalMessages,
                 temperature: 0.5,
             }),
         });

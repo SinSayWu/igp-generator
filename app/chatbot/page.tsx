@@ -67,10 +67,23 @@ export default function ChatbotPage() {
         setLoading(true);
 
         try {
+            // Inject the current schedule into the context if it exists
+            const payloadMessages = [...newMessages];
+            if (schedule) {
+                // Insert a system message before the last user message
+                const systemInjection = {
+                    role: "system",
+                    content: `[SYSTEM INJECTION] The user is actively viewing the following schedule JSON. If they request changes, you MUST modify this JSON and output the full NEW JSON. If they ask questions, answer based on this schedule.\n\n${JSON.stringify(
+                        schedule
+                    )}`,
+                };
+                payloadMessages.splice(payloadMessages.length - 1, 0, systemInjection as Message);
+            }
+
             const res = await fetch("/api/chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ messages: newMessages }),
+                body: JSON.stringify({ messages: payloadMessages }),
             });
 
             if (!res.ok) throw new Error("Failed to fetch");
