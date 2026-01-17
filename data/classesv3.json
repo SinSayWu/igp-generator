@@ -1,0 +1,355 @@
+{
+  "version": "2026.01",
+  "subjects": {
+    "MATH": {
+      "display_name": "Math",
+      "course_index": {
+        "MATH-FOUNDATIONS": { "name": "Foundations", "credits": 1.0 },
+        "MATH-ALG1-CP": { "name": "Algebra 1 (CP)", "credits": 1.0 },
+        "MATH-GEOMETRY": { "name": "Geometry (REG)", "credits": 1.0 },
+        "MATH-GEOMETRY-CP": { "name": "Geometry (CP)", "credits": 1.0 },
+        "MATH-GEOMETRY-H": { "name": "Geometry (Honors)", "credits": 1.0 },
+        "MATH-ALG2-CP": { "name": "Algebra 2 (CP)", "credits": 1.0 },
+        "MATH-ALG2-H": { "name": "Algebra 2 (Honors)", "credits": 1.0 },
+        "MATH-PRECALC-CP": { "name": "Precalculus (CP)", "credits": 1.0 },
+        "MATH-PRECALC-H": { "name": "Precalculus (Honors)", "credits": 1.0 },
+        "MATH-PROB-STATS-CP": { "name": "Probability & Statistics", "credits": 1.0 },
+        "MATH-AP-STATS": { "name": "AP Statistics", "credits": 1.0 },
+        "MATH-AP-CALC-AB": { "name": "AP Calculus AB", "credits": 1.0 },
+        "MATH-AP-CALC-BC": { "name": "AP Calculus BC", "credits": 1.0 },
+        "MATH-HONORS-CALC": { "name": "Honors Calculus", "credits": 1.0 },
+        "MATH-INTERMEDIATE": { "name": "Intermediate", "credits": 1.0 }
+      },
+      "offerings": {
+        "Remedial-CP": ["MATH-FOUNDATIONS", "MATH-GEOMETRY", "MATH-INTERMEDIATE"],
+        "CP": ["MATH-ALG1-CP", "MATH-GEOMETRY-CP", "MATH-ALG2-CP", "MATH-PRECALC-CP", "MATH-PROB-STATS-CP"],
+        "HONORS": ["MATH-GEOMETRY-H", "MATH-ALG2-H", "MATH-PRECALC-H", "MATH-HONORS-CALC"],
+        "AP": ["MATH-AP-CALC-AB", "MATH-AP-CALC-BC", "MATH-AP-STATS"],
+        "DE": ["MATH-MAT120"]
+      },
+      "progressions": {
+        "STANDARD": [
+          ["MATH-ALG1-CP", "MATH-GEOMETRY-CP", "MATH-ALG2-CP", "MATH-PRECALC-CP"]
+        ],
+        "HONORS": [
+          ["MATH-ALG1-CP", "MATH-GEOMETRY-H", "MATH-ALG2-H", "MATH-PRECALC-H","MATH-HONORS-CALC"]
+        ],
+        "AP_CALC": [
+          ["MATH-ALG1-H","MATH-GEOMETRY-H","MATH-ALG-2-H","MATH-PRECALC-H", { "one_of": ["MATH-AP-CALC-AB", "MATH-AP-CALC-BC"] }]
+        ],
+        "AP_STATS": [
+          ["MATH-ALG1-H","MATH-GEOMETRY-H", "MATH-ALG2-H", "MATH-AP-STATS"]
+        ]
+      }
+    },
+
+    "ENG": {
+      "display_name": "English",
+      "course_index": {
+        "ENG-ENGLISH1-CP": { "name": "English 1 (CP)", "credits": 1.0 },
+        "ENG-ENGLISH1-H": { "name": "English 1 (Honors)", "credits": 1.0 },
+        "ENG-ENGLISH2-CP": { "name": "English 2 (CP)", "credits": 1.0 },
+        "ENG-ENGLISH2-H": { "name": "English 2 (Honors)", "credits": 1.0 },
+        "ENG-ENGLISH3-CP": { "name": "English 3 (CP)", "credits": 1.0 },
+        "ENG-ENGLISH3-H": { "name": "English 3 (Honors)", "credits": 1.0 },
+        "ENG-ENGLISH4-CP": { "name": "English 4 (CP)", "credits": 1.0 },
+        "ENG-ENGLISH4-H": { "name": "English 4 (Honors)", "credits": 1.0 },
+        "ENG-AP-LANG": { "name": "AP English Language", "credits": 1.0 },
+        "ENG-AP-LIT": { "name": "AP English Literature", "credits": 1.0 }
+      },
+      "offerings": {
+        "CP": ["ENG-ENGLISH1-CP", "ENG-ENGLISH2-CP", "ENG-ENGLISH3-CP", "ENG-ENGLISH4-CP"],
+        "HONORS": ["ENG-ENGLISH1-H", "ENG-ENGLISH2-H", "ENG-ENGLISH3-H", "ENG-ENGLISH4-H"],
+        "AP": ["ENG-AP-LANG", "ENG-AP-LIT"]
+      },
+      "progressions": {
+        "CP": [
+          ["ENG-ENGLISH1-CP", "ENG-ENGLISH2-CP", "ENG-ENGLISH3-CP", "ENG-ENGLISH4-CP"]
+        ],
+        "HONORS": [
+          ["ENG-ENGLISH1-H", "ENG-ENGLISH2-H", "ENG-ENGLISH3-H", "ENG-ENGLISH4-H"]
+        ],
+        "AP": [
+          ["ENG-ENGLISH1-H","ENG-ENGLISH2-H","ENG-ENGLISH3-H", "ENG-AP-LANG", "ENG-AP-LIT"]
+        ]
+      }
+    },
+
+    "CS": {
+      "display_name": "Computer Science",
+      "course_index": {
+        "CS-FUND-COMP-1": { "name": "Fundamentals of Computing (Part 1)", "credits": 0.5 },
+        "CS-FUND-COMP-2": { "name": "Fundamentals of Computing (Part 2)", "credits": 0.5 },
+        "CS-AP-CSP": { "name": "AP Computer Science Principles", "credits": 1.0 }
+      },
+      "offerings": {
+        "CP": ["CS-FUND-COMP-1", "CS-FUND-COMP-2"],
+        "Honors": ["CS-FUND-COMP-1", "CS-FUND-COMP-2"],
+        "AP": ["CS-AP-CSP"]
+      },
+      "progressions": {
+        "CP": [["CS-FUND-COMP-1", "CS-FUND-COMP-2"]],
+        "Honors": [["CS-FUND-COMP-1", "CS-FUND-COMP-2"]],
+        "AP": [["CS-AP-CSP"]]
+      }
+    },
+    "SCI": {
+      "display_name": "Science",
+      "course_index": {
+        "SCI-PHYSICAL-SCI-CP": { "name": "Physical Science (CP)", "credits": 1.0 },
+        "SCI-PHYSICAL-SCI-H": { "name": "Physical Science (Honors)", "credits": 1.0 },
+
+        "SCI-BIO1-CP": { "name": "Biology 1 (CP)", "credits": 1.0 },
+        "SCI-BIO1-H": { "name": "Biology 1 (Honors)", "credits": 1.0 },
+
+        "SCI-CHEM1-CP": { "name": "Chemistry 1 (CP)", "credits": 1.0 },
+        "SCI-CHEM1-H": { "name": "Chemistry 1 (Honors)", "credits": 1.0 },
+
+        "SCI-PHYS-CP": { "name": "Physics (CP)", "credits": 1.0 },
+        "SCI-PHYS-H": { "name": "Physics (Honors)", "credits": 1.0 },
+
+        "SCI-ENVSCI-CP": { "name": "Environmental Science (CP)", "credits": 1.0 },
+        "SCI-FORENSICS-CP": { "name": "Forensics (CP)", "credits": 1.0 },
+        "SCI-FORENSICS-H": { "name": "Forensics (Honors)", "credits": 1.0 },
+
+        "SCI-ANATOMY-PHYS-CP": { "name": "Anatomy & Physiology (CP)", "credits": 1.0 },
+        "SCI-ANATOMY-PHYS-H": { "name": "Anatomy & Physiology (Honors)", "credits": 1.0 },
+
+        "SCI-AP-BIO": { "name": "AP Biology", "credits": 1.0 },
+        "SCI-AP-CHEM": { "name": "AP Chemistry", "credits": 1.0 },
+        "SCI-AP-ENVSCI": { "name": "AP Environmental Science", "credits": 1.0 },
+        "SCI-AP-PHYS1": { "name": "AP Physics 1", "credits": 1.0 },
+        "SCI-AP-PHYSC": { "name": "AP Physics C", "credits": 1.0 }
+      },
+      "offerings": {
+        "CP": ["SCI-PHYSICAL-SCI-CP", "SCI-BIO1-CP", "SCI-CHEM1-CP", "SCI-PHYS-CP", "SCI-ENVSCI-CP", "SCI-FORENSICS-CP", "SCI-ANATOMY-PHYS-CP"], 
+        "HONORS": ["SCI-PHYSICAL-SCI-H", "SCI-BIO1-H", "SCI-CHEM1-H", "SCI-PHYS-H", "SCI-FORENSICS-H", "SCI-ANATOMY-PHYS-H"],
+        "AP": ["SCI-AP-BIO", "SCI-AP-CHEM", "SCI-AP-ENVSCI", "SCI-AP-PHYS1", "SCI-AP-PHYSC"]
+      },
+      "progressions": {
+        "CP": [["SCI-PHYSICAL-SCI-CP", "SCI-BIO1-CP", "SCI-CHEM1-CP", "SCI-PHYS-CP"]],
+        "HONORS": [["SCI-PHYSICAL-SCI-H", "SCI-BIO1-H", "SCI-CHEM1-H", "SCI-PHYS-H"]],
+        "AP": [["SCI-PHYSICAL-SCI-H", "SCI-BIO1-H", "SCI-CHEM1-H", { "any_of": ["SCI-AP-BIO", "SCI-AP-CHEM","SCI-AP-ENVSCI","SCI-AP-PHYS1","SCI-AP-PHYSC"] }]]
+      }
+    },
+
+    "SS": {
+      "display_name": "Social Studies",
+      "course_index": {
+        "SS-AP-HUMAN-GEO": { "name": "AP Human Geography", "credits": 1.0 },
+        "SS-HUMAN-GEO-CP": { "name": "Human Geography (CP)", "credits": 1.0 },
+        "SS-MODERN-WORLD-HIST-CP": { "name": "Modern World History (CP)", "credits": 1.0 },
+        "SS-AP-WORLD-HIST": { "name": "AP World History", "credits": 1.0 },
+        "SS-AP-EURO-HIST": { "name": "AP European History", "credits": 1.0 },
+
+        "SS-PSYCH-CP": { "name": "Psychology (CP)", "credits": 1.0 },
+        "SS-AP-PSYCH": { "name": "AP Psychology", "credits": 1.0 },
+
+        "SS-US-HIST-H": { "name": "Honors U.S. History", "credits": 1.0 },
+        "SS-AP-US-HIST": { "name": "AP U.S. History", "credits": 1.0 },
+
+        "SS-US-GOV-CP": { "name": "U.S. Government (CP)", "credits": 0.5 },
+        "SS-AP-GOV": { "name": "AP Government", "credits": 0.5 },
+
+        "SS-ECON-CP": { "name": "Economics (CP)", "credits": 0.5 },
+        "SS-AP-MACRO-ECON": { "name": "AP Macroeconomics", "credits": 0.5 }
+      },
+      "offerings": {
+        "CP": ["SS-HUMAN-GEO-CP","SS-MODERN-WORLD-HIST-CP","SS-US-GOV","SS-ECON", "SS-PSYCH-CP"],
+        "HONORS": ["SS-US-HIST-H"],
+        "AP": ["SS-AP-HUMAN-GEO", "SS-AP-WORLD-HIST", "SS-AP-EURO-HIST", "SS-AP-PSYCH", "SS-AP-US-HIST", "SS-AP-GOV", "SS-AP-MACRO-ECON"]
+      },
+      "progressions": {
+        "CP": [["SS-HUMAN-GEO-CP", "SS-MODERN-WORLD-HIST-CP", "SS-US-HIST-H", {"together": ["SS-MACRO-ECON","SS-GOV"]}]],
+        "Honors": [["SS-AP-HUMAN-GEO", "SS-AP-WORLD-HIST", {"one_of": ["SS-US-HIST-H","SS-AP-US-HIST"]}, {"together": ["SS-MACRO-ECON","SS-GOV"]}]],
+        "AP_CORE" : [["SS-AP-HUMAN-GEO", "SS-AP-WORLD-HIST", "SS-AP-US-HIST", {"together": ["SS-AP-MACRO-ECON","SS-AP-GOV"]}]]
+      }
+    },
+
+    "WL": {
+      "display_name": "World Language",
+      "course_index": {
+
+
+        "LANG-GERMAN-1-CP": { "name": "German 1", "credits": 1.0 },
+        "LANG-GERMAN-2-CP": { "name": "German 2", "credits": 1.0 },
+        "LANG-GERMAN-3-H": { "name": "German 3 (Honors)", "credits": 1.0 },
+        "LANG-GERMAN-4-H": { "name": "German 4 (Honors)", "credits": 1.0 },
+        "LANG-GERMAN-AP": { "name": "AP German", "credits": 1.0 },
+
+        "LANG-SPANISH-1-CP": { "name": "Spanish 1", "credits": 1.0 },
+        "LANG-SPANISH-2-CP": { "name": "Spanish 2", "credits": 1.0 },
+        "LANG-SPANISH-3-H": { "name": "Spanish 3 (Honors)", "credits": 1.0 },
+        "LANG-SPANISH-4-H": { "name": "Spanish 4 (Honors)", "credits": 1.0 },
+        "LANG-SPANISH-AP": { "name": "AP Spanish", "credits": 1.0 }
+      },
+      "offerings": {
+        "CP": ["LANG-GERMAN-1-CP", "LANG-GERMAN-2-CP", "LANG-SPANISH-1-CP", "LANG-SPANISH-2-CP"],
+        "HONORS": ["LANG-GERMAN-3-H", "LANG-GERMAN-4-H", "LANG-SPANISH-3-H", "LANG-SPANISH-4-H"],
+        "AP": ["LANG-GERMAN-AP", "LANG-SPANISH-AP"]
+      },
+      "progressions": {
+        "GERMAN": [
+          ["LANG-GERMAN-1-CP", "LANG-GERMAN-2-CP", "LANG-GERMAN-3-H", "LANG-GERMAN-4-H", "LANG-GERMAN-AP"]
+        ],
+        "SPANISH": [
+          ["LANG-SPANISH-1-CP", "LANG-SPANISH-2-CP", "LANG-SPANISH-3-H", "LANG-SPANISH-4-H", "LANG-SPANISH-AP"]
+        ]
+      }
+    },
+        "FA": {
+      "display_name": "Fine Arts",
+      "course_index": {
+        "ART-ART1": { "name": "Art 1", "credits": 1.0 },
+        "ART-ART2": { "name": "Art 2", "credits": 1.0 },
+        "ART-ART3": { "name": "Art 3", "credits": 1.0 },
+        "ART-ART4-H": { "name": "Art 4 (Honors)", "credits": 1.0 },
+
+        "ART-MEDIA-ARTS-1": { "name": "Media Arts 1 (Photography)", "credits": 0.5 },
+        "ART-MEDIA-ARTS-2": { "name": "Media Arts 2 (Graphic Design)", "credits": 0.5 },
+        "ART-MEDIA-ARTS-3": { "name": "Media Arts 3", "credits": 1.0 },
+        "ART-MEDIA-ARTS-4": { "name": "Media Arts 4", "credits": 1.0 },
+
+        "ART-THEATRE-1": { "name": "Theatre 1", "credits": 0.5 },
+        "ART-THEATRE-2": { "name": "Theatre 2", "credits": 0.5 },
+        "ART-THEATRE-3-H": { "name": "Theatre 3 (Honors)", "credits": 1.0 },
+        "ART-THEATRE-4-H": { "name": "Theatre 4 (Honors)", "credits": 1.0 },
+
+        "ART-AP-2D-DESIGN": { "name": "AP 2D Design (AP Photography)", "credits": 1.0 },
+        "ART-AP-3D-DESIGN": { "name": "AP 3D Design", "credits": 1.0 },
+        "ART-AP-DRAWING": { "name": "AP Drawing", "credits": 1.0 },
+
+        "MUS-AP-MUSIC-THEORY": { "name": "AP Music Theory", "credits": 1.0 },
+
+        "MUS-CHORUS-1": { "name": "Chorus 1", "credits": 1.0 },
+        "MUS-CHORUS-2": { "name": "Chorus 2", "credits": 1.0 },
+        "MUS-CHORUS-3": { "name": "Chorus 3", "credits": 1.0 },
+        "MUS-CHORUS-3-H": { "name": "Chorus 3 (Honors)", "credits": 1.0 },
+        "MUS-CHORUS-4": { "name": "Chorus 4", "credits": 1.0 },
+        "MUS-CHORUS-4-H": { "name": "Chorus 4 (Honors)", "credits": 1.0 },
+
+        "MUS-COLORGUARD": { "name": "Colorguard", "credits": 0.5 },
+        "MUS-GUITAR1": { "name": "Guitar 1", "credits": 0.5 },
+        "MUS-GUITAR2": { "name": "Guitar 2", "credits": 0.5 },
+        "MUS-JAZZ-ENSEMBLE": { "name": "Jazz Ensemble", "credits": 1.0 },
+        "MUS-JAZZ-ENSEMBLE-H": { "name": "Jazz Ensemble (Honors)", "credits": 1.0 },
+        "MUS-MUSIC-APPRECIATION-1": { "name": "Music Appreciation 1", "credits": 0.5 },
+
+        "MUS-ORCHESTRA-1": { "name": "Orchestra 1", "credits": 1.0 },
+        "MUS-ORCHESTRA-2": { "name": "Orchestra 2", "credits": 1.0 },
+        "MUS-ORCHESTRA-3": { "name": "Orchestra 3", "credits": 1.0 },
+        "MUS-ORCHESTRA-3-H": { "name": "Orchestra 3 (Honors)", "credits": 1.0 },
+        "MUS-ORCHESTRA-4": { "name": "Orchestra 4", "credits": 1.0 },
+        "MUS-ORCHESTRA-4-H": { "name": "Orchestra 4 (Honors)", "credits": 1.0 },
+
+        "MUS-PERCUSSION": { "name": "Percussion", "credits": 1.0 },
+        "MUS-SYMPHONIC-BAND": { "name": "Symphonic Band", "credits": 1.0 },
+        "MUS-SYMPHONIC-BAND-H": { "name": "Symphonic Band (Honors)", "credits": 1.0 },
+        "MUS-WIND-ENSEMBLE": { "name": "Wind Ensemble", "credits": 1.0 },
+        "MUS-WIND-ENSEMBLE-H": { "name": "Wind Ensemble (Honors)", "credits": 1.0 }
+      },
+      "offerings": {
+        "REG": [
+          "ART-ART1",
+          "ART-ART2",
+          "ART-ART3",
+          "ART-MEDIA-ARTS-1",
+          "ART-MEDIA-ARTS-2",
+          "ART-MEDIA-ARTS-3",
+          "ART-MEDIA-ARTS-4",
+          "ART-THEATRE-1",
+          "ART-THEATRE-2",
+          "MUS-CHORUS-1",
+          "MUS-CHORUS-2",
+          "MUS-CHORUS-3",
+          "MUS-CHORUS-4",
+          "MUS-COLORGUARD",
+          "MUS-GUITAR1",
+          "MUS-GUITAR2",
+          "MUS-JAZZ-ENSEMBLE",
+          "MUS-MUSIC-APPRECIATION-1",
+          "MUS-ORCHESTRA-1",
+          "MUS-ORCHESTRA-2",
+          "MUS-ORCHESTRA-3",
+          "MUS-ORCHESTRA-4",
+          "MUS-PERCUSSION",
+          "MUS-SYMPHONIC-BAND",
+          "MUS-WIND-ENSEMBLE"
+        ],
+        "HONORS": [
+          "ART-ART4-H",
+          "ART-THEATRE-3-H",
+          "ART-THEATRE-4-H",
+          "MUS-CHORUS-3-H",
+          "MUS-CHORUS-4-H",
+          "MUS-JAZZ-ENSEMBLE-H",
+          "MUS-ORCHESTRA-3-H",
+          "MUS-ORCHESTRA-4-H",
+          "MUS-SYMPHONIC-BAND-H",
+          "MUS-WIND-ENSEMBLE-H"
+        ],
+        "AP": [
+          "ART-AP-2D-DESIGN",
+          "ART-AP-3D-DESIGN",
+          "ART-AP-DRAWING",
+          "MUS-AP-MUSIC-THEORY"
+        ]
+      },
+      "progressions": {
+        "CP_ART_TRACK": [["ART-ART1", "ART-ART2", "ART-ART3", "ART-ART4-H"]],
+        "CP_MEDIA_TRACK": [["ART-MEDIA-ARTS-1", "ART-MEDIA-ARTS-2", "ART-MEDIA-ARTS-3", "ART-MEDIA-ARTS-4"]],
+        "THEATRE_TRACK": [["ART-THEATRE-1", "ART-THEATRE-2", "ART-THEATRE-3-H", "ART-THEATRE-4-H"]],
+        "GUITAR_TRACK": [["MUS-GUITAR1", "MUS-GUITAR2"]],
+        "CHORUS_TRACK": [["MUS-CHORUS-1", "MUS-CHORUS-2", "MUS-CHORUS-3", "MUS-CHORUS-4"]],
+        "ORCHESTRA_TRACK": [["MUS-ORCHESTRA-1", "MUS-ORCHESTRA-2", "MUS-ORCHESTRA-3", "MUS-ORCHESTRA-4"]],
+        "BAND_TRACK": [[{"multi_year":"MUS-WIND-ENSEMBLE"}]],
+        "AP_MUSIC": [["MUS-AP-MUSIC-THEORY"]],
+        "AP_ART": [["ART-ART1", "ART-ART2",{"one_of":["ART-AP-2D-DESIGN","ART-AP_DRAWING"]}]], 
+        "AP_MEDIA": [["ART-MEDIA-ARTS-1", "ART-MEDIA-ARTS-2","ART-AP-3D-DESIGN"]]
+      }
+    },
+
+    "PE": {
+      "display_name": "Physical Education",
+      "course_index": {
+        "PE-PE-1": { "name": "Physical Education 1", "credits": 1.0 },
+        "PE-PE-2": { "name": "Physical Education 2", "credits": 1.0 },
+        "PE-WEIGHTLIFTING": { "name": "Weightlifting", "credits": 1.0 }
+      },
+      "offerings": {
+        "CP": ["PE-PE-1", "PE-PE-2", "PE-WEIGHTLIFTING"]
+      },
+      "progressions": {
+        "PE_SEQUENCE": [["PE-PE-1", {"only_explicit_interst":"PE-PE-2"}]],
+        "ELECTIVE": [[{"multi_year":"PE-WEIGHTLIFTING"}]]
+      }
+    },
+
+    "JROTC": {
+      "display_name": "JROTC",
+      "course_index": {
+        "PE-AFJROTC-1": { "name": "Air Force Junior ROTC 1", "credits": 1.0 },
+        "PE-AFJROTC-2": { "name": "Air Force Junior ROTC 2", "credits": 1.0 },
+        "PE-AFJROTC-3": { "name": "Air Force Junior ROTC 3", "credits": 1.0 },
+        "PE-AFJROTC-4": { "name": "Air Force Junior ROTC 4", "credits": 1.0 }
+      },
+      "offerings": {
+        "REG": ["PE-AFJROTC-1", "PE-AFJROTC-2", "PE-AFJROTC-3", "PE-AFJROTC-4"]
+      },
+      "progressions": {
+        "AFJROTC": [["PE-AFJROTC-1", "PE-AFJROTC-2", "PE-AFJROTC-3", "PE-AFJROTC-4"]]
+      }
+    },
+
+    "SH": {
+      "display_name": "Study Hall",
+      "course_index": {
+        "SH-STUDY-HALL": { "name": "Study Hall", "credits": 1.0 }
+      },
+      "offerings": {
+        "REG": ["SH-STUDY-HALL"]
+      },
+      "progressions": {}
+    }
+  }
+}

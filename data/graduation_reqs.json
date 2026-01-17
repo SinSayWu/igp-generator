@@ -1,0 +1,20 @@
+[
+  { "id":"REQ-ENG", "name":"English Language Arts", "cr":4.0, "req":["ENGLISH_CREDIT"], "must":[], "notes":"4 units. Must include English 2 (EOCEP). Can be English 1–4, AP English, or approved Dual Enrollment." },
+  { "id":"REQ-MATH", "name":"Mathematics", "cr":4.0, "req":["MATH_CREDIT"], "must":[], "notes":"4 units. Algebra 1 (or Intermediate Algebra) requires an EOCEP." },
+  { "id":"REQ-SCI", "name":"Natural Science", "cr":3.0, "req":["SCIENCE_CREDIT"], "must":[], "notes":"3 units. Must include Biology 1 (EOCEP). Colleges often recommend 3 lab sciences." },
+
+  { "id":"REQ-SS-US", "name":"U.S. History", "cr":1.0, "req":["US_HISTORY_CREDIT"], "must":[], "notes":"U.S. History (EOCEP)." },
+  { "id":"REQ-SS-GOV", "name":"U.S. Government", "cr":0.5, "req":["GOVERNMENT_CREDIT"], "must":[], "notes":"0.5 credit." },
+  { "id":"REQ-SS-ECON", "name":"Economics", "cr":0.5, "req":["ECONOMICS_CREDIT"], "must":[], "notes":"0.5 credit." },
+  { "id":"REQ-SS-OTHER", "name":"Other Social Studies", "cr":1.0, "req":["SOCIAL_STUDIES_CREDIT"], "must":[], "notes":"Other SS credit not already counted as US/GOV/ECON (e.g., World History, Geography, APHUG, etc.)." },
+
+  { "id":"REQ-PE", "name":"Physical Education", "cr":1.0, "req":["PE_CREDIT"], "must":[], "notes":"1 unit of PE. (If you want JROTC to satisfy this too, make sure JROTC courses also include PE_CREDIT in their course req list.)" },
+  { "id":"REQ-HEALTH", "name":"Health", "cr":0.5, "req":["HEALTH_CREDIT"], "must":[], "notes":"If required separately; some programs (ex: JROTC) may cover health/CPR/AED depending on your local rules." },
+
+  { "id":"REQ-CS", "name":"Computer Science", "cr":1.0, "req":["COMPUTER_SCIENCE_CREDIT"], "must":[], "notes":"1 unit (Fundamentals, AP CS, etc.)." },
+  { "id":"REQ-LANG-CATE", "name":"World Language or CATE", "cr":1.0, "req":["WORLD_LANGUAGE_CREDIT","CATE_CREDIT"], "must":[], "notes":"SC grad: 1 unit World Language OR CATE. Many colleges want 2–3 units same language." },
+
+  { "id":"REQ-FINANCE", "name":"Personal Finance", "cr":0.5, "req":["PERSONAL_FINANCE_CREDIT"], "must":[], "notes":"Mandatory for Class of 2027+. If not applicable, set cr to 0.0." },
+
+  { "id":"REQ-ELECTIVES", "name":"General Electives", "cr":6.5, "req":["ELECTIVE_CREDIT"], "must":[], "notes":"Extra credits can roll into electives. Adjust to hit 24 total credits (often 7.0 for older cohorts)." }
+]

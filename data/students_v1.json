@@ -1,0 +1,44 @@
+[
+  {
+    "id": "Bob Boberstein",
+    "grade": 8,
+    "difficulty": "Honors/Advanced",
+    "interests": ["Computer Science", "Math", "Biology"],
+    "completed_courses": ["ENG-ENGLISH1-H","MATH-ALG1-H"],
+    "transcript": [
+      {
+        "course_id": "ENG-ENGLISH1-H",
+        "final_grade": 95,
+        "confidence": "Low",
+        "stress": "Low"
+      },
+      {
+        "course_id": "MATH-ALG1-H",
+        "final_grade": 99,
+        "confidence": "Very High",
+        "stress": "Low"
+      }
+    ],
+    "study_hall_preferences": {
+      "interested": false,
+      "min_per_year": 0,
+      "max_per_year": 2
+    },
+    "program_intent": {
+      "band": true,
+      "orchestra": false,
+      "visual_arts": false,
+      "jrotc": false,
+      "weightlifting": false
+    },
+    "target_colleges": [
+      "Clemson University",
+      "Duke University",
+      "University of South Carolina"
+    ],
+    "additional_factors": {
+      "postsecondary_goal": "STEM_major",
+      "bio": "I am very interested in STEM and like to be challenged"
+    }
+  }
+]

@@ -1,0 +1,4 @@
+- Students usually take:
+    - SCI-BIO1-H before SCI-BIO-AP
+    - SCI-CHEM-H before SCI-CHEM-AP
+
