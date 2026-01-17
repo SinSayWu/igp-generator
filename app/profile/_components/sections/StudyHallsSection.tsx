@@ -1,7 +1,7 @@
 "use client";
 
 interface StudyHallsSectionProps {
-    studyHalls: number;
+    isEnabled: boolean;
     minStudyHalls: number;
     maxStudyHalls: number;
     onToggle: (checked: boolean) => void;
@@ -10,7 +10,7 @@ interface StudyHallsSectionProps {
 }
 
 export function StudyHallsSection({
-    studyHalls,
+    isEnabled,
     minStudyHalls,
     maxStudyHalls,
     onToggle,
@@ -27,7 +27,7 @@ export function StudyHallsSection({
                 <input
                     type="checkbox"
                     id="studyHallsToggle"
-                    checked={studyHalls > 0}
+                    checked={isEnabled}
                     onChange={(e) => onToggle(e.target.checked)}
                     className="w-4 h-4 rounded cursor-pointer"
                 />
@@ -39,7 +39,7 @@ export function StudyHallsSection({
                 </label>
             </div>
 
-            {studyHalls > 0 && (
+            {isEnabled && (
                 <div
                     className="border rounded-lg p-6 space-y-8"
                     style={{ borderColor: "var(--accent-background)" }}

@@ -49,6 +49,10 @@ export async function updateStudentProfile(userId: string, formData: FormData) {
     // NEW: Extract study halls
     const rawStudyHalls = formData.get("studyHallsPerYear");
     const studyHallsPerYear = rawStudyHalls ? parseInt(rawStudyHalls as string) : undefined;
+    const rawMaxStudyHalls = formData.get("maxStudyHallsPerYear");
+    const maxStudyHallsPerYear = rawMaxStudyHalls
+        ? parseInt(rawMaxStudyHalls as string)
+        : undefined;
 
     // 3. Update Database
     await prisma.student.update({
@@ -62,6 +66,7 @@ export async function updateStudentProfile(userId: string, formData: FormData) {
             ...(careerInterest === undefined ? {} : { careerInterest }),
             ...(interestedInNCAA === undefined ? {} : { interestedInNCAA }),
             ...(studyHallsPerYear == null ? {} : { studyHallsPerYear }),
+            ...(maxStudyHallsPerYear == null ? {} : { maxStudyHallsPerYear }),
 
             // Relations
             clubs: { set: [], connect: clubIds.map((id) => ({ id })) },

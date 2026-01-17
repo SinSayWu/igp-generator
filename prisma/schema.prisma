@@ -110,7 +110,8 @@ model Student {
   interestedInNCAA   Boolean @default(false)
 
   // Study Halls
-  studyHallsPerYear Int? @default(0)
+  studyHallsPerYear    Int? @default(0)
+  maxStudyHallsPerYear Int? @default(0)
 
   // RELATIONSHIPS
   userId String @id

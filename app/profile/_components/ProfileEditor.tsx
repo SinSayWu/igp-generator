@@ -88,7 +88,13 @@ export default function ProfileEditor({
     const [plan, setPlan] = useState(student.postHighSchoolPlan || "");
     const [ncaa, setNcaa] = useState(student.interestedInNCAA);
     const [minStudyHalls, setMinStudyHalls] = useState(student.studyHallsPerYear || 0);
-    const [maxStudyHalls, setMaxStudyHalls] = useState(student.studyHallsPerYear || 0);
+    // Fallback to min if max is not set (handles migration from single-value schema)
+    const [maxStudyHalls, setMaxStudyHalls] = useState(
+        student.maxStudyHallsPerYear || student.studyHallsPerYear || 0
+    );
+    const [wantsStudyHalls, setWantsStudyHalls] = useState(
+        (student.maxStudyHallsPerYear || 0) > 0 || (student.studyHallsPerYear || 0) > 0
+    );
 
     // 2. Course Data State (Grades, Stress, etc.)
     const [courseData, setCourseData] = useState<
@@ -263,6 +269,24 @@ export default function ProfileEditor({
         }, 2000);
     }, [handleSubmit]);
 
+    // Warn user about unsaved changes before page reload/close
+    useEffect(() => {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (hasUnsavedChanges || isPending) {
+                e.preventDefault();
+                // Standard approach for modern browsers:
+                // Setting returnValue triggers the prompt.
+                e.returnValue = "";
+            }
+        };
+
+        window.addEventListener("beforeunload", handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+    }, [hasUnsavedChanges, isPending]);
+
     // Cleanup timeout on unmount
     useEffect(() => {
         return () => {
@@ -334,6 +358,7 @@ export default function ProfileEditor({
                         <input type="hidden" name="postHighSchoolPlan" value={plan} />
                         <input type="hidden" name="interestedInNCAA" value={String(ncaa)} />
                         <input type="hidden" name="studyHallsPerYear" value={minStudyHalls} />
+                        <input type="hidden" name="maxStudyHallsPerYear" value={maxStudyHalls} />
                         {/* Flatten subject interests for form submission if needed, or rely on component internal hidden inputs */}
                         {Array.from(new Set(subjectInterests)).map((s) => (
                             <input key={s} type="hidden" name="subjectInterests" value={s} />
@@ -431,15 +456,17 @@ export default function ProfileEditor({
 
                     <SectionCard>
                         <StudyHallsSection
-                            // StudyHallsSection uses `studyHalls > 0` as the "enabled" flag.
-                            // Use max/min so checked state actually reflects current range.
-                            studyHalls={Math.max(minStudyHalls, maxStudyHalls)}
+                            isEnabled={wantsStudyHalls}
                             minStudyHalls={minStudyHalls}
                             maxStudyHalls={maxStudyHalls}
                             onToggle={(checked) => {
+                                setWantsStudyHalls(checked);
                                 if (checked) {
-                                    setMinStudyHalls(0);
-                                    setMaxStudyHalls(2);
+                                    // Set default range when enabling
+                                    if (minStudyHalls === 0 && maxStudyHalls === 0) {
+                                        setMinStudyHalls(0);
+                                        setMaxStudyHalls(2);
+                                    }
                                 } else {
                                     setMinStudyHalls(0);
                                     setMaxStudyHalls(0);
