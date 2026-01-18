@@ -336,7 +336,7 @@ export default function SignupWizard() {
                         </StepWrapper>
                     )}
 
-                    {step === 3 && (
+                    {step === 3 && schoolData && (
                         <StepWrapper>
                             <h2 className="text-xl font-bold text-slate-800 mb-6 font-[family-name:var(--primary-font)]">
                                 Academic Interests
