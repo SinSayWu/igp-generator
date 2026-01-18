@@ -1,180 +1,66 @@
 "use client";
 
-export { default } from "./Classes.fixed";
+export { default } from "./classes/ClassesPage";
 
 /*
 import { useEffect, useRef, useState, useTransition } from "react";
-import type { MouseEvent as ReactMouseEvent } from "react";
 import { useRouter } from "next/navigation";
-            <section className="rounded-xl shadow-lg border border-slate-200 bg-white">
-                <div className="flex items-center justify-between p-6 bg-slate-50 border-b border-slate-200">
-                    <div>
-                        <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                            <span>🗓️</span> Projected 4-Year Plan
-                        </h2>
-                        <p className="text-xs text-slate-500 mt-1">
-                            Click any cell to add a course you’ve already taken or are currently
-                            taking.
-                        </p>
-                    </div>
-                </div>
+import { deleteCourse } from "@/app/actions/delete-course";
+import { addCourse } from "@/app/actions/add-course";
+import { StudentCourseData, CourseCatalogItem } from "./types";
+import type { CourseStatus } from "@prisma/client";
 
-                <div className="px-6 pt-6 pb-6">
-                    <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-                        <strong className="font-semibold">
-                            Only add courses you’ve taken or are taking.
-                        </strong>
-                        <span className="ml-2">Click any cell below to add them.</span>
-                    </div>
-                </div>
+type ClassesPageProps = {
+    courses: StudentCourseData[];
+    courseCatalog: CourseCatalogItem[];
+    currentGrade: number;
+};
 
-                <div className="bg-white relative mt-2" ref={tableRef}>
-                    <div className="flex divide-x divide-slate-200 border-b border-slate-200 bg-slate-50">
-                        {[
-                            { key: "MS", label: "Middle School" },
-                            { key: "9", label: "9th Grade" },
-                            { key: "10", label: "10th Grade" },
-                            { key: "11", label: "11th Grade" },
-                            { key: "12", label: "12th Grade" },
-                        ].map((col) => (
-                            <div
-                                key={col.key}
-                                className="flex-1 p-4 text-center font-bold text-slate-700 uppercase tracking-wide text-sm"
-                            >
-                                {col.label}
-                            </div>
-                        ))}
-                    </div>
-                    <div className="flex divide-x divide-slate-200">
-                        {["MS", "9", "10", "11", "12"].map((gradeKey) => {
-                            const gradeCourses = scheduleByGrade[gradeKey] || [];
-                            return (
-                                <div key={gradeKey} className="flex-1 divide-y divide-slate-100">
-                                    {gradeCourses.map((c) => {
-                                        let statusClass = "hover:bg-indigo-50 border-transparent";
-                                        let badge = null;
-                                        let isClickable = false;
+export default function ClassesPage({ courses, courseCatalog, currentGrade }: ClassesPageProps) {
+    const router = useRouter();
+    const [generating, setGenerating] = useState(false);
+    const [isCatalogOpen, setIsCatalogOpen] = useState(false);
+    const [isMutating, startTransition] = useTransition();
 
-                                        if (c.status === "COMPLETED") {
-                                            statusClass =
-                                                "bg-emerald-50/50 hover:bg-emerald-100 border-l-4 border-emerald-400";
-                                            badge = (
-                                                <span className="absolute top-1 right-1 text-[8px] font-bold text-emerald-600 bg-emerald-100 px-1 rounded">
-                                                    DONE
-                                                </span>
-                                            );
-                                        } else if (c.status === "IN_PROGRESS") {
-                                            statusClass =
-                                                "bg-blue-50/50 hover:bg-blue-100 border-l-4 border-blue-400";
-                                            badge = (
-                                                <span className="absolute top-1 right-1 text-[8px] font-bold text-blue-600 bg-blue-100 px-1 rounded">
-                                                    NOW
-                                                </span>
-                                            );
-                                        } else if (c.status === "PLANNED") {
-                                            statusClass =
-                                                "bg-indigo-50/30 hover:bg-indigo-100 border-l-4 border-indigo-400 cursor-pointer hover:bg-red-50 hover:border-red-400 transition-colors";
-                                            badge = (
-                                                <span className="absolute top-1 right-1 text-[8px] font-bold text-indigo-600 bg-indigo-100 px-1 rounded group-hover:bg-red-100 group-hover:text-red-600">
-                                                    PLAN
-                                                </span>
-                                            );
-                                            isClickable = true;
-                                        }
+    // Debug State
+    const [debugInfo, setDebugInfo] = useState<{ draft: string; audit: string } | null>(null);
+    const [showDebug, setShowDebug] = useState(false);
 
-                                        const meta = courseMap[c.course.name];
+    // Modal State
+    const [courseToDelete, setCourseToDelete] = useState<{ id: string; name: string } | null>(null);
 
-                                        return (
-                                            <div
-                                                key={c.id}
-                                                onClick={() =>
-                                                    isClickable &&
-                                                    handleDeleteRequest(c.id, c.course.name)
-                                                }
-                                                className={`relative p-2 h-16 flex items-center justify-center text-center text-sm transition-colors group ${statusClass}`}
-                                                role={isClickable ? "button" : undefined}
-                                                title={
-                                                    isClickable
-                                                        ? "Click to remove this planned course"
-                                                        : undefined
-                                                }
-                                            >
-                                                {badge}
-                                                <span className="cursor-help border-b border-dotted border-slate-400/50 group-hover:border-slate-600">
-                                                    {c.course.name}
-                                                </span>
+    // Course Adder State (matches Profile Editor format)
+    const [selectedCourseId, setSelectedCourseId] = useState("");
+    const [pendingCourseData, setPendingCourseData] = useState<{
+        status: CourseStatus;
+        grade: string;
+        confidence: string;
+        stress: string;
+    }>({
+        status: "COMPLETED",
+        grade: "",
+        confidence: "",
+        stress: "",
+    });
+    const [courseSearch, setCourseSearch] = useState("");
+    const [isCourseDropdownOpen, setIsCourseDropdownOpen] = useState(false);
+    const [isAddCourseOpen, setIsAddCourseOpen] = useState(false);
+    const [selectedGradeKey, setSelectedGradeKey] = useState<
+        "MS" | "9" | "10" | "11" | "12" | null
+    >(null);
 
-                                                {(meta || c.course) && (
-                                                    <div className="absolute hidden group-hover:block z-50 w-64 p-3 bg-slate-800 text-white text-xs rounded-lg shadow-xl bottom-full mb-2 left-1/2 -translate-x-1/2 pointer-events-none text-left">
-                                                        <div className="font-bold mb-1 text-indigo-300">
-                                                            {c.course.name}
-                                                        </div>
-                                                        <div className="flex gap-2 mb-1">
-                                                            {meta?.level && (
-                                                                <span className="bg-slate-700 px-1.5 rounded">
-                                                                    {meta.level}
-                                                                </span>
-                                                            )}
-                                                            {meta?.credits && (
-                                                                <span className="bg-slate-700 px-1.5 rounded">
-                                                                    {meta.credits} cr
-                                                                </span>
-                                                            )}
-                                                            <span className="bg-slate-700 px-1.5 rounded">
-                                                                {c.course.department}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        );
-                                    })}
-                                    {Array.from({
-                                        length: Math.max(0, 8 - gradeCourses.length),
-                                    }).map((_, idx) => (
-                                        <button
-                                            key={`empty-${gradeKey}-${idx}`}
-                                            type="button"
-                                            onClick={() =>
-                                                openAddCourseModal(
-                                                    gradeKey as "MS" | "9" | "10" | "11" | "12"
-                                                )
-                                            }
-                                            className="w-full h-16 p-4 flex items-center justify-center text-center text-xs sm:text-sm text-slate-500 hover:text-indigo-700 hover:bg-indigo-50/60 transition-colors"
-                                            title="Click to add a course you’ve already taken or are taking"
-                                        >
-                                            <span className="font-medium">Study Hall</span>
-                                        </button>
-                                    ))}
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            </section>
+    const dropdownRef = useRef<HTMLDivElement>(null);
+    const courseSearchRef = useRef<HTMLInputElement>(null);
+    const tableRef = useRef<HTMLDivElement>(null);
+    const modalRef = useRef<HTMLDivElement>(null);
 
-            {isAddCourseOpen && (
-                <div className="fixed inset-0 z-[80] flex items-center justify-center">
-                    <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-                    <div
-                        ref={modalRef}
-                        className="relative w-[900px] max-w-[96vw] bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden"
-                    >
-                        <div className="px-8 py-5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-                            <div className="text-lg font-semibold text-slate-800">
-                                Add a taken or in-progress course
-                            </div>
-                            <button
-                                type="button"
-                                onClick={() => setIsAddCourseOpen(false)}
-                                className="text-slate-400 hover:text-slate-600 text-lg"
-                                aria-label="Close"
-                            >
-                                ✕
-                            </button>
-                        </div>
+    const handleDeleteRequest = (courseId: string, courseName: string) => {
+        setCourseToDelete({ id: courseId, name: courseName });
+    };
 
-                        <div className="p-8 space-y-6">
+    const confirmDelete = async () => {
+        if (!courseToDelete) return(
+                        <div className="p-8 space-y-6 flex-1 overflow-y-auto">
                             {selectedCourseId && (
                                 <div className="bg-slate-50 rounded-2xl p-5 border border-indigo-100 animate-fadeIn space-y-5">
                                     <div className="flex items-center gap-2 mb-1">
@@ -328,7 +214,9 @@ import { useRouter } from "next/navigation";
                                     </div>
                                 </div>
                             )}
+                        </div>
 
+                        <div className="border-t border-slate-200 px-8 py-6 bg-white">
                             <div className="flex flex-col sm:flex-row gap-3">
                                 <div className="relative flex-1" ref={dropdownRef}>
                                     <input
@@ -403,386 +291,442 @@ import { useRouter } from "next/navigation";
                                 </button>
                             </div>
                         </div>
+                console.error("Failed to generate courses:", errData.error || res.statusText);
+                alert(`Error: ${errData.error || "Failed to generate courses"}`);
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setGenerating(false);
+        }
+    };
+
+    return (
+        <div className="flex flex-col gap-10">
+            <div className="flex flex-col gap-6">
+                <div className="flex justify-between items-start">
+                    <div>
+                        <h2 className="text-2xl font-bold">Classes</h2>
+                        <p className="text-gray-600">
+                            Track your current and completed classes, view grades, and explore
+                            suggested future courses.
+                        </p>
+                    </div>
+                    <div className="flex gap-2">
+                        {debugInfo && (
+                            <button
+                                onClick={() => setShowDebug(true)}
+                                className="bg-gray-100 text-gray-600 px-4 py-3 rounded-xl hover:bg-gray-200 transition-colors font-medium flex items-center gap-2"
+                            >
+                                🧠 Debug Thought Process
+                            </button>
+                        )}
+                        <button
+                            onClick={handleGenerateFuture}
+                            disabled={generating}
+                            className={`
+                        relative overflow-hidden group
+                        bg-gradient-to-r from-indigo-600 to-purple-600 
+                        text-white font-bold py-3 px-6 rounded-xl shadow-lg 
+                        hover:shadow-xl hover:scale-105 transition-all duration-300
+                        disabled:opacity-70 disabled:cursor-not-allowed
+                    `}
+                        >
+                            <div className="absolute inset-0 bg-white/20 group-hover:translate-x-full transition-transform duration-700 ease-in-out -skew-x-12 -translate-x-[150%]"></div>
+                            {generating ? (
+                                <span className="flex items-center gap-2">
+                                    <svg
+                                        className="animate-spin h-5 w-5 text-white"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            className="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            strokeWidth="4"
+                                        ></circle>
+                                        <path
+                                            className="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                        ></path>
+                                    </svg>
+                                    Thinking...
+                                </span>
+                            ) : (
+                                <span className="flex items-center gap-2">
+                                    <span>✨</span> Generate Potential Future Courses
+                                </span>
+                            )}
+                        </button>
                     </div>
                 </div>
-            )}
+            </div>
 
-            <section>
-                                                { key: "MS", label: "Middle School" },
-                                                { key: "9", label: "9th Grade" },
-                                                { key: "10", label: "10th Grade" },
-                                                { key: "11", label: "11th Grade" },
-                                                { key: "12", label: "12th Grade" },
-                                            ].map((col) => (
-                                                <div
-                                                    key={col.key}
-                                                    className="flex-1 p-4 text-center font-bold text-slate-700 uppercase tracking-wide text-sm"
-                                                >
-                                                    {col.label}
-                                                </div>
-                                            ))}
-                                        </div>
-                                        <div className="flex divide-x divide-slate-200">
-                                            {["MS", "9", "10", "11", "12"].map((gradeKey) => {
-                                                const gradeCourses = scheduleByGrade[gradeKey] || [];
-                                                return (
-                                                    <div key={gradeKey} className="flex-1 divide-y divide-slate-100">
-                                                        {gradeCourses.map((c) => {
-                                                            let statusClass = "hover:bg-indigo-50 border-transparent";
-                                                            let badge = null;
-                                                            let isClickable = false;
+            <div className="grid grid-cols-4 gap-6 border rounded-lg p-6">
+                <div>
+                    <p className="text-sm text-gray-500">Current Classes</p>
+                    <p className="text-2xl font-bold">{currentCourses.length}</p>
+                </div>
+                <div>
+                    <p className="text-sm text-gray-500">Completed Classes</p>
+                    <p className="text-2xl font-bold">{completedCourses.length}</p>
+                </div>
+                <div>
+                    <p className="text-sm text-gray-500">Next Semester</p>
+                    <p className="text-2xl font-bold">{nextSemesterCourses.length}</p>
+                </div>
+                <div>
+                    <p className="text-sm text-indigo-500 font-semibold">Planned / Future</p>
+                    <p className="text-2xl font-bold text-indigo-600">{plannedCourses.length}</p>
+                </div>
+            </div>
 
-                                                            if (c.status === "COMPLETED") {
-                                                                statusClass =
-                                                                    "bg-emerald-50/50 hover:bg-emerald-100 border-l-4 border-emerald-400";
-                                                                badge = (
-                                                                    <span className="absolute top-1 right-1 text-[8px] font-bold text-emerald-600 bg-emerald-100 px-1 rounded">
-                                                                        DONE
-                                                                    </span>
-                                                                );
-                                                            } else if (c.status === "IN_PROGRESS") {
-                                                                statusClass =
-                                                                    "bg-blue-50/50 hover:bg-blue-100 border-l-4 border-blue-400";
-                                                                badge = (
-                                                                    <span className="absolute top-1 right-1 text-[8px] font-bold text-blue-600 bg-blue-100 px-1 rounded">
-                                                                        NOW
-                                                                    </span>
-                                                                );
-                                                            } else if (c.status === "PLANNED") {
-                                                                statusClass =
-                                                                    "bg-indigo-50/30 hover:bg-indigo-100 border-l-4 border-indigo-400 cursor-pointer hover:bg-red-50 hover:border-red-400 transition-colors";
-                                                                badge = (
-                                                                    <span className="absolute top-1 right-1 text-[8px] font-bold text-indigo-600 bg-indigo-100 px-1 rounded group-hover:bg-red-100 group-hover:text-red-600">
-                                                                        PLAN
-                                                                    </span>
-                                                                );
-                                                                isClickable = true;
-                                                            }
+            <section className="rounded-xl shadow-lg border border-slate-200 bg-white">
+                <div className="flex items-center justify-between p-6 bg-slate-50 border-b border-slate-200">
+                    <div>
+                        <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+                            <span>🗓️</span> Projected 4-Year Plan
+                        </h2>
+                        <p className="text-xs text-slate-500 mt-1">
+                            Click any cell to add a course you’ve already taken or are currently
+                            taking.
+                        </p>
+                    </div>
+                </div>
 
-                                                            const meta = courseMap[c.course.name];
+                <div className="px-6 pt-6 pb-6">
+                    <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                        <strong className="font-semibold">
+                            Only add courses you’ve taken or are taking.
+                        </strong>
+                        <span className="ml-2">Click any cell below to add them.</span>
+                    </div>
+                </div>
 
-                                                            return (
-                                                                <div
-                                                                    key={c.id}
-                                                                    onClick={() =>
-                                                                        isClickable &&
-                                                                        handleDeleteRequest(c.id, c.course.name)
-                                                                    }
-                                                                    className={`relative p-2 h-16 flex items-center justify-center text-center text-sm transition-colors group ${statusClass}`}
-                                                                    role={isClickable ? "button" : undefined}
-                                                                    title={
-                                                                        isClickable
-                                                                            ? "Click to remove this planned course"
-                                                                            : undefined
-                                                                    }
-                                                                >
-                                                                    {badge}
-                                                                    <span className="cursor-help border-b border-dotted border-slate-400/50 group-hover:border-slate-600">
-                                                                        {c.course.name}
-                                                                    </span>
+                <div className="bg-white relative mt-2" ref={tableRef}>
+                    <div className="flex divide-x divide-slate-200 border-b border-slate-200 bg-slate-50">
+                        {[
+                            { key: "MS", label: "Middle School" },
+                            { key: "9", label: "9th Grade" },
+                            { key: "10", label: "10th Grade" },
+                            { key: "11", label: "11th Grade" },
+                            { key: "12", label: "12th Grade" },
+                        ].map((col) => (
+                            <div
+                                key={col.key}
+                                className="flex-1 p-4 text-center font-bold text-slate-700 uppercase tracking-wide text-sm"
+                            >
+                                {col.label}
+                            </div>
+                        ))}
+                    </div>
+                    <div className="flex divide-x divide-slate-200">
+                        {["MS", "9", "10", "11", "12"].map((gradeKey) => {
+                            const gradeCourses = scheduleByGrade[gradeKey] || [];
+                            return (
+                                <div key={gradeKey} className="flex-1 divide-y divide-slate-100">
+                                    {gradeCourses.map((c) => {
+                                        let statusClass = "hover:bg-indigo-50 border-transparent";
+                                        let badge = null;
+                                        let isClickable = false;
 
-                                                                    {(meta || c.course) && (
-                                                                        <div className="absolute hidden group-hover:block z-50 w-64 p-3 bg-slate-800 text-white text-xs rounded-lg shadow-xl bottom-full mb-2 left-1/2 -translate-x-1/2 pointer-events-none text-left">
-                                                                            <div className="font-bold mb-1 text-indigo-300">
-                                                                                {c.course.name}
-                                                                            </div>
-                                                                            <div className="flex gap-2 mb-1">
-                                                                                {meta?.level && (
-                                                                                    <span className="bg-slate-700 px-1.5 rounded">
-                                                                                        {meta.level}
-                                                                                    </span>
-                                                                                )}
-                                                                                {meta?.credits && (
-                                                                                    <span className="bg-slate-700 px-1.5 rounded">
-                                                                                        {meta.credits} cr
-                                                                                    </span>
-                                                                                )}
-                                                                                <span className="bg-slate-700 px-1.5 rounded">
-                                                                                    {c.course.department}
-                                                                                </span>
-                                                                            </div>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            );
-                                                        })}
-                                                        {Array.from({
-                                                            length: Math.max(0, 8 - gradeCourses.length),
-                                                        }).map((_, idx) => (
-                                                            <button
-                                                                key={`empty-${gradeKey}-${idx}`}
-                                                                type="button"
-                                                                onClick={() =>
-                                                                    openAddCourseModal(
-                                                                        gradeKey as "MS" | "9" | "10" | "11" | "12"
-                                                                    )
-                                                                }
-                                                                className="w-full h-16 p-4 flex items-center justify-center text-center text-xs sm:text-sm text-slate-500 hover:text-indigo-700 hover:bg-indigo-50/60 transition-colors"
-                                                                title="Click to add a course you’ve already taken or are taking"
-                                                            >
-                                                                <span className="font-medium">Study Hall</span>
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-                                </section>
+                                        if (c.status === "COMPLETED") {
+                                            statusClass =
+                                                "bg-emerald-50/50 hover:bg-emerald-100 border-l-4 border-emerald-400";
+                                            badge = (
+                                                <span className="absolute top-1 right-1 text-[8px] font-bold text-emerald-600 bg-emerald-100 px-1 rounded">
+                                                    DONE
+                                                </span>
+                                            );
+                                        } else if (c.status === "IN_PROGRESS") {
+                                            statusClass =
+                                                "bg-blue-50/50 hover:bg-blue-100 border-l-4 border-blue-400";
+                                            badge = (
+                                                <span className="absolute top-1 right-1 text-[8px] font-bold text-blue-600 bg-blue-100 px-1 rounded">
+                                                    NOW
+                                                </span>
+                                            );
+                                        } else if (c.status === "PLANNED") {
+                                            statusClass =
+                                                "bg-indigo-50/30 hover:bg-indigo-100 border-l-4 border-indigo-400 cursor-pointer hover:bg-red-50 hover:border-red-400 transition-colors";
+                                            badge = (
+                                                <span className="absolute top-1 right-1 text-[8px] font-bold text-indigo-600 bg-indigo-100 px-1 rounded group-hover:bg-red-100 group-hover:text-red-600">
+                                                    PLAN
+                                                </span>
+                                            );
+                                            isClickable = true;
+                                        }
 
-                                {isAddCourseOpen && (
-                                    <div className="fixed inset-0 z-[80] flex items-center justify-center">
-                                        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-                                        <div
-                                            ref={modalRef}
-                                            className="relative w-[900px] max-w-[96vw] bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden"
-                                        >
-                                            <div className="px-8 py-5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-                                                <div className="text-lg font-semibold text-slate-800">
-                                                    Add a taken or in-progress course
-                                                </div>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setIsAddCourseOpen(false)}
-                                                    className="text-slate-400 hover:text-slate-600 text-lg"
-                                                    aria-label="Close"
-                                                >
-                                                    ✕
-                                                </button>
-                                            </div>
+                                        const meta = courseMap[c.course.name];
 
-                                            <div className="p-8 space-y-6">
-                                                {selectedCourseId && (
-                                                    <div className="bg-slate-50 rounded-2xl p-5 border border-indigo-100 animate-fadeIn space-y-5">
-                                                        <div className="flex items-center gap-2 mb-1">
-                                                            <span className="text-xs font-bold text-indigo-600 uppercase tracking-wider bg-indigo-50 px-2.5 py-1 rounded">
-                                                                Course Details Required
-                                                            </span>
-                                                            <div className="h-px bg-indigo-100 flex-1"></div>
+                                        return (
+                                            <div
+                                                key={c.id}
+                                                onClick={() =>
+                                                    isClickable &&
+                                                    handleDeleteRequest(c.id, c.course.name)
+                                                }
+                                                className={`relative p-2 h-16 flex items-center justify-center text-center text-sm transition-colors group ${statusClass}`}
+                                                role={isClickable ? "button" : undefined}
+                                                title={
+                                                    isClickable
+                                                        ? "Click to remove this planned course"
+                                                        : undefined
+                                                }
+                                            >
+                                                {badge}
+                                                <span className="cursor-help border-b border-dotted border-slate-400/50 group-hover:border-slate-600">
+                                                    {c.course.name}
+                                                </span>
+
+                                                {(meta || c.course) && (
+                                                    <div className="absolute hidden group-hover:block z-50 w-64 p-3 bg-slate-800 text-white text-xs rounded-lg shadow-xl bottom-full mb-2 left-1/2 -translate-x-1/2 pointer-events-none text-left">
+                                                        <div className="font-bold mb-1 text-indigo-300">
+                                                            {c.course.name}
                                                         </div>
-                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                                                            <div className="col-span-1 sm:col-span-2">
-                                                                <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
-                                                                    Status
-                                                                </label>
-                                                                <select
-                                                                    value={pendingCourseData.status}
-                                                                    onChange={(e) => {
-                                                                        const nextStatus = e.target.value as CourseStatus;
-                                                                        setPendingCourseData((prev) => ({
-                                                                            ...prev,
-                                                                            status: nextStatus,
-                                                                            confidence:
-                                                                                nextStatus === "COMPLETED" &&
-                                                                                selectedGradeKey
-                                                                                    ? gradeKeyToConfidence(selectedGradeKey)
-                                                                                    : prev.confidence,
-                                                                        }));
-                                                                    }}
-                                                                    className="w-full text-base border-slate-200 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                                                                >
-                                                                    <option value="IN_PROGRESS">In Progress</option>
-                                                                    <option value="COMPLETED">Completed</option>
-                                                                    <option value="NEXT_SEMESTER" disabled>
-                                                                        Next Semester (Not allowed here)
-                                                                    </option>
-                                                                    <option value="PLANNED" disabled>
-                                                                        Planned (Not allowed here)
-                                                                    </option>
-                                                                </select>
-                                                            </div>
-
-                                                            {(pendingCourseData.status === "COMPLETED" ||
-                                                                pendingCourseData.status === "IN_PROGRESS") && (
-                                                                <div>
-                                                                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
-                                                                        Grade <span className="text-red-500">*</span>
-                                                                    </label>
-                                                                    <select
-                                                                        required
-                                                                        value={pendingCourseData.grade}
-                                                                        onChange={(e) =>
-                                                                            setPendingCourseData({
-                                                                                ...pendingCourseData,
-                                                                                grade: e.target.value,
-                                                                            })
-                                                                        }
-                                                                        className="w-full text-base border-slate-200 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 invalid:border-red-300 invalid:text-red-600"
-                                                                    >
-                                                                        <option value="">-- Select Grade --</option>
-                                                                        <option value="A+">A+</option>
-                                                                        <option value="A">A</option>
-                                                                        <option value="A-">A-</option>
-                                                                        <option value="B+">B+</option>
-                                                                        <option value="B">B</option>
-                                                                        <option value="B-">B-</option>
-                                                                        <option value="C+">C+</option>
-                                                                        <option value="C">C</option>
-                                                                        <option value="C-">C-</option>
-                                                                        <option value="D+">D+</option>
-                                                                        <option value="D">D</option>
-                                                                        <option value="D-">D-</option>
-                                                                        <option value="F">F</option>
-                                                                    </select>
-                                                                </div>
+                                                        <div className="flex gap-2 mb-1">
+                                                            {meta?.level && (
+                                                                <span className="bg-slate-700 px-1.5 rounded">
+                                                                    {meta.level}
+                                                                </span>
                                                             )}
-
-                                                            {pendingCourseData.status === "COMPLETED" && (
-                                                                <div>
-                                                                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
-                                                                        Completed in Grade <span className="text-red-500">*</span>
-                                                                    </label>
-                                                                    <select
-                                                                        required
-                                                                        value={pendingCourseData.confidence}
-                                                                        onChange={(e) =>
-                                                                            setPendingCourseData({
-                                                                                ...pendingCourseData,
-                                                                                confidence: e.target.value,
-                                                                            })
-                                                                        }
-                                                                        className="w-full text-base border-slate-200 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 invalid:border-red-300 invalid:text-red-600"
-                                                                    >
-                                                                        <option value="">-- Select Level --</option>
-                                                                        <option value="middle">Middle School</option>
-                                                                        <option value="9">9th Grade</option>
-                                                                        <option value="10">10th Grade</option>
-                                                                        <option value="11">11th Grade</option>
-                                                                        <option value="12">12th Grade</option>
-                                                                    </select>
-                                                                </div>
+                                                            {meta?.credits && (
+                                                                <span className="bg-slate-700 px-1.5 rounded">
+                                                                    {meta.credits} cr
+                                                                </span>
                                                             )}
-
-                                                            {(pendingCourseData.status === "IN_PROGRESS" ||
-                                                                pendingCourseData.status === "NEXT_SEMESTER") && (
-                                                                <>
-                                                                    <div>
-                                                                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
-                                                                            Confidence
-                                                                        </label>
-                                                                        <select
-                                                                            value={pendingCourseData.confidence}
-                                                                            onChange={(e) =>
-                                                                                setPendingCourseData({
-                                                                                    ...pendingCourseData,
-                                                                                    confidence: e.target.value,
-                                                                                })
-                                                                            }
-                                                                            className="w-full text-base border-slate-200 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                                                                        >
-                                                                            <option value="">-- Select --</option>
-                                                                            <option value="VERY_LOW">Very Low</option>
-                                                                            <option value="LOW">Low</option>
-                                                                            <option value="NEUTRAL">Neutral</option>
-                                                                            <option value="HIGH">High</option>
-                                                                            <option value="VERY_HIGH">Very High</option>
-                                                                        </select>
-                                                                    </div>
-                                                                    <div>
-                                                                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
-                                                                            Stress
-                                                                        </label>
-                                                                        <select
-                                                                            value={pendingCourseData.stress}
-                                                                            onChange={(e) =>
-                                                                                setPendingCourseData({
-                                                                                    ...pendingCourseData,
-                                                                                    stress: e.target.value,
-                                                                                })
-                                                                            }
-                                                                            className="w-full text-base border-slate-200 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                                                                        >
-                                                                            <option value="">-- Select --</option>
-                                                                            <option value="VERY_LOW">Very Low</option>
-                                                                            <option value="LOW">Low</option>
-                                                                            <option value="NEUTRAL">Neutral</option>
-                                                                            <option value="HIGH">High</option>
-                                                                            <option value="VERY_HIGH">Very High</option>
-                                                                        </select>
-                                                                    </div>
-                                                                </>
-                                                            )}
+                                                            <span className="bg-slate-700 px-1.5 rounded">
+                                                                {c.course.department}
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 )}
-
-                                                <div className="flex flex-col sm:flex-row gap-3">
-                                                    <div className="relative flex-1" ref={dropdownRef}>
-                                                        <input
-                                                            type="text"
-                                                            value={courseSearch}
-                                                            onChange={(e) => {
-                                                                setCourseSearch(e.target.value);
-                                                                if (selectedCourseId) setSelectedCourseId("");
-                                                                setIsCourseDropdownOpen(true);
-                                                            }}
-                                                            onFocus={() => setIsCourseDropdownOpen(true)}
-                                                            placeholder="Search and add a course..."
-                                                            className="w-full pl-4 pr-10 py-3 text-base border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow"
-                                                            ref={courseSearchRef}
-                                                        />
-                                                        {isCourseDropdownOpen && (
-                                                            <div className="absolute z-[90] left-0 right-0 bottom-full mb-2 max-h-72 overflow-y-auto bg-white border border-slate-200 rounded-lg shadow-lg">
-                                                                {filteredCourses.length === 0 ? (
-                                                                    <div className="p-4 text-base text-slate-500 text-center">
-                                                                        No matches found
-                                                                    </div>
-                                                                ) : (
-                                                                    filteredCourses.map((course) => {
-                                                                        const detail = [
-                                                                            course.department,
-                                                                            course.level,
-                                                                            course.credits ? `${course.credits}cr` : "",
-                                                                        ]
-                                                                            .filter(Boolean)
-                                                                            .join(" • ");
-                                                                        return (
-                                                                            <button
-                                                                                key={course.id}
-                                                                                type="button"
-                                                                                onClick={() => {
-                                                                                    setSelectedCourseId(course.id);
-                                                                                    setCourseSearch(course.name);
-                                                                                    setIsCourseDropdownOpen(false);
-                                                                                }}
-                                                                                className="w-full text-left px-4 py-3 text-base hover:bg-slate-50 flex items-center justify-between group"
-                                                                            >
-                                                                                <span className="font-medium text-slate-700 group-hover:text-indigo-700">
-                                                                                    {course.name}
-                                                                                </span>
-                                                                                {detail && (
-                                                                                    <span className="text-xs text-slate-400 group-hover:text-indigo-400">
-                                                                                        {detail}
-                                                                                    </span>
-                                                                                )}
-                                                                            </button>
-                                                                        );
-                                                                    })
-                                                                )}
-                                                            </div>
-                                                        )}
-                                                    </div>
-
-                                                    <button
-                                                        type="button"
-                                                        onClick={handleAddCourse}
-                                                        disabled={!selectedCourseId || !isPendingValid() || isMutating}
-                                                        className={`
-                                                            px-6 py-3 rounded-lg text-base font-bold shadow-sm transition-all
-                                                            ${
-                                                                selectedCourseId && isPendingValid() && !isMutating
-                                                                    ? "bg-slate-800 text-white hover:bg-slate-900 hover:shadow-md active:scale-95"
-                                                                    : "bg-slate-100 text-slate-400 cursor-not-allowed"
-                                                            }
-                                                        `}
-                                                    >
-                                                        Add Course
-                                                    </button>
-                                                </div>
                                             </div>
-                                        </div>
+                                        );
+                                    })}
+                                    {Array.from({
+                                        length: Math.max(0, 8 - gradeCourses.length),
+                                    }).map((_, idx) => (
+                                        <button
+                                            key={`empty-${gradeKey}-${idx}`}
+                                            type="button"
+                                            onClick={() =>
+                                                openAddCourseModal(
+                                                    gradeKey as "MS" | "9" | "10" | "11" | "12"
+                                                )
+                                            }
+                                            className="w-full h-16 p-4 flex items-center justify-center text-center text-xs sm:text-sm text-slate-500 hover:text-indigo-700 hover:bg-indigo-50/60 transition-colors"
+                                            title="Click to add a course you’ve already taken or are taking"
+                                        >
+                                            <span className="font-medium">Study Hall</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            </section>
+
+            {isAddCourseOpen && (
+                <div className="fixed inset-0 z-[80] flex items-center justify-center">
+                    <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+                    <div
+                        ref={modalRef}
+                        className="relative w-[900px] max-w-[96vw] h-[85vh] max-h-[90vh] bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col"
+                    >
+                        <div className="px-8 py-5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                            <div className="text-lg font-semibold text-slate-800">
+                                Add a taken or in-progress course
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setIsAddCourseOpen(false)}
+                                className="text-slate-400 hover:text-slate-600 text-lg"
+                                aria-label="Close"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        <div className="p-8 space-y-6 flex-1 overflow-y-auto">
+                            {selectedCourseId && (
+                                <div className="bg-slate-50 rounded-2xl p-5 border border-indigo-100 animate-fadeIn space-y-5">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <span className="text-xs font-bold text-indigo-600 uppercase tracking-wider bg-indigo-50 px-2.5 py-1 rounded">
+                                            Course Details Required
+                                        </span>
+                                        <div className="h-px bg-indigo-100 flex-1"></div>
                                     </div>
-                                )}
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                        <div className="col-span-1 sm:col-span-2">
+                                            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
+                                                Status
+                                            </label>
+                                            <select
+                                                value={pendingCourseData.status}
+                                                onChange={(e) => {
+                                                    const nextStatus = e.target
+                                                        .value as CourseStatus;
+                                                    setPendingCourseData((prev) => ({
+                                                        ...prev,
+                                                        status: nextStatus,
+                                                        confidence:
+                                                            nextStatus === "COMPLETED" &&
+                                                            selectedGradeKey
+                                                                ? gradeKeyToConfidence(
+                                                                      selectedGradeKey
+                                                                  )
+                                                                : prev.confidence,
+                                                    }));
+                                                }}
+                                                className="w-full text-base border-slate-200 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                                            >
+                                                <option value="IN_PROGRESS">In Progress</option>
+                                                <option value="COMPLETED">Completed</option>
+                                                <option value="NEXT_SEMESTER" disabled>
+                                                    Next Semester (Not allowed here)
+                                                </option>
+                                                <option value="PLANNED" disabled>
+                                                    Planned (Not allowed here)
+                                                </option>
+                                            </select>
+                                        </div>
+
+                                        {(pendingCourseData.status === "COMPLETED" ||
+                                            pendingCourseData.status === "IN_PROGRESS") && (
+                                            <div>
+                                                <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
+                                                    Grade <span className="text-red-500">*</span>
+                                                </label>
+                                                <select
+                                                    required
+                                                    value={pendingCourseData.grade}
+                                                    onChange={(e) =>
+                                                        setPendingCourseData({
+                                                            ...pendingCourseData,
+                                                            grade: e.target.value,
+                                                        })
+                                                    }
+                                                    className="w-full text-base border-slate-200 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 invalid:border-red-300 invalid:text-red-600"
+                                                >
+                                                    <option value="">-- Select Grade --</option>
+                                                    <option value="A+">A+</option>
+                                                    <option value="A">A</option>
+                                                    <option value="A-">A-</option>
+                                                    <option value="B+">B+</option>
+                                                    <option value="B">B</option>
+                                                    <option value="B-">B-</option>
+                                                    <option value="C+">C+</option>
+                                                    <option value="C">C</option>
+                                                    <option value="C-">C-</option>
+                                                    <option value="D+">D+</option>
+                                                    <option value="D">D</option>
+                                                    <option value="D-">D-</option>
+                                                    <option value="F">F</option>
+                                                </select>
+                                            </div>
+                                        )}
+
+                                        {pendingCourseData.status === "COMPLETED" && (
+                                            <div>
+                                                <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
+                                                    Completed in Grade{" "}
+                                                    <span className="text-red-500">*</span>
+                                                </label>
+                                                <select
+                                                    required
+                                                    value={pendingCourseData.confidence}
+                                                    onChange={(e) =>
+                                                        setPendingCourseData({
+                                                            ...pendingCourseData,
+                                                            confidence: e.target.value,
+                                                        })
+                                                    }
+                                                    className="w-full text-base border-slate-200 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 invalid:border-red-300 invalid:text-red-600"
+                                                >
+                                                    <option value="">-- Select Level --</option>
+                                                    <option value="middle">Middle School</option>
+                                                    <option value="9">9th Grade</option>
+                                                    <option value="10">10th Grade</option>
+                                                    <option value="11">11th Grade</option>
+                                                    <option value="12">12th Grade</option>
+                                                </select>
+                                            </div>
+                                        )}
+
+                                        {(pendingCourseData.status === "IN_PROGRESS" ||
+                                            pendingCourseData.status === "NEXT_SEMESTER") && (
+                                            <>
+                                                <div>
+                                                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
+                                                        Confidence
+                                                    </label>
+                                                    <select
+                                                        value={pendingCourseData.confidence}
+                                                        onChange={(e) =>
+                                                            setPendingCourseData({
+                                                                ...pendingCourseData,
+                                                                confidence: e.target.value,
+                                                            })
+                                                        }
+                                                        className="w-full text-base border-slate-200 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                                                    >
+                                                        <option value="">-- Select --</option>
+                                                        <option value="VERY_LOW">Very Low</option>
+                                                        <option value="LOW">Low</option>
+                                                        <option value="NEUTRAL">Neutral</option>
+                                                        <option value="HIGH">High</option>
+                                                        <option value="VERY_HIGH">Very High</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
+                                                        Stress
+                                                    </label>
+                                                    <select
+                                                        value={pendingCourseData.stress}
+                                                        onChange={(e) =>
+                                                            setPendingCourseData({
+                                                                ...pendingCourseData,
+                                                                stress: e.target.value,
+                                                            })
+                                                        }
+                                                        className="w-full text-base border-slate-200 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                                                    >
+                                                        <option value="">-- Select --</option>
+                                                        <option value="VERY_LOW">Very Low</option>
+                                                        <option value="LOW">Low</option>
+                                                        <option value="NEUTRAL">Neutral</option>
+                                                        <option value="HIGH">High</option>
+                                                        <option value="VERY_HIGH">Very High</option>
+                                                    </select>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="flex flex-col sm:flex-row gap-3">
+                                <div className="relative flex-1" ref={dropdownRef}>
+                                    <input
+                                        type="text"
+                                        value={courseSearch}
+                                        onChange={(e) => {
+                                            setCourseSearch(e.target.value);
+                                            if (selectedCourseId) setSelectedCourseId("");
+                                            setIsCourseDropdownOpen(true);
+                                        }}
+                                        onFocus={() => setIsCourseDropdownOpen(true)}
+                                        placeholder="Search and add a course..."
+                                        className="w-full pl-4 pr-10 py-3 text-base border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow"
+                                        ref={courseSearchRef}
                                     />
                                     {isCourseDropdownOpen && (
                                         <div className="absolute z-[90] left-0 right-0 bottom-full mb-2 max-h-72 overflow-y-auto bg-white border border-slate-200 rounded-lg shadow-lg">
