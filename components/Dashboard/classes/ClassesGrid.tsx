@@ -302,7 +302,7 @@ export default function ClassesGrid({
                                                                     : "Add another 0.5 credit course"
                                                             }
                                                         >
-                                                            Add 0.5
+                                                            Study Hall
                                                         </button>
                                                     )}
                                                 </div>

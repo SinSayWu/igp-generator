@@ -800,7 +800,7 @@
             "name": "AP Comparative Government & Politics",
             "subj": "SS",
             "lvl": "AP",
-            "cr": 1.0,
+            "cr": 0.5,
             "grades": [11, 12],
             "req": ["SOCIAL_STUDIES_CREDIT"],
             "counts_for_grad": true,

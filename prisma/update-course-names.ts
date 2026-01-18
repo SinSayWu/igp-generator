@@ -46,6 +46,7 @@ async function main() {
             },
             data: {
                 name: c.name,
+                credits: c.cr ?? null,
             },
         });
 
