@@ -50,7 +50,7 @@ export async function POST(req: Request) {
         );
 
         // Modify prompt for updates to ensure Pros/Cons analysis
-        let finalMessages = [{ role: "system", content: systemPrompt }, ...messages];
+        const finalMessages = [{ role: "system", content: systemPrompt }, ...messages];
 
         if (isConversationalUpdate) {
             finalMessages.push({
@@ -70,7 +70,7 @@ export async function POST(req: Request) {
 
         const draftCompletion = await openai.chat.completions.create({
             model: modelName,
-            messages: finalMessages as any,
+            messages: finalMessages as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
             temperature: 0.5,
         });
 
@@ -130,7 +130,7 @@ export async function POST(req: Request) {
                     if (student && student.history) {
                         history = student.history;
                     }
-                } catch (e) {
+                } catch {
                     /* ignore parse error */
                 }
 
@@ -274,11 +274,9 @@ export async function POST(req: Request) {
                 auditContent: finalData.choices[0].message.content, // This is the auditor's output (or draft if audit failed)
             },
         });
-    } catch (error: any) {
+    } catch (error) {
         console.error("Chat API Error:", error);
-        return NextResponse.json(
-            { error: error.message || "Internal Server Error" },
-            { status: 500 }
-        );
+        const errorMessage = error instanceof Error ? error.message : "Internal Server Error";
+        return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
 }

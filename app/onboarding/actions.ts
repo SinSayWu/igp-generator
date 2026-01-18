@@ -12,7 +12,33 @@ export async function verifySchoolCode(code: number) {
     return !!school;
 }
 
-export async function completeOnboarding(userId: string, data: any) {
+interface MyCourse {
+    id: string;
+    name: string;
+    status: string;
+    grade?: string;
+    gradeLevel?: number;
+    confidence?: string;
+    stress?: string;
+}
+
+interface OnboardingData {
+    gradeLevel: number;
+    age: number;
+    bio: string;
+    courses: MyCourse[];
+    subjectInterests: string[];
+    studyHallsPerYear: number;
+    clubIds: string[];
+    sportIds: string[];
+    collegeIds: string[];
+    programIds: string[];
+    postHighSchoolPlan: string;
+    careerInterest: string;
+    interestedInNCAA: boolean;
+}
+
+export async function completeOnboarding(userId: string, data: OnboardingData) {
     try {
         const {
             // Step 1
@@ -52,17 +78,17 @@ export async function completeOnboarding(userId: string, data: any) {
                 interestedInNCAA,
 
                 // Set relations
-                clubs: { set: [], connect: clubIds.map((id: string) => ({ id })) },
-                sports: { set: [], connect: sportIds.map((id: string) => ({ id })) },
-                targetColleges: { set: [], connect: collegeIds.map((id: string) => ({ id })) },
-                focusPrograms: { set: [], connect: programIds.map((id: string) => ({ id })) },
+                clubs: { set: [], connect: clubIds.map((id) => ({ id })) },
+                sports: { set: [], connect: sportIds.map((id) => ({ id })) },
+                targetColleges: { set: [], connect: collegeIds.map((id) => ({ id })) },
+                focusPrograms: { set: [], connect: programIds.map((id) => ({ id })) },
 
                 // Courses
                 studentCourses: {
                     deleteMany: {},
-                    create: courses.map((c: any) => ({
+                    create: courses.map((c) => ({
                         courseId: c.id,
-                        status: c.status,
+                        status: c.status as CourseStatus,
                         grade: c.grade || null,
                         confidenceLevel: c.confidence || null,
                         stressLevel: c.stress || null,

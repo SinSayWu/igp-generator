@@ -2,10 +2,30 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { Club, Sport, Course, College, Program } from "@prisma/client";
 import { getSchoolData, signupAndProfileSetup } from "../actions";
 
-// --- Types (Simplified/Loose for this standalone wizard) ---
-// In a real app, import shared types.
+// --- Types ---
+
+interface MyCourse {
+    id: string;
+    name: string;
+    status: string;
+    grade?: string;
+    gradeLevel?: number;
+    confidence?: string;
+    stress?: string;
+}
+
+interface SchoolData {
+    schoolId: string;
+    schoolName: string;
+    allClubs: Club[];
+    allSports: Sport[];
+    allCourses: Course[];
+    allPrograms: Program[];
+    allColleges: College[];
+}
 
 export default function SignupWizard() {
     const [step, setStep] = useState(0); // 0 = Account, 1 = Basic Profile, ...
@@ -14,7 +34,7 @@ export default function SignupWizard() {
     const [globalError, setGlobalError] = useState("");
 
     // --- Fetched Data (Empty until Step 0 is done) ---
-    const [schoolData, setSchoolData] = useState<any>(null);
+    const [schoolData, setSchoolData] = useState<SchoolData | null>(null);
 
     // --- State: Account (Step 0) ---
     const [firstName, setFirstName] = useState("");
@@ -30,7 +50,7 @@ export default function SignupWizard() {
     const [bio, setBio] = useState("");
 
     // Step 2: Courses
-    const [myCourses, setMyCourses] = useState<any[]>([]);
+    const [myCourses, setMyCourses] = useState<MyCourse[]>([]);
 
     // Step 3: Interests
     const [subjectInterests, setSubjectInterests] = useState<string[]>([]);
@@ -61,10 +81,10 @@ export default function SignupWizard() {
             // Verify School & Load Data
             startTransition(async () => {
                 const res = await getSchoolData(Number(schoolCode));
-                if (res.error) {
-                    setGlobalError(res.error);
+                if (res && "error" in res) {
+                    setGlobalError((res as { error: string }).error);
                 } else {
-                    setSchoolData(res);
+                    setSchoolData(res as SchoolData);
                     setStep(1); // Move to Profile Setup
                 }
             });
@@ -104,8 +124,9 @@ export default function SignupWizard() {
                 });
                 // Success
                 router.push("/dashboard");
-            } catch (err: any) {
-                setGlobalError(err.message || "Signup failed");
+            } catch (err) {
+                const message = err instanceof Error ? err.message : "Signup failed";
+                setGlobalError(message);
             }
         });
     };
@@ -553,8 +574,18 @@ function StepWrapper({ children }: { children: React.ReactNode }) {
     return <div className="animate-in fade-in slide-in-from-right-4 duration-300">{children}</div>;
 }
 
-function MultiSelector({ items, selectedIds, onChange, placeholder }: any) {
-    const available = items.filter((i: any) => !selectedIds.includes(i.id));
+function MultiSelector({
+    items,
+    selectedIds,
+    onChange,
+    placeholder,
+}: {
+    items: { id: string; name: string }[];
+    selectedIds: string[];
+    onChange: (ids: string[]) => void;
+    placeholder: string;
+}) {
+    const available = items.filter((i) => !selectedIds.includes(i.id));
     return (
         <div className="space-y-2">
             <select
@@ -565,15 +596,15 @@ function MultiSelector({ items, selectedIds, onChange, placeholder }: any) {
                 }}
             >
                 <option value="">{placeholder}</option>
-                {available.map((i: any) => (
+                {available.map((i) => (
                     <option key={i.id} value={i.id}>
                         {i.name}
                     </option>
                 ))}
             </select>
             <div className="flex flex-wrap gap-2 mt-2">
-                {selectedIds.map((id: string) => {
-                    const item = items.find((i: any) => i.id === id);
+                {selectedIds.map((id) => {
+                    const item = items.find((i) => i.id === id);
                     if (!item) return null;
                     return (
                         <div
@@ -582,9 +613,7 @@ function MultiSelector({ items, selectedIds, onChange, placeholder }: any) {
                         >
                             {item.name}
                             <button
-                                onClick={() =>
-                                    onChange(selectedIds.filter((sid: string) => sid !== id))
-                                }
+                                onClick={() => onChange(selectedIds.filter((sid) => sid !== id))}
                                 className="hover:text-red-900"
                             >
                                 ×
@@ -597,7 +626,15 @@ function MultiSelector({ items, selectedIds, onChange, placeholder }: any) {
     );
 }
 
-function CourseSelector({ allCourses, myCourses, setMyCourses }: any) {
+function CourseSelector({
+    allCourses,
+    myCourses,
+    setMyCourses,
+}: {
+    allCourses: Course[];
+    myCourses: MyCourse[];
+    setMyCourses: (courses: MyCourse[]) => void;
+}) {
     const [search, setSearch] = useState("");
     const [selectedId, setSelectedId] = useState("");
     const [status, setStatus] = useState("IN_PROGRESS");
@@ -605,13 +642,13 @@ function CourseSelector({ allCourses, myCourses, setMyCourses }: any) {
 
     // Simplified logic for brevity (can expand if needed)
     const available = allCourses.filter(
-        (c: any) =>
-            !myCourses.some((mc: any) => mc.id === c.id) &&
+        (c) =>
+            !myCourses.some((mc) => mc.id === c.id) &&
             c.name.toLowerCase().includes(search.toLowerCase())
     );
 
     const handleAdd = () => {
-        const course = allCourses.find((c: any) => c.id === selectedId);
+        const course = allCourses.find((c) => c.id === selectedId);
         if (course) {
             setMyCourses([...myCourses, { id: course.id, name: course.name, status, grade }]);
             setSelectedId("");
@@ -624,7 +661,7 @@ function CourseSelector({ allCourses, myCourses, setMyCourses }: any) {
         <div className="space-y-4">
             {/* List */}
             <div className="space-y-2 max-h-60 overflow-y-auto mb-4">
-                {myCourses.map((c: any) => (
+                {myCourses.map((c) => (
                     <div
                         key={c.id}
                         className="flex justify-between items-center bg-white p-3 rounded-lg border border-slate-200"
@@ -636,9 +673,7 @@ function CourseSelector({ allCourses, myCourses, setMyCourses }: any) {
                             </p>
                         </div>
                         <button
-                            onClick={() =>
-                                setMyCourses(myCourses.filter((mc: any) => mc.id !== c.id))
-                            }
+                            onClick={() => setMyCourses(myCourses.filter((mc) => mc.id !== c.id))}
                             className="text-red-500"
                         >
                             ×
@@ -664,7 +699,7 @@ function CourseSelector({ allCourses, myCourses, setMyCourses }: any) {
                     />
                     {search && !selectedId && (
                         <div className="mt-1 bg-white border border-slate-200 rounded shadow-lg max-h-40 overflow-y-auto">
-                            {available.map((c: any) => (
+                            {available.map((c) => (
                                 <div
                                     key={c.id}
                                     className="p-2 hover:bg-slate-100 cursor-pointer text-sm"

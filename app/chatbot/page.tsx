@@ -148,11 +148,6 @@ export default function ChatbotPage() {
             // This implies the DEFAULT view should perhaps be MINIMAL?
             // Let's hide the reasoning text if a schedule was found, unless debug is on.
 
-            const messageContent =
-                foundSchedule && !debugMode
-                    ? displayContent // ALWAYS show the explanation/summary now
-                    : displayContent;
-
             // Store the original full reasoning in a separate property if we wanted,
             // but for now we essentially lose the reasoning if we replace it here.
             // Better to store the FULL content in the message state, but control RENDER based on debugMode.

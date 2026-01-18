@@ -43,6 +43,8 @@ export default async function DashboardPage() {
                             grade: true,
                             status: true,
                             gradeLevel: true,
+                            confidenceLevel: true, // Added for type match
+                            stressLevel: true, // Added for type match
                             course: {
                                 select: {
                                     id: true,
@@ -57,6 +59,9 @@ export default async function DashboardPage() {
                             id: true,
                             name: true,
                             category: true,
+                            description: true, // Added for type match
+                            teacherLeader: true, // Added for type match
+                            studentLeaders: true, // Added for type match
                         },
                     },
                     sports: {
@@ -106,10 +111,12 @@ export default async function DashboardPage() {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 role: String(user.role),
-                student: {
-                    ...user.student,
-                    gradeLevel: user.student?.gradeLevel ?? 9, // Fallback
-                },
+                student: user.student
+                    ? {
+                          ...user.student,
+                          gradeLevel: user.student.gradeLevel ?? 9, // Fallback
+                      }
+                    : null,
             }}
             courseCatalog={courseCatalog}
         />

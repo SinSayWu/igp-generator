@@ -8,7 +8,7 @@ type TranscriptItem = {
     status: string;
     level: string | null;
     credits: number;
-    code: number;
+    code: string;
 };
 
 type PlannedCourseItem = {
@@ -67,15 +67,15 @@ export async function getStudentContext(userId: string) {
                 status: sc.status,
                 // NEW: Rich metadata
                 level: sc.course.level,
-                credits: sc.course.credits,
-                code: sc.course.code,
+                credits: sc.course.credits || 0,
+                code: sc.course.code || "",
             });
         } else if (sc.status === "PLANNED") {
             plannedCourses.push({
                 course_name: sc.course.name,
                 grade_level: sc.gradeLevel,
                 level: sc.course.level,
-                credits: sc.course.credits,
+                credits: sc.course.credits || 0,
             });
         }
     });

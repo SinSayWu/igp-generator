@@ -7,40 +7,9 @@ import Extracurriculars from "./Extracurriculars";
 import Schools from "./Schools";
 import Jobs from "./Jobs";
 import Goals from "./Goals";
+import { StudentCourseData, ClubData, SportData, CollegeData, CourseCatalogItem } from "./types";
 
 type TabId = "overview" | "classes" | "extracurriculars" | "schools" | "jobs" | "chatbot" | "goals";
-
-// Types for student data
-type StudentCourseData = {
-    id: string;
-    courseId: string;
-    grade: string | null;
-    status: string;
-    gradeLevel: number | null;
-    course: {
-        id: string;
-        name: string;
-        department: string;
-    };
-};
-
-type ClubData = {
-    id: string;
-    name: string;
-    category: string;
-};
-
-type SportData = {
-    id: string;
-    name: string;
-    season: string;
-};
-
-type CollegeData = {
-    id: string;
-    name: string;
-    type: string;
-};
 
 type DashboardUser = {
     firstName: string;
@@ -62,14 +31,6 @@ type DashboardUser = {
         sports: SportData[];
         targetColleges: CollegeData[];
     } | null;
-};
-
-type CourseCatalogItem = {
-    id: string;
-    name: string;
-    department: string;
-    credits: number | null;
-    level: string | null;
 };
 
 type DashboardShellProps = {

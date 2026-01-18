@@ -131,11 +131,10 @@ export default function ProfileEditor({
     ): SelectableItem => {
         let detail: string | null = null;
         if ("category" in item) {
-            detail = item.category;
-            // @ts-ignore
-            if (item.teacherLeader) {
-                // @ts-ignore
-                detail += ` • Sponsor: ${item.teacherLeader}`;
+            const club = item as Club;
+            detail = club.category;
+            if (club.teacherLeader) {
+                detail += ` • Sponsor: ${club.teacherLeader}`;
             }
         } else if ("season" in item) detail = item.season;
         else if ("department" in item) {
@@ -1215,16 +1214,14 @@ function SectionTable({
                                                             if (item.credits)
                                                                 parts.push(`${item.credits}cr`);
                                                             detail = parts.join(" • ");
-                                                        } else {
-                                                            // @ts-ignore
-                                                            if ("category" in item) {
-                                                                detail = item.category;
-                                                                // @ts-ignore
-                                                                if (item.teacherLeader)
-                                                                    detail += ` • Sponsor: ${item.teacherLeader}`;
-                                                            } else if ("season" in item) {
-                                                                detail = item.season;
+                                                        } else if ("category" in item) {
+                                                            const club = item as Club;
+                                                            detail = club.category;
+                                                            if (club.teacherLeader) {
+                                                                detail += ` • Sponsor: ${club.teacherLeader}`;
                                                             }
+                                                        } else if ("season" in item) {
+                                                            detail = (item as Sport).season;
                                                         }
                                                         return (
                                                             <button
@@ -1268,16 +1265,14 @@ function SectionTable({
                                                     if (item.credits)
                                                         parts.push(`${item.credits}cr`);
                                                     detail = parts.join(" • ");
-                                                } else {
-                                                    // @ts-ignore
-                                                    if ("category" in item) {
-                                                        detail = item.category;
-                                                        // @ts-ignore
-                                                        if (item.teacherLeader)
-                                                            detail += ` • Sponsor: ${item.teacherLeader}`;
-                                                    } else if ("season" in item) {
-                                                        detail = item.season;
+                                                } else if ("category" in item) {
+                                                    const club = item as Club;
+                                                    detail = club.category;
+                                                    if (club.teacherLeader) {
+                                                        detail += ` • Sponsor: ${club.teacherLeader}`;
                                                     }
+                                                } else if ("season" in item) {
+                                                    detail = (item as Sport).season;
                                                 }
                                                 return (
                                                     <option key={item.id} value={item.id}>

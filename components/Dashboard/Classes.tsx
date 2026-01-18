@@ -3,31 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { deleteCourse } from "@/app/actions/delete-course";
-
-// Types matching the data from Shell
-type StudentCourseData = {
-    id: string;
-    courseId: string;
-    grade: string | null;
-    status: string;
-    gradeLevel: number | null;
-    confidenceLevel: string | null; // Added
-    stressLevel: string | null; // Added
-    course: {
-        id: string;
-        name: string;
-        department: string;
-    };
-};
-
-type CourseCatalogItem = {
-    id: string;
-    name: string;
-    department: string;
-    credits: number | null;
-    level: string | null;
-    availableGrades: number[];
-};
+import { StudentCourseData, CourseCatalogItem } from "./types";
 
 type ClassesPageProps = {
     courses: StudentCourseData[];
@@ -39,7 +15,7 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade }: Cl
     const router = useRouter();
     const [generating, setGenerating] = useState(false);
     const [isCatalogOpen, setIsCatalogOpen] = useState(false);
-    const [isPending, startTransition] = useTransition();
+    const [, startTransition] = useTransition();
 
     // Debug State
     const [debugInfo, setDebugInfo] = useState<{ draft: string; audit: string } | null>(null);
@@ -324,7 +300,7 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade }: Cl
                             const gradeCourses = scheduleByGrade[gradeKey] || [];
                             return (
                                 <div key={gradeKey} className="flex-1 divide-y divide-slate-100">
-                                    {gradeCourses.map((c, idx) => {
+                                    {gradeCourses.map((c) => {
                                         let statusClass = "hover:bg-indigo-50 border-transparent";
                                         let badge = null;
                                         let isClickable = false;

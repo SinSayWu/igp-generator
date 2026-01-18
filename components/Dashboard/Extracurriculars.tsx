@@ -1,20 +1,6 @@
 "use client";
 
-// Types matching the data from Shell
-type ClubData = {
-    id: string;
-    name: string;
-    category: string;
-    description: string | null;
-    teacherLeader: string | null;
-    studentLeaders: string | null;
-};
-
-type SportData = {
-    id: string;
-    name: string;
-    season: string;
-};
+import { ClubData, SportData } from "./types";
 
 type ExtracurricularsProps = {
     clubs: ClubData[];

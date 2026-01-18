@@ -1,17 +1,27 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
-import { Club, Sport, Course, College, Program, Student } from "@prisma/client";
+// import { useRouter } from "next/navigation"; // Removed unused router
+import { Club, Sport, Course, College, Program, Student, StudentCourse } from "@prisma/client";
 import { verifySchoolCode, completeOnboarding } from "../actions";
 
 // --- Types ---
+
+interface MyCourse {
+    id: string;
+    name: string;
+    status: string;
+    grade?: string;
+    gradeLevel?: number;
+    confidence?: string;
+    stress?: string;
+}
 
 type Props = {
     student: Student & {
         clubs: Club[];
         sports: Sport[];
-        studentCourses: any[];
+        studentCourses: (StudentCourse & { course: Course })[];
         targetColleges: College[];
         focusPrograms: Program[];
     };
@@ -32,7 +42,6 @@ export default function OnboardingWizard({
 }: Props) {
     const [step, setStep] = useState(1);
     const [isPending, startTransition] = useTransition();
-    const router = useRouter();
 
     // --- State ---
 
@@ -45,13 +54,13 @@ export default function OnboardingWizard({
 
     // Step 2: Courses
     // Structure: { id, name, status, grade, ... }
-    const [myCourses, setMyCourses] = useState<any[]>(
+    const [myCourses, setMyCourses] = useState<MyCourse[]>(
         student.studentCourses.map((sc) => ({
             id: sc.courseId,
             name: sc.course.name, // Will need to ensure we have this data, logic below
             status: sc.status,
-            grade: sc.grade,
-            gradeLevel: sc.gradeLevel,
+            grade: sc.grade || undefined,
+            gradeLevel: sc.gradeLevel || undefined,
         }))
     );
     // Note: The prop passed `studentCourses` needs to include `course` relation for this initial state to work fully.
@@ -61,8 +70,9 @@ export default function OnboardingWizard({
     const [subjectInterests, setSubjectInterests] = useState<string[]>(
         student.subjectInterests || []
     );
+    // Derived state - check if existing studyHallsPerYear > 0
     const [wantsStudyHalls, setWantsStudyHalls] = useState<boolean>(
-        student.wantsStudyHalls || false
+        (student.studyHallsPerYear || 0) > 0
     );
 
     // Step 4: Extracurriculars
@@ -727,8 +737,18 @@ function StepWrapper({ children }: { children: React.ReactNode }) {
     );
 }
 
-function MultiSelector({ items, selectedIds, onChange, placeholder }: any) {
-    const available = items.filter((i: any) => !selectedIds.includes(i.id));
+function MultiSelector({
+    items,
+    selectedIds,
+    onChange,
+    placeholder,
+}: {
+    items: { id: string; name: string }[];
+    selectedIds: string[];
+    onChange: (ids: string[]) => void;
+    placeholder: string;
+}) {
+    const available = items.filter((i) => !selectedIds.includes(i.id));
 
     return (
         <div className="space-y-2">
@@ -740,7 +760,7 @@ function MultiSelector({ items, selectedIds, onChange, placeholder }: any) {
                 }}
             >
                 <option value="">{placeholder}</option>
-                {available.map((i: any) => (
+                {available.map((i) => (
                     <option key={i.id} value={i.id}>
                         {i.name}
                     </option>
@@ -748,8 +768,8 @@ function MultiSelector({ items, selectedIds, onChange, placeholder }: any) {
             </select>
 
             <div className="flex flex-wrap gap-2 mt-2">
-                {selectedIds.map((id: string) => {
-                    const item = items.find((i: any) => i.id === id);
+                {selectedIds.map((id) => {
+                    const item = items.find((i) => i.id === id);
                     if (!item) return null;
                     return (
                         <div
@@ -758,9 +778,7 @@ function MultiSelector({ items, selectedIds, onChange, placeholder }: any) {
                         >
                             {item.name}
                             <button
-                                onClick={() =>
-                                    onChange(selectedIds.filter((sid: string) => sid !== id))
-                                }
+                                onClick={() => onChange(selectedIds.filter((sid) => sid !== id))}
                                 className="hover:text-red-900"
                             >
                                 ×
@@ -773,7 +791,15 @@ function MultiSelector({ items, selectedIds, onChange, placeholder }: any) {
     );
 }
 
-function CourseSelector({ allCourses, myCourses, setMyCourses }: any) {
+function CourseSelector({
+    allCourses,
+    myCourses,
+    setMyCourses,
+}: {
+    allCourses: Course[];
+    myCourses: MyCourse[];
+    setMyCourses: (courses: MyCourse[]) => void;
+}) {
     const [search, setSearch] = useState("");
     const [selectedId, setSelectedId] = useState("");
     const [status, setStatus] = useState("IN_PROGRESS");
@@ -782,14 +808,14 @@ function CourseSelector({ allCourses, myCourses, setMyCourses }: any) {
     const [stress, setStress] = useState("");
 
     const available = allCourses.filter(
-        (c: any) =>
-            !myCourses.some((mc: any) => mc.id === c.id) &&
+        (c) =>
+            !myCourses.some((mc) => mc.id === c.id) &&
             c.name.toLowerCase().includes(search.toLowerCase())
     );
 
     const handleAdd = () => {
         if (!selectedId) return;
-        const course = allCourses.find((c: any) => c.id === selectedId);
+        const course = allCourses.find((c) => c.id === selectedId);
         if (!course) return;
 
         setMyCourses([
@@ -847,7 +873,7 @@ function CourseSelector({ allCourses, myCourses, setMyCourses }: any) {
                 {myCourses.length === 0 && (
                     <p className="text-slate-400 text-sm italic">No courses added yet.</p>
                 )}
-                {myCourses.map((c: any) => (
+                {myCourses.map((c) => (
                     <div
                         key={c.id}
                         className="flex justify-between items-center bg-white p-3 rounded-lg border border-slate-200 shadow-sm transition-all hover:shadow-md"
@@ -916,9 +942,7 @@ function CourseSelector({ allCourses, myCourses, setMyCourses }: any) {
                             </div>
                         </div>
                         <button
-                            onClick={() =>
-                                setMyCourses(myCourses.filter((mc: any) => mc.id !== c.id))
-                            }
+                            onClick={() => setMyCourses(myCourses.filter((mc) => mc.id !== c.id))}
                             className="ml-3 p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
                             title="Remove Course"
                         >
@@ -1018,9 +1042,7 @@ function CourseSelector({ allCourses, myCourses, setMyCourses }: any) {
                                     </svg>
                                     <span>
                                         Selected:{" "}
-                                        <b>
-                                            {allCourses.find((c: any) => c.id === selectedId)?.name}
-                                        </b>
+                                        <b>{allCourses.find((c) => c.id === selectedId)?.name}</b>
                                     </span>
                                 </span>
                                 <button
@@ -1040,7 +1062,7 @@ function CourseSelector({ allCourses, myCourses, setMyCourses }: any) {
                                         No courses found matching &quot;{search}&quot;
                                     </div>
                                 ) : (
-                                    available.slice(0, 50).map((c: any) => (
+                                    available.slice(0, 50).map((c) => (
                                         <button
                                             key={c.id}
                                             onClick={() => {

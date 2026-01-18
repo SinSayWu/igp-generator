@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { CourseStatus, Prisma } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { createSession } from "@/lib/session";
 import { cookies } from "next/headers";
@@ -33,7 +34,39 @@ export async function getSchoolData(schoolCode: number) {
     };
 }
 
-export async function signupAndProfileSetup(data: any) {
+export interface MyCourse {
+    id: string;
+    name: string;
+    status: string;
+    grade?: string;
+    gradeLevel?: number;
+    confidence?: string;
+    stress?: string;
+}
+
+export interface SignupData {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    schoolCode: number;
+    gradeLevel: number;
+    age: number;
+    bio: string;
+    courses: MyCourse[];
+    subjectInterests: string[];
+    studyHallsPerYear: number;
+    clubIds: string[];
+    sportIds: string[];
+    collegeIds: string[];
+    programIds: string[];
+    postHighSchoolPlan: string;
+    careerInterest: string;
+    interestedInNCAA: boolean;
+    middleName?: string;
+}
+
+export async function signupAndProfileSetup(data: SignupData) {
     const {
         firstName,
         lastName,
@@ -76,8 +109,8 @@ export async function signupAndProfileSetup(data: any) {
     // Note: We are creating "StudentCourse" records here too
 
     // Prepare nested writes
-    const studentData: any = {
-        schoolId: school.id,
+    const studentData: Prisma.StudentCreateWithoutUserInput = {
+        school: { connect: { id: school.id } },
         gradeLevel,
         graduationYear: new Date().getFullYear() + (12 - gradeLevel), // Approximation
         age,
@@ -88,24 +121,24 @@ export async function signupAndProfileSetup(data: any) {
         careerInterest,
         interestedInNCAA,
         clubs: {
-            connect: clubIds.map((id: string) => ({ id })),
+            connect: clubIds.map((id) => ({ id })),
         },
         sports: {
-            connect: sportIds.map((id: string) => ({ id })),
+            connect: sportIds.map((id) => ({ id })),
         },
         targetColleges: {
-            connect: collegeIds.map((id: string) => ({ id })),
+            connect: collegeIds.map((id) => ({ id })),
         },
         focusPrograms: {
-            connect: programIds.map((id: string) => ({ id })),
+            connect: programIds.map((id) => ({ id })),
         },
     };
 
     if (courses && courses.length > 0) {
         studentData.studentCourses = {
-            create: courses.map((c: any) => ({
+            create: courses.map((c) => ({
                 courseId: c.id,
-                status: c.status,
+                status: c.status as CourseStatus,
                 grade: c.grade,
                 gradeLevel: c.gradeLevel, // e.g., 9, 10
                 // confidence/stress might be ignored unless schema calls for it
@@ -143,8 +176,9 @@ export async function signupAndProfileSetup(data: any) {
         });
 
         return { success: true };
-    } catch (e: any) {
+    } catch (e) {
         console.error("Signup Transaction Failed:", e);
-        throw new Error("Failed to create account: " + e.message);
+        const errorMessage = e instanceof Error ? e.message : "Unknown error";
+        throw new Error("Failed to create account: " + errorMessage);
     }
 }
