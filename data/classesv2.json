@@ -68,7 +68,7 @@
             "program_tag": "STEM"
         },
         { "id": "CS-FUND-COMP-1", 
-            "name": "Fundamentals of Computing - Part 1", 
+            "name": "CP Fundamentals of Computing - Part 1", 
             "subj": "CS", 
             "lvl": "CP", 
             "cr": 0.5,
@@ -80,7 +80,7 @@
             "program_tag": "STEM" },
 
         { "id": "CS-FUND-COMP-2", 
-            "name": "Fundamentals of Computing - Part 2", 
+            "name": "CP Fundamentals of Computing - Part 2", 
             "subj": "CS", 
             "lvl": "CP", 
             "cr": 0.5,
@@ -92,7 +92,7 @@
             "program_tag": "STEM" },
         {
             "id": "CS-PLTW-ESSENTIALS",
-            "name": "PLTW Computer Science Essentials",
+            "name": "PLTW Computer Science Essentials Honors",
             "subj": "CS",
             "lvl": "HON",
             "cr": 1.0,
@@ -106,7 +106,7 @@
 
         {
             "id": "ENG-1-CP",
-            "name": "English 1",
+            "name": "English 1 CP",
             "subj": "ENG",
             "lvl": "CP",
             "cr": 1.0,
@@ -119,7 +119,7 @@
         },
         {
             "id": "ENG-1-H",
-            "name": "English 1",
+            "name": "English 1 Honors",
             "subj": "ENG",
             "lvl": "HON",
             "cr": 1.0,
@@ -132,7 +132,7 @@
         },
         {
             "id": "ENG-2-CP",
-            "name": "English 2",
+            "name": "English 2 CP",
             "subj": "ENG",
             "lvl": "CP",
             "cr": 1.0,
@@ -145,7 +145,7 @@
         },
         {
             "id": "ENG-2-H",
-            "name": "English 2",
+            "name": "English 2 Honors",
             "subj": "ENG",
             "lvl": "HON",
             "cr": 1.0,
@@ -158,7 +158,7 @@
         },
         {
             "id": "ENG-3-CP",
-            "name": "English 3",
+            "name": "English 3 CP",
             "subj": "ENG",
             "lvl": "CP",
             "cr": 1.0,
@@ -171,7 +171,7 @@
         },
         {
             "id": "ENG-3-H",
-            "name": "English 3",
+            "name": "English 3 Honors",
             "subj": "ENG",
             "lvl": "HON",
             "cr": 1.0,
@@ -184,7 +184,7 @@
         },
         {
             "id": "ENG-4-CP",
-            "name": "English 4",
+            "name": "English 4 CP",
             "subj": "ENG",
             "lvl": "CP",
             "cr": 1.0,
@@ -197,7 +197,7 @@
         },
         {
             "id": "ENG-4-H",
-            "name": "English 4",
+            "name": "English 4 Honors",
             "subj": "ENG",
             "lvl": "HON",
             "cr": 1.0,
@@ -236,7 +236,7 @@
         },
         {
             "id": "ENG-CREATIVE-WRITING",
-            "name": "Creative Writing",
+            "name": "Creative Writing CP",
             "subj": "ENG",
             "lvl": "CP",
             "cr": 0.5,
@@ -249,7 +249,7 @@
         },
         {
             "id": "ENG-FILM-CRIT",
-            "name": "Film Criticism",
+            "name": "Film Criticism CP",
             "subj": "ENG",
             "lvl": "CP",
             "cr": 0.5,
@@ -262,7 +262,7 @@
         },
         {
             "id": "ENG-SPEECH",
-            "name": "Speech",
+            "name": "Speech CP",
             "subj": "ENG",
             "lvl": "CP",
             "cr": 0.5,
@@ -275,7 +275,7 @@
         },
         {
             "id": "ENG-YEARBOOK",
-            "name": "Yearbook / Journalism",
+            "name": "Yearbook / Journalism CP",
             "subj": "ENG",
             "lvl": "CP",
             "cr": 1.0,
@@ -315,7 +315,7 @@
         },
         {
             "id": "MATH-GEOM-CP",
-            "name": "Geometry",
+            "name": "Geometry CP",
             "subj": "MATH",
             "lvl": "CP",
             "cr": 1.0,
@@ -328,7 +328,7 @@
         },
         {
             "id": "MATH-GEOM-H",
-            "name": "Geometry",
+            "name": "Geometry Honors",
             "subj": "MATH",
             "lvl": "HON",
             "cr": 1.0,
@@ -341,7 +341,7 @@
         },
         {
             "id": "MATH-ALG2-CP",
-            "name": "Algebra 2",
+            "name": "Algebra 2 CP",
             "subj": "MATH",
             "lvl": "CP",
             "cr": 1.0,
@@ -354,7 +354,7 @@
         },
         {
             "id": "MATH-ALG2-H",
-            "name": "Algebra 2",
+            "name": "Algebra 2 Honors",
             "subj": "MATH",
             "lvl": "HON",
             "cr": 1.0,
@@ -367,7 +367,7 @@
         },
         {
             "id": "MATH-PRECALC-CP",
-            "name": "Pre-Calculus",
+            "name": "Pre-Calculus CP",
             "subj": "MATH",
             "lvl": "CP",
             "cr": 1.0,
@@ -380,7 +380,7 @@
         },
         {
             "id": "MATH-PRECALC-H",
-            "name": "Pre-Calculus",
+            "name": "Pre-Calculus Honors",
             "subj": "MATH",
             "lvl": "HON",
             "cr": 1.0,
@@ -419,7 +419,7 @@
         },
         {
             "id": "MATH-PROB-STAT",
-            "name": "Probability & Statistics",
+            "name": "Probability & Statistics CP",
             "subj": "MATH",
             "lvl": "CP",
             "cr": 1.0,
@@ -446,7 +446,7 @@
 
         {
             "id": "SCI-PHYS-SCI",
-            "name": "Physical Science",
+            "name": "Physical Science CP",
             "subj": "SCI",
             "lvl": "CP",
             "cr": 1.0,
@@ -459,7 +459,7 @@
         },
         {
             "id": "SCI-BIO1-CP",
-            "name": "Biology 1",
+            "name": "Biology 1 CP",
             "subj": "SCI",
             "lvl": "CP",
             "cr": 1.0,
@@ -472,7 +472,7 @@
         },
         {
             "id": "SCI-BIO1-H",
-            "name": "Biology 1",
+            "name": "Biology 1 Honors",
             "subj": "SCI",
             "lvl": "HON",
             "cr": 1.0,
@@ -485,7 +485,7 @@
         },
         {
             "id": "SCI-CHEM1-CP",
-            "name": "Chemistry 1",
+            "name": "Chemistry 1 CP",
             "subj": "SCI",
             "lvl": "CP",
             "cr": 1.0,
@@ -498,7 +498,7 @@
         },
         {
             "id": "SCI-CHEM1-H",
-            "name": "Chemistry 1",
+            "name": "Chemistry 1 Honors",
             "subj": "SCI",
             "lvl": "HON",
             "cr": 1.0,
@@ -511,7 +511,7 @@
         },
         {
             "id": "SCI-FORENSIC",
-            "name": "Forensic Science",
+            "name": "Forensic Science CP",
             "subj": "SCI",
             "lvl": "CP",
             "cr": 1.0,
@@ -524,7 +524,7 @@
         },
         {
             "id": "SCI-ENV-SCI",
-            "name": "Environmental Science",
+            "name": "Environmental Science CP",
             "subj": "SCI",
             "lvl": "CP",
             "cr": 1.0,
@@ -537,7 +537,7 @@
         },
         {
             "id": "SCI-PHYSICS-CP",
-            "name": "Physics",
+            "name": "Physics CP",
             "subj": "SCI",
             "lvl": "CP",
             "cr": 1.0,
@@ -550,7 +550,7 @@
         },
         {
             "id": "SCI-PHYSICS-H",
-            "name": "Physics",
+            "name": "Physics Honors",
             "subj": "SCI",
             "lvl": "HON",
             "cr": 1.0,
@@ -628,7 +628,7 @@
 
         {
             "id": "SS-HUMAN-GEO",
-            "name": "Human Geography",
+            "name": "Human Geography CP",
             "subj": "SS",
             "lvl": "CP",
             "cr": 1.0,
@@ -641,7 +641,7 @@
         },
         {
             "id": "SS-MOD-WORLD-CP",
-            "name": "Modern World History",
+            "name": "Modern World History CP",
             "subj": "SS",
             "lvl": "CP",
             "cr": 1.0,
@@ -654,7 +654,7 @@
         },
         {
             "id": "SS-MOD-WORLD-H",
-            "name": "Modern World History",
+            "name": "Modern World History Honors",
             "subj": "SS",
             "lvl": "HON",
             "cr": 1.0,
@@ -667,7 +667,7 @@
         },
         {
             "id": "SS-US-HIST-CP",
-            "name": "US History",
+            "name": "US History CP",
             "subj": "SS",
             "lvl": "CP",
             "cr": 1.0,
@@ -680,7 +680,7 @@
         },
         {
             "id": "SS-US-HIST-H",
-            "name": "US History",
+            "name": "US History Honors",
             "subj": "SS",
             "lvl": "HON",
             "cr": 1.0,
@@ -693,7 +693,7 @@
         },
         {
             "id": "SS-GOV",
-            "name": "US Government",
+            "name": "US Government CP",
             "subj": "SS",
             "lvl": "CP",
             "cr": 0.5,
@@ -706,7 +706,7 @@
         },
         {
             "id": "SS-ECON",
-            "name": "Economics",
+            "name": "Economics CP",
             "subj": "SS",
             "lvl": "CP",
             "cr": 0.5,
@@ -719,7 +719,7 @@
         },
         {
             "id": "SS-PSYCH",
-            "name": "Psychology",
+            "name": "Psychology CP",
             "subj": "SS",
             "lvl": "CP",
             "cr": 0.5,
@@ -850,7 +850,7 @@
 
         {
             "id": "WL-GERMAN-1",
-            "name": "German 1",
+            "name": "German 1 CP",
             "subj": "WL",
             "lvl": "CP",
             "cr": 1.0,
@@ -863,7 +863,7 @@
         },
         {
             "id": "WL-GERMAN-2",
-            "name": "German 2",
+            "name": "German 2 CP",
             "subj": "WL",
             "lvl": "CP",
             "cr": 1.0,
@@ -876,7 +876,7 @@
         },
         {
             "id": "WL-GERMAN-3-H",
-            "name": "German 3",
+            "name": "German 3 Honors",
             "subj": "WL",
             "lvl": "HON",
             "cr": 1.0,
@@ -902,7 +902,7 @@
         },
         {
             "id": "WL-SPAN-1",
-            "name": "Spanish 1",
+            "name": "Spanish 1 CP",
             "subj": "WL",
             "lvl": "CP",
             "cr": 1.0,
@@ -915,7 +915,7 @@
         },
         {
             "id": "WL-SPAN-2",
-            "name": "Spanish 2",
+            "name": "Spanish 2 CP",
             "subj": "WL",
             "lvl": "CP",
             "cr": 1.0,
@@ -928,7 +928,7 @@
         },
         {
             "id": "WL-SPAN-3-H",
-            "name": "Spanish 3",
+            "name": "Spanish 3 Honors",
             "subj": "WL",
             "lvl": "HON",
             "cr": 1.0,
@@ -955,7 +955,7 @@
 
         {
             "id": "FA-ART-1",
-            "name": "Art 1",
+            "name": "Art 1 CP",
             "subj": "FA",
             "lvl": "CP",
             "cr": 1.0,
@@ -968,7 +968,7 @@
         },
         {
             "id": "FA-ART-2",
-            "name": "Art 2",
+            "name": "Art 2 CP",
             "subj": "FA",
             "lvl": "CP",
             "cr": 1.0,
@@ -981,7 +981,7 @@
         },
         {
             "id": "FA-ART-3",
-            "name": "Art 3",
+            "name": "Art 3 CP",
             "subj": "FA",
             "lvl": "CP",
             "cr": 1.0,
@@ -994,7 +994,7 @@
         },
         {
             "id": "FA-ART-4-H",
-            "name": "Art 4",
+            "name": "Art 4 Honors",
             "subj": "FA",
             "lvl": "HON",
             "cr": 1.0,
@@ -1007,7 +1007,7 @@
         },
         {
             "id": "FA-PHOTO",
-            "name": "Photography",
+            "name": "Photography CP",
             "subj": "FA",
             "lvl": "CP",
             "cr": 1.0,
@@ -1059,7 +1059,7 @@
         },
         {
             "id": "FA-BAND-PERC",
-            "name": "Band: Percussion",
+            "name": "Band: Percussion CP",
             "subj": "FA",
             "lvl": "CP",
             "cr": 1.0,
@@ -1072,7 +1072,7 @@
         },
         {
             "id": "FA-BAND-WIND",
-            "name": "Band: Wind Ensemble",
+            "name": "Band: Wind Ensemble CP",
             "subj": "FA",
             "lvl": "CP",
             "cr": 1.0,
@@ -1085,7 +1085,7 @@
         },
         {
             "id": "FA-BAND-SYMP",
-            "name": "Symphonic Band",
+            "name": "Symphonic Band CP",
             "subj": "FA",
             "lvl": "CP",
             "cr": 1.0,
@@ -1098,7 +1098,7 @@
         },
         {
             "id": "FA-JAZZ",
-            "name": "Jazz Ensemble",
+            "name": "Jazz Ensemble CP",
             "subj": "FA",
             "lvl": "CP",
             "cr": 1.0,
@@ -1111,7 +1111,7 @@
         },
         {
             "id": "FA-CHORUS",
-            "name": "Chorus",
+            "name": "Chorus CP",
             "subj": "FA",
             "lvl": "CP",
             "cr": 1.0,
@@ -1124,7 +1124,7 @@
         },
         {
             "id": "FA-GUITAR",
-            "name": "Guitar",
+            "name": "Guitar CP",
             "subj": "FA",
             "lvl": "CP",
             "cr": 1.0,
@@ -1137,7 +1137,7 @@
         },
         {
             "id": "FA-ORCH",
-            "name": "Orchestra",
+            "name": "Orchestra CP",
             "subj": "FA",
             "lvl": "CP",
             "cr": 1.0,
@@ -1163,7 +1163,7 @@
         },
         {
             "id": "FA-THEATRE-1",
-            "name": "Theatre 1",
+            "name": "Theatre 1 CP",
             "subj": "FA",
             "lvl": "CP",
             "cr": 1.0,
@@ -1176,7 +1176,7 @@
         },
         {
             "id": "FA-THEATRE-2",
-            "name": "Theatre 2",
+            "name": "Theatre 2 CP",
             "subj": "FA",
             "lvl": "CP",
             "cr": 1.0,
@@ -1189,7 +1189,7 @@
         },
         {
             "id": "FA-THEATRE-3-H",
-            "name": "Theatre 3",
+            "name": "Theatre 3 Honors",
             "subj": "FA",
             "lvl": "HON",
             "cr": 1.0,
@@ -1202,7 +1202,7 @@
         },
         {
             "id": "FA-THEATRE-4-H",
-            "name": "Theatre 4",
+            "name": "Theatre 4 Honors",
             "subj": "FA",
             "lvl": "HON",
             "cr": 1.0,
@@ -1215,7 +1215,7 @@
         },
         {
             "id": "FA-MEDIA-ARTS",
-            "name": "Media Arts",
+            "name": "Media Arts CP",
             "subj": "FA",
             "lvl": "CP",
             "cr": 1.0,
@@ -1229,7 +1229,7 @@
 
         {
             "id": "ELEC-TECH-TEAM",
-            "name": "DWD Tech Team",
+            "name": "DWD Tech Team CP",
             "subj": "ELEC",
             "lvl": "CP",
             "cr": 1.0,
@@ -1243,7 +1243,7 @@
 
         {
             "id": "JROTC-1",
-            "name": "JROTC 1",
+            "name": "JROTC 1 CP",
             "subj": "JROTC",
             "lvl": "CP",
             "cr": 1.0,
@@ -1256,7 +1256,7 @@
         },
         {
             "id": "JROTC-2",
-            "name": "JROTC 2",
+            "name": "JROTC 2 CP",
             "subj": "JROTC",
             "lvl": "CP",
             "cr": 1.0,
@@ -1269,7 +1269,7 @@
         },
         {
             "id": "JROTC-3",
-            "name": "JROTC 3",
+            "name": "JROTC 3 CP",
             "subj": "JROTC",
             "lvl": "CP",
             "cr": 1.0,
@@ -1282,7 +1282,7 @@
         },
         {
             "id": "JROTC-4",
-            "name": "JROTC 4",
+            "name": "JROTC 4 CP",
             "subj": "JROTC",
             "lvl": "CP",
             "cr": 1.0,
@@ -1295,7 +1295,7 @@
         },
         {
             "id": "PE-1-LIFE",
-            "name": "PE 1 - Lifetime Fitness",
+            "name": "PE 1 - Lifetime Fitness CP",
             "subj": "PE",
             "lvl": "CP",
             "cr": 0.5,
@@ -1308,7 +1308,7 @@
         },
         {
             "id": "PE-1-PERS",
-            "name": "PE 1 - Personal Fitness",
+            "name": "PE 1 - Personal Fitness CP",
             "subj": "PE",
             "lvl": "CP",
             "cr": 0.5,
@@ -1321,7 +1321,7 @@
         },
         {
             "id": "PE-2",
-            "name": "PE 2",
+            "name": "PE 2 CP",
             "subj": "PE",
             "lvl": "CP",
             "cr": 1.0,

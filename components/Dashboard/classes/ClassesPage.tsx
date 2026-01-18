@@ -11,9 +11,11 @@ import { CourseCatalogItem, StudentCourseData } from "../types";
 import AddCourseModal from "./AddCourseModal";
 import ClassesGrid from "./ClassesGrid";
 import CourseCatalog from "./CourseCatalog";
+import CurrentClassRow from "./CurrentClassRow";
 import DebugModal from "./DebugModal";
 import DeleteCourseModal from "./DeleteCourseModal";
 import SummaryCards from "./SummaryCards";
+import { MetricIndex, metricScale } from "@/components/Dashboard/classes/metrics";
 
 type ClassesPageProps = {
     courses: StudentCourseData[];
@@ -27,166 +29,6 @@ type PendingCourseData = {
     confidence: string;
     stress: string;
 };
-
-const metricScale = ["VERY_LOW", "LOW", "NEUTRAL", "HIGH", "VERY_HIGH"] as const;
-const metricLabels = ["Very Low", "Low", "Neutral", "High", "Very High"];
-const metricTickLabels = ["Very Low", "Low", "Neutral", "High", "Very High"];
-const gradeOptions = ["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D", "F"];
-
-type MetricIndex = 0 | 1 | 2 | 3 | 4;
-
-type MetricSliderProps = {
-    title: string;
-    value: MetricIndex;
-    accentColor: string;
-    trackColor: string;
-    labels: string[];
-    onChange: (value: number) => void;
-    onCommit: (value: number) => void;
-    ariaLabel: string;
-    listId: string;
-};
-
-function MetricSlider({
-    title,
-    value,
-    accentColor,
-    trackColor,
-    labels,
-    onChange,
-    onCommit,
-    ariaLabel,
-    listId,
-}: MetricSliderProps) {
-    return (
-        <div className="rounded-lg bg-slate-50 px-3 py-2 flex-1 min-w-[220px]">
-            <div className="flex items-center justify-between text-[11px] font-semibold text-slate-600">
-                <span>{title}</span>
-                <span>{metricLabels[value]}</span>
-            </div>
-            <div className="mt-1">
-                <div className="px-2">
-                    <div className="grid grid-cols-5 text-[9px] text-slate-500 leading-none">
-                        {labels.map((label) => (
-                            <span
-                                key={`${title}-${label}`}
-                                className="text-center whitespace-nowrap"
-                            >
-                                {label}
-                            </span>
-                        ))}
-                    </div>
-                    <input
-                        type="range"
-                        min={0}
-                        max={4}
-                        step={1}
-                        value={value}
-                        list={listId}
-                        onChange={(event) => onChange(Number(event.target.value))}
-                        onMouseUp={(event) =>
-                            onCommit(Number((event.target as HTMLInputElement).value))
-                        }
-                        onTouchEnd={(event) =>
-                            onCommit(Number((event.target as HTMLInputElement).value))
-                        }
-                        className="mt-1 w-full"
-                        style={{ accentColor, backgroundColor: trackColor }}
-                        aria-label={ariaLabel}
-                    />
-                </div>
-                <datalist id={listId}>
-                    <option value="0" />
-                    <option value="1" />
-                    <option value="2" />
-                    <option value="3" />
-                    <option value="4" />
-                </datalist>
-            </div>
-        </div>
-    );
-}
-
-type CurrentClassRowProps = {
-    course: StudentCourseData;
-    stressValue: MetricIndex;
-    confidenceValue: MetricIndex;
-    gradeValue: string;
-    onStressChange: (value: number) => void;
-    onStressCommit: (value: number) => void;
-    onConfidenceChange: (value: number) => void;
-    onConfidenceCommit: (value: number) => void;
-    onGradeChange: (value: string) => void;
-    onGradeCommit: (value: string) => void;
-};
-
-function CurrentClassRow({
-    course,
-    stressValue,
-    confidenceValue,
-    gradeValue,
-    onStressChange,
-    onStressCommit,
-    onConfidenceChange,
-    onConfidenceCommit,
-    onGradeChange,
-    onGradeCommit,
-}: CurrentClassRowProps) {
-    return (
-        <div className="border rounded-lg px-4 py-3 flex items-center gap-4 flex-nowrap">
-            <div className="min-w-[180px] max-w-[280px] flex-1 min-w-0">
-                <p className="font-semibold truncate">{course.course.name}</p>
-                <p className="text-sm text-gray-500 truncate">{course.course.department}</p>
-            </div>
-
-            <div className="flex flex-1 items-center gap-4 min-w-[320px]">
-                <MetricSlider
-                    title="Stress"
-                    value={stressValue}
-                    accentColor="var(--foreground)"
-                    trackColor="var(--button-color)"
-                    labels={metricTickLabels}
-                    onChange={onStressChange}
-                    onCommit={onStressCommit}
-                    ariaLabel={`Stress for ${course.course.name}`}
-                    listId={`stress-ticks-${course.courseId}`}
-                />
-                <MetricSlider
-                    title="Confidence"
-                    value={confidenceValue}
-                    accentColor="var(--foreground)"
-                    trackColor="var(--button-color)"
-                    labels={metricTickLabels}
-                    onChange={onConfidenceChange}
-                    onCommit={onConfidenceCommit}
-                    ariaLabel={`Confidence for ${course.course.name}`}
-                    listId={`confidence-ticks-${course.courseId}`}
-                />
-            </div>
-
-            <select
-                value={gradeValue}
-                onChange={(event) => {
-                    const next = event.target.value;
-                    onGradeChange(next);
-                    onGradeCommit(next);
-                }}
-                className="px-3 py-1 text-sm font-medium rounded-full focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-slate-300 appearance-none cursor-pointer"
-                style={{
-                    backgroundColor: "var(--button-color)",
-                    color: "var(--foreground)",
-                }}
-                aria-label={`Grade for ${course.course.name}`}
-            >
-                {gradeOptions.map((option) => (
-                    <option key={option} value={option}>
-                        {option}
-                    </option>
-                ))}
-            </select>
-        </div>
-    );
-}
 
 export default function ClassesPage({ courses, courseCatalog, currentGrade }: ClassesPageProps) {
     const router = useRouter();
