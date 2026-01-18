@@ -34,6 +34,11 @@ export async function getSchoolData(schoolCode: number) {
     };
 }
 
+export async function checkEmailExists(email: string) {
+    const existing = await prisma.user.findUnique({ where: { email } });
+    return !!existing;
+}
+
 export interface MyCourse {
     id: string;
     name: string;
@@ -56,6 +61,7 @@ export interface SignupData {
     courses: MyCourse[];
     subjectInterests: string[];
     studyHallsPerYear: number;
+    maxStudyHallsPerYear?: number;
     clubIds: string[];
     sportIds: string[];
     collegeIds: string[];
@@ -80,6 +86,7 @@ export async function signupAndProfileSetup(data: SignupData) {
         courses,
         subjectInterests,
         studyHallsPerYear,
+        maxStudyHallsPerYear,
         clubIds,
         sportIds,
         collegeIds,
@@ -116,6 +123,7 @@ export async function signupAndProfileSetup(data: SignupData) {
         age,
         bio,
         subjectInterests,
+        maxStudyHallsPerYear: maxStudyHallsPerYear || studyHallsPerYear, // Fallback to min if not set
         studyHallsPerYear,
         postHighSchoolPlan,
         careerInterest,

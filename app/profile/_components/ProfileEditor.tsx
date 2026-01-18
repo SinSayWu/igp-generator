@@ -68,20 +68,20 @@ export default function ProfileEditor({
 }: Props) {
     const [isPending, startTransition] = useTransition();
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
     const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const formRef = useRef<HTMLFormElement | null>(null);
     const isFirstRender = useRef(true);
 
     const handleDeleteAccount = async () => {
-        if (
-            window.confirm(
-                "Are you sure you want to delete your account? This action cannot be undone."
-            )
-        ) {
-            startTransition(async () => {
-                await deleteAccount();
-            });
-        }
+        setShowDeleteConfirm(true);
+    };
+
+    const confirmDelete = async () => {
+        startTransition(async () => {
+            await deleteAccount();
+        });
     };
 
     // 1. Core Profile State
@@ -329,6 +329,65 @@ export default function ProfileEditor({
     // --- RENDER ---
     return (
         <div className="min-h-screen bg-slate-50 font-sans text-slate-800 pb-40">
+            {/* Custom Delete Confirmation Modal */}
+            {showDeleteConfirm && (
+                <div className="fixed inset-0 flex items-center justify-center z-[100] px-4">
+                    {/* Backdrop */}
+                    <div
+                        className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+                        onClick={() => setShowDeleteConfirm(false)}
+                    />
+
+                    {/* Modal Content */}
+                    <div className="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 max-w-md w-full relative z-10 animate-in fade-in zoom-in duration-200 border border-slate-200">
+                        <div className="flex flex-col items-center text-center">
+                            <div className="w-16 h-16 bg-red-100/50 rounded-full flex items-center justify-center mb-6 ring-8 ring-red-50">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="w-8 h-8 text-red-600"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                                    />
+                                </svg>
+                            </div>
+
+                            <h3 className="text-xl font-bold text-slate-800 mb-2 font-[family-name:var(--primary-font)]">
+                                Delete Your Account?
+                            </h3>
+
+                            <p className="text-slate-500 text-sm mb-8 leading-relaxed">
+                                You are about to permanently delete your account and all associated
+                                data. This action is irreversible.
+                            </p>
+
+                            <div className="flex flex-col sm:flex-row gap-3 w-full">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowDeleteConfirm(false)}
+                                    className="flex-1 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={confirmDelete}
+                                    className="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl shadow-lg shadow-red-200 hover:shadow-red-300 transition-all active:scale-95"
+                                >
+                                    {isPending ? "Deleting..." : "Delete Account"}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Decorative Top Bar Removed */}
 
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

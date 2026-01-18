@@ -3,7 +3,8 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Club, Sport, Course, College, Program } from "@prisma/client";
-import { getSchoolData, signupAndProfileSetup } from "../actions";
+import { getSchoolData, signupAndProfileSetup, checkEmailExists } from "../actions";
+import { StudyHallsSection } from "@/app/profile/_components/sections/StudyHallsSection";
 
 // --- Types ---
 
@@ -41,6 +42,7 @@ export default function SignupWizard() {
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
     const [schoolCode, setSchoolCode] = useState<string>("");
 
     // --- State: Profile ---
@@ -55,6 +57,8 @@ export default function SignupWizard() {
     // Step 3: Interests
     const [subjectInterests, setSubjectInterests] = useState<string[]>([]);
     const [wantsStudyHalls, setWantsStudyHalls] = useState<boolean>(false);
+    const [minStudyHalls, setMinStudyHalls] = useState(1);
+    const [maxStudyHalls, setMaxStudyHalls] = useState(1);
 
     // Step 4: Activities
     const [myClubs, setMyClubs] = useState<string[]>([]);
@@ -73,13 +77,27 @@ export default function SignupWizard() {
         setGlobalError("");
         if (step === 0) {
             // Validate Account Info
-            if (!firstName || !lastName || !email || !password || !schoolCode) {
+            if (!firstName || !lastName || !email || !password || !confirmPassword || !schoolCode) {
                 setGlobalError("Please fill in all fields.");
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                setGlobalError("Passwords do not match.");
                 return;
             }
 
             // Verify School & Load Data
             startTransition(async () => {
+                // Check Email existence first
+                const emailExists = await checkEmailExists(email);
+                if (emailExists) {
+                    setGlobalError(
+                        "User with this email already exists. Please login or use a different email."
+                    );
+                    return;
+                }
+
                 const res = await getSchoolData(Number(schoolCode));
                 if (res && "error" in res) {
                     setGlobalError((res as { error: string }).error);
@@ -113,7 +131,8 @@ export default function SignupWizard() {
                     bio,
                     courses: myCourses,
                     subjectInterests,
-                    studyHallsPerYear: wantsStudyHalls ? 1 : 0,
+                    studyHallsPerYear: wantsStudyHalls ? minStudyHalls : 0,
+                    maxStudyHallsPerYear: wantsStudyHalls ? maxStudyHalls : 0,
                     clubIds: myClubs,
                     sportIds: mySports,
                     collegeIds,
@@ -234,6 +253,18 @@ export default function SignupWizard() {
                                             type="password"
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
+                                            className="w-full border-slate-300 rounded-lg p-3"
+                                            placeholder="••••••••"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-slate-700 mb-1">
+                                            Confirm Password
+                                        </label>
+                                        <input
+                                            type="password"
+                                            value={confirmPassword}
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
                                             className="w-full border-slate-300 rounded-lg p-3"
                                             placeholder="••••••••"
                                         />
@@ -370,55 +401,14 @@ export default function SignupWizard() {
                                 </div>
 
                                 <div className="space-y-3">
-                                    <label className="block text-sm font-bold text-slate-700 uppercase">
-                                        Schedule Preference
-                                    </label>
-                                    <div className="flex flex-col gap-3">
-                                        <label
-                                            className={`relative flex items-center p-4 rounded-lg border cursor-pointer transition-all ${
-                                                wantsStudyHalls
-                                                    ? "bg-amber-50 border-amber-500 ring-1"
-                                                    : "bg-slate-50 border-slate-200"
-                                            }`}
-                                        >
-                                            <input
-                                                type="radio"
-                                                className="sr-only"
-                                                checked={wantsStudyHalls}
-                                                onChange={() => setWantsStudyHalls(true)}
-                                            />
-                                            <div>
-                                                <span className="block text-sm font-bold text-slate-800">
-                                                    I want a Study Hall
-                                                </span>
-                                                <span className="block text-xs text-slate-500">
-                                                    I need time during school to study.
-                                                </span>
-                                            </div>
-                                        </label>
-                                        <label
-                                            className={`relative flex items-center p-4 rounded-lg border cursor-pointer transition-all ${
-                                                !wantsStudyHalls
-                                                    ? "bg-amber-50 border-amber-500 ring-1"
-                                                    : "bg-slate-50 border-slate-200"
-                                            }`}
-                                        >
-                                            <input
-                                                type="radio"
-                                                className="sr-only"
-                                                checked={!wantsStudyHalls}
-                                                onChange={() => setWantsStudyHalls(false)}
-                                            />
-                                            <div>
-                                                <span className="block text-sm font-bold text-slate-800">
-                                                    Maximize Credits
-                                                </span>
-                                                <span className="block text-xs text-slate-500">
-                                                    I prefer to take more classes.
-                                                </span>
-                                            </div>
-                                        </label>
-                                    </div>
+                                    <StudyHallsSection
+                                        isEnabled={wantsStudyHalls}
+                                        minStudyHalls={minStudyHalls}
+                                        maxStudyHalls={maxStudyHalls}
+                                        onToggle={setWantsStudyHalls}
+                                        onMinChange={setMinStudyHalls}
+                                        onMaxChange={setMaxStudyHalls}
+                                    />
                                 </div>
                             </div>
                         </StepWrapper>
