@@ -27,18 +27,18 @@ export function PathwaysSection({ programs, selectedProgramIds, onToggle }: Path
                             key={prog.id}
                             onClick={() => onToggle(prog.id)}
                             className={`p-4 rounded border cursor-pointer transition-all select-none ${
-                                isSelected ? "bg-yellow-50" : "bg-white hover:bg-gray-50"
+                                isSelected ? "bg-red-50" : "bg-white hover:bg-gray-50"
                             }`}
                             style={{
                                 borderColor: isSelected
-                                    ? "var(--foreground)"
+                                    ? "#d70026"
                                     : "var(--accent-background)",
                             }}
                         >
                             <div className="flex items-start gap-3">
                                 <div
                                     className={`mt-1 w-5 h-5 rounded-full border flex items-center justify-center flex-shrink-0 transition ${
-                                        isSelected ? "bg-yellow-500" : ""
+                                        isSelected ? "bg-[#d70026]" : ""
                                     }`}
                                     style={{ borderColor: "var(--accent-background)" }}
                                 >

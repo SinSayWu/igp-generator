@@ -101,15 +101,17 @@ export default function ProfileEditor({
         Map<string, { grade?: string; status: string; confidence?: string; stress?: string }>
     >(
         new Map(
-            student.studentCourses.map((sc) => [
-                sc.courseId,
-                {
-                    grade: sc.grade || undefined,
-                    status: sc.status || "IN_PROGRESS",
-                    confidence: sc.confidenceLevel || undefined,
-                    stress: sc.stressLevel || undefined,
-                },
-            ])
+            student.studentCourses
+                .filter((sc) => sc.status !== "PLANNED") // Filter first
+                .map((sc) => [
+                    sc.courseId,
+                    {
+                        grade: sc.grade || undefined,
+                        status: sc.status || "IN_PROGRESS",
+                        confidence: sc.confidenceLevel || undefined,
+                        stress: sc.stressLevel || undefined,
+                    },
+                ])
         )
     );
 
@@ -155,7 +157,9 @@ export default function ProfileEditor({
         student.sports.map((i) => formatItem(i, "sport"))
     );
     const [myCourses, setMyCourses] = useState<SelectableItem[]>(
-        student.studentCourses.map((i) => formatItem(i.course, "course"))
+        student.studentCourses
+            .filter((sc) => sc.status !== "PLANNED") // Filter out PLANNED courses from the UI list
+            .map((i) => formatItem(i.course, "course"))
     );
 
     const [selClub, setSelClub] = useState("");
@@ -513,8 +517,8 @@ export default function ProfileEditor({
                                 setWantsStudyHalls(checked);
                                 if (checked) {
                                     // Set default range when enabling
-                                    setMinStudyHalls(0);
-                                    setMaxStudyHalls(1);
+                                    setMinStudyHalls(1);
+                                    setMaxStudyHalls(3);
                                 } else {
                                     setMinStudyHalls(0);
                                     setMaxStudyHalls(0);
