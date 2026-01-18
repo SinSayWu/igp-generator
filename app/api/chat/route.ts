@@ -114,8 +114,8 @@ export async function POST(req: Request) {
             finalData = draftData;
         }
 
-        // --- ENFORCEMENT LAYER: Immutable History ---
-        // Forcefully overwrite any AI hallucinations about past years with real DB data
+        // --- ENFORCEMENT LAYER: Immutable History + Locked Courses ---
+        // Forcefully overwrite any AI hallucinations about past years and remove locked courses
         try {
             const content = finalData.choices[0].message.content;
             const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/);
@@ -124,11 +124,19 @@ export async function POST(req: Request) {
             // studentDataStr is either mock array or real array from getStudentContext
             if (jsonMatch && studentDataStr) {
                 let history: Record<string, string[]> | null = null;
+                let lockedCourses: Set<string> | null = null;
                 try {
                     const parsedContext = JSON.parse(studentDataStr);
                     const student = Array.isArray(parsedContext) ? parsedContext[0] : parsedContext;
                     if (student && student.history) {
                         history = student.history;
+                    }
+                    if (student && Array.isArray(student.transcript)) {
+                        lockedCourses = new Set(
+                            student.transcript
+                                .map((item: { course_name?: string }) => item.course_name)
+                                .filter(Boolean)
+                        );
                     }
                 } catch {
                     /* ignore parse error */
@@ -141,13 +149,29 @@ export async function POST(req: Request) {
 
                     if (schedule) {
                         let modified = false;
+
+                        // Lock past grades to exact history
                         for (const [grade, courses] of Object.entries(history)) {
-                            // Only overwrite if the AI actually returned this grade key
-                            // (If AI didn't return grade 9, we don't strictly need to add it, but usually it does)
                             if (schedule[grade]) {
-                                // console.log(`[Enforcement] Overwriting Grade ${grade} history.`);
                                 schedule[grade] = courses;
                                 modified = true;
+                            }
+                        }
+
+                        // Remove locked courses from future grades
+                        if (lockedCourses) {
+                            for (const [grade, courses] of Object.entries(schedule)) {
+                                if (!Array.isArray(courses)) continue;
+                                if (history && history[grade]) continue; // already locked
+                                const filtered = courses.filter(
+                                    (courseName: unknown) =>
+                                        typeof courseName === "string" &&
+                                        !lockedCourses?.has(courseName)
+                                );
+                                if (filtered.length !== courses.length) {
+                                    schedule[grade] = filtered;
+                                    modified = true;
+                                }
                             }
                         }
 

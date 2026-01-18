@@ -53,6 +53,7 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade }: Cl
     const [courseSearch, setCourseSearch] = useState("");
     const [isCourseDropdownOpen, setIsCourseDropdownOpen] = useState(false);
     const [isAddCourseOpen, setIsAddCourseOpen] = useState(false);
+    const [creditFilter, setCreditFilter] = useState<"any" | "half">("any");
     const [selectedGradeKey, setSelectedGradeKey] = useState<
         "MS" | "9" | "10" | "11" | "12" | null
     >(null);
@@ -238,6 +239,7 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade }: Cl
     );
 
     const filteredCourses = availableCourses.filter((course) => {
+        if (creditFilter === "half" && course.credits !== 0.5) return false;
         if (!courseSearch) return true;
         const lowerSearch = courseSearch.toLowerCase();
         const detail = [
@@ -299,11 +301,32 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade }: Cl
         });
     };
 
+    const handleDeleteCourse = () => {
+        if (!editingCourseId) return;
+        startTransition(async () => {
+            await deleteCourse(editingCourseId);
+            setSelectedCourseId("");
+            setEditingCourseId(null);
+            setEditingCourseCatalogId(null);
+            setCourseSearch("");
+            setPendingCourseData({
+                status: "COMPLETED",
+                grade: "A+",
+                confidence: "NEUTRAL",
+                stress: "NEUTRAL",
+            });
+            setIsCourseDropdownOpen(false);
+            setIsAddCourseOpen(false);
+            router.refresh();
+        });
+    };
+
     const gradeKeyToConfidence = (gradeKey: "MS" | "9" | "10" | "11" | "12") =>
         gradeKey === "MS" ? "middle" : gradeKey;
 
-    const openAddCourseModal = (gradeKey: "MS" | "9" | "10" | "11" | "12") => {
+    const openAddCourseModal = (gradeKey: "MS" | "9" | "10" | "11" | "12", onlyHalf?: boolean) => {
         setSelectedGradeKey(gradeKey);
+        setCreditFilter(onlyHalf ? "half" : "any");
         const isCurrentGrade =
             (gradeKey === "MS" && currentGrade < 9) ||
             (gradeKey !== "MS" && Number(gradeKey) === currentGrade);
@@ -339,6 +362,7 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade }: Cl
     const openEditCourseModal = (course: StudentCourseData) => {
         const gradeKey = resolveGradeKeyFromCourse(course);
         setSelectedGradeKey(gradeKey);
+        setCreditFilter("any");
         setSelectedCourseId(course.courseId);
         setEditingCourseId(course.id);
         setEditingCourseCatalogId(course.courseId);
@@ -529,6 +553,7 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade }: Cl
                 dropdownRef={dropdownRef}
                 courseSearchRef={courseSearchRef}
                 selectedCourseId={selectedCourseId}
+                editingCourseId={editingCourseId}
                 pendingCourseData={pendingCourseData}
                 selectedGradeKey={selectedGradeKey}
                 courseSearch={courseSearch}
@@ -537,6 +562,7 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade }: Cl
                 isMutating={isMutating}
                 onClose={() => setIsAddCourseOpen(false)}
                 onAddCourse={handleAddCourse}
+                onDeleteCourse={handleDeleteCourse}
                 onCourseSearchChange={handleCourseSearchChange}
                 onCourseSelect={handleCourseSelect}
                 setCourseDropdownOpen={setIsCourseDropdownOpen}

@@ -4,7 +4,7 @@ type ClassesGridProps = {
     scheduleByGrade: Record<string, StudentCourseData[]>;
     courseMap: Record<string, CourseCatalogItem>;
     onDeleteRequest: (courseId: string, courseName: string) => void;
-    onAddCourse: (gradeKey: "MS" | "9" | "10" | "11" | "12") => void;
+    onAddCourse: (gradeKey: "MS" | "9" | "10" | "11" | "12", onlyHalf?: boolean) => void;
     onEditCourse: (course: StudentCourseData) => void;
     currentGrade: number;
 };
@@ -21,6 +21,32 @@ export default function ClassesGrid({
         if (gradeKey === "MS") return false;
         const gradeNum = Number(gradeKey);
         return Number.isFinite(gradeNum) && gradeNum > currentGrade;
+    };
+
+    const getCredits = (courseName: string) => {
+        const credits = courseMap[courseName]?.credits;
+        return typeof credits === "number" && !Number.isNaN(credits) ? credits : 1;
+    };
+
+    const buildSlots = (courses: StudentCourseData[]) => {
+        const halfCredit: StudentCourseData[] = [];
+        const fullCredit: StudentCourseData[][] = [];
+
+        courses.forEach((course) => {
+            const credits = getCredits(course.course.name);
+            if (credits === 0.5) {
+                halfCredit.push(course);
+            } else {
+                fullCredit.push([course]);
+            }
+        });
+
+        const halfSlots: StudentCourseData[][] = [];
+        for (let i = 0; i < halfCredit.length; i += 2) {
+            halfSlots.push(halfCredit.slice(i, i + 2));
+        }
+
+        return [...fullCredit, ...halfSlots];
     };
     return (
         <section className="rounded-xl shadow-lg border border-slate-200 bg-white">
@@ -105,6 +131,7 @@ export default function ClassesGrid({
                                 sensitivity: "base",
                             });
                         });
+                        const slots = buildSlots(sortedCourses);
                         return (
                             <div
                                 key={gradeKey}
@@ -112,105 +139,179 @@ export default function ClassesGrid({
                                     isFuture ? "bg-slate-50/60" : ""
                                 }`}
                             >
-                                {sortedCourses.map((c) => {
-                                    let statusClass = "hover:bg-indigo-50 border-transparent";
-                                    let badge = null;
-                                    let isClickable = false;
-                                    let isEditable = false;
-                                    let clickTitle: string | undefined;
+                                {slots.map((slot, slotIndex) => {
+                                    const isHalfSlot =
+                                        slot.length === 1 &&
+                                        getCredits(slot[0].course.name) === 0.5;
+                                    const isSingleFull =
+                                        slot.length === 1 &&
+                                        getCredits(slot[0].course.name) !== 0.5;
 
-                                    if (c.status === "COMPLETED") {
-                                        statusClass =
-                                            "bg-emerald-50/50 hover:bg-emerald-100 border-l-4 border-emerald-400 cursor-pointer";
-                                        badge = (
-                                            <span className="absolute top-1 right-1 text-[8px] font-bold text-emerald-600 bg-emerald-100 px-1 rounded">
-                                                DONE
-                                            </span>
+                                    const renderCourse = (c: StudentCourseData) => {
+                                        let statusClass = "border-transparent";
+                                        let badge = null;
+                                        let isClickable = false;
+                                        let isEditable = false;
+                                        let clickTitle: string | undefined;
+
+                                        if (c.status === "COMPLETED") {
+                                            statusClass =
+                                                "bg-emerald-50/50 hover:bg-emerald-100 border-l-4 border-emerald-400 cursor-pointer";
+                                            badge = (
+                                                <span className="absolute top-1 right-1 text-[8px] font-bold text-emerald-600 bg-emerald-100 px-1 rounded">
+                                                    DONE
+                                                </span>
+                                            );
+                                            isEditable = true;
+                                            clickTitle = "Click to edit this course";
+                                        } else if (c.status === "IN_PROGRESS") {
+                                            statusClass =
+                                                "bg-blue-50/50 hover:bg-blue-100 border-l-4 border-blue-400 cursor-pointer";
+                                            badge = (
+                                                <span className="absolute top-1 right-1 text-[8px] font-bold text-blue-600 bg-blue-100 px-1 rounded">
+                                                    NOW
+                                                </span>
+                                            );
+                                            isEditable = true;
+                                            clickTitle = "Click to edit this course";
+                                        } else if (c.status === "PLANNED") {
+                                            statusClass =
+                                                "bg-amber-50/60 hover:bg-amber-100 border-l-4 border-amber-400 cursor-pointer hover:bg-red-50 hover:border-red-400 transition-colors";
+                                            badge = (
+                                                <span className="absolute top-1 right-1 text-[8px] font-bold text-amber-700 bg-amber-100 px-1 rounded group-hover:bg-red-100 group-hover:text-red-600">
+                                                    PLAN
+                                                </span>
+                                            );
+                                            isClickable = true;
+                                            clickTitle = "Click to remove this planned course";
+                                        }
+
+                                        const meta = courseMap[c.course.name];
+                                        const department = c.course.department;
+                                        const detailParts = [
+                                            department,
+                                            meta?.level,
+                                            meta?.credits ? `${meta.credits} cr` : undefined,
+                                        ].filter(Boolean);
+
+                                        const canEdit = !isFuture && isEditable;
+                                        const canDelete = isClickable;
+                                        const canInteract = canEdit || canDelete;
+
+                                        return (
+                                            <div
+                                                key={c.id}
+                                                onClick={() =>
+                                                    canInteract
+                                                        ? canDelete
+                                                            ? onDeleteRequest(c.id, c.course.name)
+                                                            : onEditCourse(c)
+                                                        : undefined
+                                                }
+                                                className={`relative h-full w-full px-2 py-1 rounded text-center text-xs transition-colors group ${statusClass}`}
+                                                role={canInteract ? "button" : undefined}
+                                                title={clickTitle}
+                                            >
+                                                {badge}
+                                                <span className="cursor-help border-b border-dotted border-slate-400/50 group-hover:border-slate-600 font-semibold">
+                                                    {c.course.name}
+                                                </span>
+                                                {detailParts.length > 0 && (
+                                                    <span className="block text-[10px] text-slate-500 mt-0.5">
+                                                        {detailParts.join(" • ")}
+                                                    </span>
+                                                )}
+
+                                                {(meta || c.course) && (
+                                                    <div className="absolute hidden group-hover:block z-50 w-64 p-3 bg-slate-800 text-white text-xs rounded-lg shadow-xl bottom-full mb-2 left-1/2 -translate-x-1/2 pointer-events-none text-left">
+                                                        <div className="font-bold mb-1 text-indigo-300">
+                                                            {c.course.name}
+                                                        </div>
+                                                        <div className="flex gap-2 mb-1">
+                                                            {meta?.level && (
+                                                                <span className="bg-slate-700 px-1.5 rounded">
+                                                                    {meta.level}
+                                                                </span>
+                                                            )}
+                                                            {meta?.credits && (
+                                                                <span className="bg-slate-700 px-1.5 rounded">
+                                                                    {meta.credits} cr
+                                                                </span>
+                                                            )}
+                                                            <span className="bg-slate-700 px-1.5 rounded">
+                                                                {c.course.department}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
                                         );
-                                        isEditable = true;
-                                        clickTitle = "Click to edit this course";
-                                    } else if (c.status === "IN_PROGRESS") {
-                                        statusClass =
-                                            "bg-blue-50/50 hover:bg-blue-100 border-l-4 border-blue-400 cursor-pointer";
-                                        badge = (
-                                            <span className="absolute top-1 right-1 text-[8px] font-bold text-blue-600 bg-blue-100 px-1 rounded">
-                                                NOW
-                                            </span>
+                                    };
+
+                                    if (isSingleFull) {
+                                        return (
+                                            <div
+                                                key={`slot-${gradeKey}-${slotIndex}`}
+                                                className={`relative p-2 h-20 text-sm transition-colors ${
+                                                    isFuture ? "" : "hover:bg-slate-50"
+                                                }`}
+                                            >
+                                                {renderCourse(slot[0])}
+                                            </div>
                                         );
-                                        isEditable = true;
-                                        clickTitle = "Click to edit this course";
-                                    } else if (c.status === "PLANNED") {
-                                        statusClass =
-                                            "bg-indigo-50/30 hover:bg-indigo-100 border-l-4 border-indigo-400 cursor-pointer hover:bg-red-50 hover:border-red-400 transition-colors";
-                                        badge = (
-                                            <span className="absolute top-1 right-1 text-[8px] font-bold text-indigo-600 bg-indigo-100 px-1 rounded group-hover:bg-red-100 group-hover:text-red-600">
-                                                PLAN
-                                            </span>
-                                        );
-                                        isClickable = true;
-                                        clickTitle = "Click to remove this planned course";
                                     }
-
-                                    const meta = courseMap[c.course.name];
-                                    const department = c.course.department;
-                                    const detailParts = [
-                                        department,
-                                        meta?.level,
-                                        meta?.credits ? `${meta.credits} cr` : undefined,
-                                    ].filter(Boolean);
 
                                     return (
                                         <div
-                                            key={c.id}
-                                            onClick={() =>
-                                                !isFuture &&
-                                                (isClickable
-                                                    ? onDeleteRequest(c.id, c.course.name)
-                                                    : isEditable
-                                                      ? onEditCourse(c)
-                                                      : undefined)
-                                            }
-                                            className={`relative p-2 h-20 flex flex-col items-center justify-center text-center text-sm transition-colors group ${statusClass}`}
-                                            role={isClickable || isEditable ? "button" : undefined}
-                                            title={clickTitle}
+                                            key={`slot-${gradeKey}-${slotIndex}`}
+                                            className={`relative p-2 h-20 text-sm transition-colors ${
+                                                isFuture ? "" : "hover:bg-slate-50"
+                                            }`}
                                         >
-                                            {badge}
-                                            <span className="cursor-help border-b border-dotted border-slate-400/50 group-hover:border-slate-600">
-                                                {c.course.name}
-                                            </span>
-                                            {detailParts.length > 0 && (
-                                                <span className="mt-1 text-[10px] leading-tight text-slate-500">
-                                                    {detailParts.join(" • ")}
-                                                </span>
-                                            )}
-
-                                            {(meta || c.course) && (
-                                                <div className="absolute hidden group-hover:block z-50 w-64 p-3 bg-slate-800 text-white text-xs rounded-lg shadow-xl bottom-full mb-2 left-1/2 -translate-x-1/2 pointer-events-none text-left">
-                                                    <div className="font-bold mb-1 text-indigo-300">
-                                                        {c.course.name}
-                                                    </div>
-                                                    <div className="flex gap-2 mb-1">
-                                                        {meta?.level && (
-                                                            <span className="bg-slate-700 px-1.5 rounded">
-                                                                {meta.level}
-                                                            </span>
-                                                        )}
-                                                        {meta?.credits && (
-                                                            <span className="bg-slate-700 px-1.5 rounded">
-                                                                {meta.credits} cr
-                                                            </span>
-                                                        )}
-                                                        <span className="bg-slate-700 px-1.5 rounded">
-                                                            {c.course.department}
-                                                        </span>
-                                                    </div>
+                                            <div className="grid grid-cols-2 gap-2 h-full">
+                                                <div className="h-full">
+                                                    {slot[0] ? renderCourse(slot[0]) : null}
                                                 </div>
-                                            )}
+                                                <div className="h-full">
+                                                    {slot[1] ? (
+                                                        renderCourse(slot[1])
+                                                    ) : (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                !isFuture &&
+                                                                onAddCourse(
+                                                                    gradeKey as
+                                                                        | "MS"
+                                                                        | "9"
+                                                                        | "10"
+                                                                        | "11"
+                                                                        | "12",
+                                                                    true
+                                                                )
+                                                            }
+                                                            disabled={isFuture}
+                                                            className={`w-full h-full rounded border border-dashed text-xs transition-colors ${
+                                                                isFuture
+                                                                    ? "text-slate-300 cursor-not-allowed"
+                                                                    : "text-slate-400 hover:text-indigo-700 hover:border-indigo-300 hover:bg-indigo-50/60"
+                                                            }`}
+                                                            title={
+                                                                isFuture
+                                                                    ? "You can't add future courses here"
+                                                                    : "Add another 0.5 credit course"
+                                                            }
+                                                        >
+                                                            Add 0.5
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </div>
                                     );
                                 })}
                                 {Array.from({
-                                    length: Math.max(0, 8 - gradeCourses.length),
+                                    length: Math.max(0, 8 - slots.length),
                                 }).map((_, idx) => (
                                     <button
                                         key={`empty-${gradeKey}-${idx}`}

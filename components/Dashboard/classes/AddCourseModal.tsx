@@ -15,6 +15,7 @@ type AddCourseModalProps = {
     dropdownRef: RefObject<HTMLDivElement | null>;
     courseSearchRef: RefObject<HTMLInputElement | null>;
     selectedCourseId: string;
+    editingCourseId: string | null;
     pendingCourseData: PendingCourseData;
     selectedGradeKey: "MS" | "9" | "10" | "11" | "12" | null;
     courseSearch: string;
@@ -23,6 +24,7 @@ type AddCourseModalProps = {
     isMutating: boolean;
     onClose: () => void;
     onAddCourse: () => void;
+    onDeleteCourse: () => void;
     onCourseSearchChange: (value: string) => void;
     onCourseSelect: (course: CourseCatalogItem) => void;
     setCourseDropdownOpen: (open: boolean) => void;
@@ -39,6 +41,7 @@ export default function AddCourseModal({
     dropdownRef,
     courseSearchRef,
     selectedCourseId,
+    editingCourseId,
     pendingCourseData,
     selectedGradeKey,
     courseSearch,
@@ -47,6 +50,7 @@ export default function AddCourseModal({
     isMutating,
     onClose,
     onAddCourse,
+    onDeleteCourse,
     onCourseSearchChange,
     onCourseSelect,
     setCourseDropdownOpen,
@@ -293,21 +297,40 @@ export default function AddCourseModal({
                             )}
                         </div>
 
-                        <button
-                            type="button"
-                            onClick={onAddCourse}
-                            disabled={!selectedCourseId || !isPendingValid() || isMutating}
-                            className={`
-                                px-6 py-3 rounded-lg text-base font-bold shadow-sm transition-all
-                                ${
-                                    selectedCourseId && isPendingValid() && !isMutating
-                                        ? "bg-slate-800 text-white hover:bg-slate-900 hover:shadow-md active:scale-95"
-                                        : "bg-slate-100 text-slate-400 cursor-not-allowed"
-                                }
-                            `}
-                        >
-                            Add Course
-                        </button>
+                        <div className="flex gap-3">
+                            {editingCourseId && (
+                                <button
+                                    type="button"
+                                    onClick={onDeleteCourse}
+                                    disabled={isMutating}
+                                    className={`
+                                        px-5 py-3 rounded-lg text-base font-semibold transition-all
+                                        ${
+                                            isMutating
+                                                ? "bg-rose-100 text-rose-300 cursor-not-allowed"
+                                                : "bg-rose-500 text-white hover:bg-rose-600 hover:shadow-md active:scale-95"
+                                        }
+                                    `}
+                                >
+                                    Delete Course
+                                </button>
+                            )}
+                            <button
+                                type="button"
+                                onClick={onAddCourse}
+                                disabled={!selectedCourseId || !isPendingValid() || isMutating}
+                                className={`
+                                    px-6 py-3 rounded-lg text-base font-bold shadow-sm transition-all
+                                    ${
+                                        selectedCourseId && isPendingValid() && !isMutating
+                                            ? "bg-slate-800 text-white hover:bg-slate-900 hover:shadow-md active:scale-95"
+                                            : "bg-slate-100 text-slate-400 cursor-not-allowed"
+                                    }
+                                `}
+                            >
+                                Add Course
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
