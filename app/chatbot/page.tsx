@@ -113,7 +113,7 @@ export default function ChatbotPage() {
             const chatModeInjection = {
                 role: "system",
                 content:
-                    "[CHAT MODE] Student-facing response only. Provide a brief, self-contained summary (2-4 sentences) that assumes the student has not seen any prior reasoning. Do not include detailed reasoning. If a schedule update is requested, include the full JSON schedule after the summary.",
+                    "[CHAT MODE] Single-pass chat response. Answer the student's request directly. If a schedule update is requested, include the full JSON schedule in a code block.",
             };
             payloadMessages.splice(payloadMessages.length - 1, 0, chatModeInjection as Message);
 

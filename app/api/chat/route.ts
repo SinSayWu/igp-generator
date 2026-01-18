@@ -110,7 +110,7 @@ export async function POST(req: Request) {
             finalMessages.push({
                 role: "system",
                 content:
-                    "Student-facing mode: provide a brief, self-contained summary (2-4 sentences) that does not assume the student has seen prior reasoning. Do not include detailed chain-of-thought or long audit reports. If a schedule change is requested, include the full JSON schedule after the summary.",
+                    "Single-pass chat mode: respond directly to the student's request. If you update the schedule, include the full JSON schedule in a code block. Do not include audit-report formatting.",
             });
         }
 
@@ -152,28 +152,30 @@ export async function POST(req: Request) {
             .replace("{{STUDENTS}}", studentDataStr)
             .replace("{{DRAFT_OUTPUT}}", draftContent);
 
-        let finalData;
+        let finalData = draftData;
 
-        try {
-            const auditCompletion = await openai.chat.completions.create({
-                model: modelName,
-                messages: [
-                    { role: "system", content: auditorPrompt },
-                    // No ...messages here. The auditor only sees the rules and the draft.
-                ],
-                temperature: 0.3, // Lower temperature for stricter checking
-            });
+        if (!isChatMode) {
+            try {
+                const auditCompletion = await openai.chat.completions.create({
+                    model: modelName,
+                    messages: [
+                        { role: "system", content: auditorPrompt },
+                        // No ...messages here. The auditor only sees the rules and the draft.
+                    ],
+                    temperature: 0.3, // Lower temperature for stricter checking
+                });
 
-            const auditContent = auditCompletion.choices[0]?.message?.content;
-            if (auditContent) {
-                finalData = { choices: [{ message: { content: auditContent } }] };
-            } else {
-                console.error("Audit step returned empty content, using draft.");
+                const auditContent = auditCompletion.choices[0]?.message?.content;
+                if (auditContent) {
+                    finalData = { choices: [{ message: { content: auditContent } }] };
+                } else {
+                    console.error("Audit step returned empty content, using draft.");
+                    finalData = draftData;
+                }
+            } catch (auditError) {
+                console.error("Audit step failed, using draft.", auditError);
                 finalData = draftData;
             }
-        } catch (auditError) {
-            console.error("Audit step failed, using draft.", auditError);
-            finalData = draftData;
         }
 
         const parseStudentContext = (): StudentProfile | null => {
@@ -327,224 +329,184 @@ export async function POST(req: Request) {
 
         // --- ENFORCEMENT LAYER: Immutable History + Locked Courses ---
         // Forcefully overwrite any AI hallucinations about past years and remove locked courses
-        try {
-            const content = finalData.choices[0].message.content;
-            const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/);
+        if (!isChatMode) {
+            try {
+                const content = finalData.choices[0].message.content;
+                const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/);
 
-            // Parse student context to get the truth 'history' map
-            // studentDataStr is either mock array or real array from getStudentContext
-            if (jsonMatch && studentDataStr) {
-                let history: Record<string, string[]> | null = null;
-                let lockedCourses: Set<string> | null = null;
-                try {
-                    const student = parseStudentContext();
-                    if (student && student.history) {
-                        history = student.history;
-                    }
-                    if (student && Array.isArray(student.transcript)) {
-                        lockedCourses = new Set(
-                            student.transcript
-                                .map((item) => item.course_name)
-                                .filter((name): name is string => Boolean(name))
-                        );
-                    }
-                } catch {
-                    /* ignore parse error */
-                }
-
-                if (history) {
-                    const parsedResponse = JSON.parse(jsonMatch[1]);
-                    // Support both formats
-                    const schedule = parsedResponse.schedule || parsedResponse.schedule_summary;
-
-                    if (schedule) {
-                        let modified = false;
-
-                        // Lock past grades to exact history
-                        for (const [grade, courses] of Object.entries(history)) {
-                            if (schedule[grade]) {
-                                schedule[grade] = courses;
-                                modified = true;
-                            }
+                // Parse student context to get the truth 'history' map
+                // studentDataStr is either mock array or real array from getStudentContext
+                if (jsonMatch && studentDataStr) {
+                    let history: Record<string, string[]> | null = null;
+                    let lockedCourses: Set<string> | null = null;
+                    try {
+                        const student = parseStudentContext();
+                        if (student && student.history) {
+                            history = student.history;
                         }
+                        if (student && Array.isArray(student.transcript)) {
+                            lockedCourses = new Set(
+                                student.transcript
+                                    .map((item) => item.course_name)
+                                    .filter((name): name is string => Boolean(name))
+                            );
+                        }
+                    } catch {
+                        /* ignore parse error */
+                    }
 
-                        // Remove locked courses from future grades
-                        if (lockedCourses) {
-                            for (const [grade, courses] of Object.entries(schedule)) {
-                                if (!Array.isArray(courses)) continue;
-                                if (history && history[grade]) continue; // already locked
-                                const filtered = courses.filter(
-                                    (courseName: unknown) =>
-                                        typeof courseName === "string" &&
-                                        !lockedCourses?.has(courseName)
-                                );
-                                if (filtered.length !== courses.length) {
-                                    schedule[grade] = filtered;
+                    if (history) {
+                        const parsedResponse = JSON.parse(jsonMatch[1]);
+                        // Support both formats
+                        const schedule = parsedResponse.schedule || parsedResponse.schedule_summary;
+
+                        if (schedule) {
+                            let modified = false;
+
+                            // Lock past grades to exact history
+                            for (const [grade, courses] of Object.entries(history)) {
+                                if (schedule[grade]) {
+                                    schedule[grade] = courses;
                                     modified = true;
                                 }
                             }
-                        }
 
-                        if (modified) {
-                            const newJsonStr = JSON.stringify(parsedResponse, null, 2);
-                            const newContent = content.replace(
-                                jsonMatch[0],
-                                "```json\n" + newJsonStr + "\n```"
-                            );
-                            finalData.choices[0].message.content = newContent;
+                            // Remove locked courses from future grades
+                            if (lockedCourses) {
+                                for (const [grade, courses] of Object.entries(schedule)) {
+                                    if (!Array.isArray(courses)) continue;
+                                    if (history && history[grade]) continue; // already locked
+                                    const filtered = courses.filter(
+                                        (courseName: unknown) =>
+                                            typeof courseName === "string" &&
+                                            !lockedCourses?.has(courseName)
+                                    );
+                                    if (filtered.length !== courses.length) {
+                                        schedule[grade] = filtered;
+                                        modified = true;
+                                    }
+                                }
+                            }
+
+                            if (modified) {
+                                const newJsonStr = JSON.stringify(parsedResponse, null, 2);
+                                const newContent = content.replace(
+                                    jsonMatch[0],
+                                    "```json\n" + newJsonStr + "\n```"
+                                );
+                                finalData.choices[0].message.content = newContent;
+                            }
                         }
                     }
                 }
+            } catch (e) {
+                console.error("Enforcement Layer Error:", e);
             }
-        } catch (e) {
-            console.error("Enforcement Layer Error:", e);
         }
         // --------------------------------------------
 
         // --- VALIDATION + REPAIR LAYER ---
-        try {
-            const content = finalData.choices[0].message.content;
-            const parsed = getScheduleFromContent(content);
-            if (parsed) {
-                const student = parseStudentContext();
-                const errors = validateSchedule(parsed.schedule, student);
+        if (!isChatMode) {
+            try {
+                const content = finalData.choices[0].message.content;
+                const parsed = getScheduleFromContent(content);
+                if (parsed) {
+                    const student = parseStudentContext();
+                    const errors = validateSchedule(parsed.schedule, student);
 
-                if (errors.length > 0) {
-                    const auditorTemplate = fs.readFileSync(
-                        path.join(dataDir, "prompt_auditor.txt"),
-                        "utf8"
-                    );
-                    const auditorPrompt = auditorTemplate
-                        .replace("{{CLASSES}}", classes)
-                        .replace("{{GRADUATION_REQS}}", graduationReqs)
-                        .replace("{{STUDENTS}}", studentDataStr)
-                        .replace("{{DRAFT_OUTPUT}}", parsed.jsonMatch[0]);
+                    if (errors.length > 0) {
+                        const auditorTemplate = fs.readFileSync(
+                            path.join(dataDir, "prompt_auditor.txt"),
+                            "utf8"
+                        );
+                        const auditorPrompt = auditorTemplate
+                            .replace("{{CLASSES}}", classes)
+                            .replace("{{GRADUATION_REQS}}", graduationReqs)
+                            .replace("{{STUDENTS}}", studentDataStr)
+                            .replace("{{DRAFT_OUTPUT}}", parsed.jsonMatch[0]);
 
-                    const repairCompletion = await openai.chat.completions.create({
-                        model: modelName,
-                        messages: [
-                            { role: "system", content: auditorPrompt },
-                            {
-                                role: "system",
-                                content:
-                                    "Fix the schedule to address these errors. Do NOT change any locked history courses. Errors:\n" +
-                                    errors.map((e) => `- ${e}`).join("\n"),
-                            },
-                        ],
-                        temperature: 0.2,
-                    });
+                        const repairCompletion = await openai.chat.completions.create({
+                            model: modelName,
+                            messages: [
+                                { role: "system", content: auditorPrompt },
+                                {
+                                    role: "system",
+                                    content:
+                                        "Fix the schedule to address these errors. Do NOT change any locked history courses. Errors:\n" +
+                                        errors.map((e) => `- ${e}`).join("\n"),
+                                },
+                            ],
+                            temperature: 0.2,
+                        });
 
-                    const repairContent = repairCompletion.choices[0]?.message?.content;
-                    if (repairContent) {
-                        finalData = { choices: [{ message: { content: repairContent } }] };
+                        const repairContent = repairCompletion.choices[0]?.message?.content;
+                        if (repairContent) {
+                            finalData = { choices: [{ message: { content: repairContent } }] };
+                        }
                     }
                 }
+            } catch (e) {
+                console.error("Validation/Repair Error:", e);
             }
-        } catch (e) {
-            console.error("Validation/Repair Error:", e);
         }
 
         // Re-apply enforcement after repair
-        try {
-            const content = finalData.choices[0].message.content;
-            const parsed = getScheduleFromContent(content);
-            if (parsed) {
-                const student = parseStudentContext();
-                const history = (student?.history || {}) as Record<string, string[]>;
-                const lockedCourses = new Set(
-                    Array.isArray(student?.transcript)
-                        ? student.transcript
-                              .map((item: { course_name?: string }) => item.course_name)
-                              .filter(Boolean)
-                        : []
-                );
+        if (!isChatMode) {
+            try {
+                const content = finalData.choices[0].message.content;
+                const parsed = getScheduleFromContent(content);
+                if (parsed) {
+                    const student = parseStudentContext();
+                    const history = (student?.history || {}) as Record<string, string[]>;
+                    const lockedCourses = new Set(
+                        Array.isArray(student?.transcript)
+                            ? student.transcript
+                                  .map((item: { course_name?: string }) => item.course_name)
+                                  .filter(Boolean)
+                            : []
+                    );
 
-                let modified = false;
-                const schedule = parsed.schedule as Record<string, string[]>;
+                    let modified = false;
+                    const schedule = parsed.schedule as Record<string, string[]>;
 
-                for (const [grade, courses] of Object.entries(history)) {
-                    if (schedule[grade]) {
-                        schedule[grade] = courses;
-                        modified = true;
+                    for (const [grade, courses] of Object.entries(history)) {
+                        if (schedule[grade]) {
+                            schedule[grade] = courses;
+                            modified = true;
+                        }
+                    }
+
+                    for (const [grade, courses] of Object.entries(schedule)) {
+                        if (!Array.isArray(courses)) continue;
+                        if (history && history[grade]) continue;
+                        const filtered = courses.filter(
+                            (courseName) =>
+                                typeof courseName === "string" && !lockedCourses.has(courseName)
+                        );
+                        if (filtered.length !== courses.length) {
+                            schedule[grade] = filtered;
+                            modified = true;
+                        }
+                    }
+
+                    if (modified) {
+                        const newJsonStr = JSON.stringify(parsed.parsedResponse, null, 2);
+                        const newContent = content.replace(
+                            parsed.jsonMatch[0],
+                            "```json\n" + newJsonStr + "\n```"
+                        );
+                        finalData.choices[0].message.content = newContent;
                     }
                 }
-
-                for (const [grade, courses] of Object.entries(schedule)) {
-                    if (!Array.isArray(courses)) continue;
-                    if (history && history[grade]) continue;
-                    const filtered = courses.filter(
-                        (courseName) =>
-                            typeof courseName === "string" && !lockedCourses.has(courseName)
-                    );
-                    if (filtered.length !== courses.length) {
-                        schedule[grade] = filtered;
-                        modified = true;
-                    }
-                }
-
-                if (modified) {
-                    const newJsonStr = JSON.stringify(parsed.parsedResponse, null, 2);
-                    const newContent = content.replace(
-                        parsed.jsonMatch[0],
-                        "```json\n" + newJsonStr + "\n```"
-                    );
-                    finalData.choices[0].message.content = newContent;
-                }
+            } catch (e) {
+                console.error("Post-Repair Enforcement Error:", e);
             }
-        } catch (e) {
-            console.error("Post-Repair Enforcement Error:", e);
         }
 
-        // Summarizer (Chat Mode): create a student-facing response after audit/repair
+        // Summarizer removed (single-model chat flow)
         let auditContentForDebug: string | null = null;
         if (finalData?.choices?.[0]?.message?.content) {
             auditContentForDebug = finalData.choices[0].message.content;
-        }
-
-        if (isChatMode && auditContentForDebug) {
-            const summaryModel = "gpt-4o-mini";
-            const lastUserMessage =
-                [...messages].reverse().find((m) => m.role === "user")?.content || "";
-            const scheduleParsed = getScheduleFromContent(auditContentForDebug);
-
-            const summarizerPrompt =
-                "You are a student-facing summarizer. Provide a brief, self-contained summary (2-4 sentences) that addresses the student's prompt and explains the response. Do not include chain-of-thought or detailed audit calculations. If a schedule update is required, the JSON schedule will be appended separately.";
-
-            const summarizerCompletion = await openai.chat.completions.create({
-                model: summaryModel,
-                messages: [
-                    { role: "system", content: summarizerPrompt },
-                    {
-                        role: "user",
-                        content:
-                            "Student prompt:\n" +
-                            lastUserMessage +
-                            "\n\nDraft schedule output:\n" +
-                            draftData.choices[0].message.content +
-                            "\n\nAuditor output:\n" +
-                            auditContentForDebug,
-                    },
-                ],
-                temperature: 0.2,
-            });
-
-            const summaryText =
-                summarizerCompletion.choices[0]?.message?.content?.trim() || "Summary unavailable.";
-
-            if (scheduleParsed) {
-                const jsonStr = JSON.stringify(scheduleParsed.parsedResponse, null, 2);
-                finalData = {
-                    choices: [
-                        {
-                            message: {
-                                content: summaryText + "\n\n```json\n" + jsonStr + "\n```",
-                            },
-                        },
-                    ],
-                };
-            } else {
-                finalData = { choices: [{ message: { content: summaryText } }] };
-            }
         }
 
         // 5. Save Schedule to Database (if authenticated)

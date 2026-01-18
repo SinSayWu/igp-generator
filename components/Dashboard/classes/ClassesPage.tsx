@@ -38,6 +38,8 @@ type ChatMessage = {
     showThought?: boolean;
 };
 
+type ChatPayloadMessage = ChatMessage | { role: "system"; content: string };
+
 export default function ClassesPage({ courses, courseCatalog, currentGrade }: ClassesPageProps) {
     const router = useRouter();
     const [generating, setGenerating] = useState(false);
@@ -459,15 +461,16 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade }: Cl
         if (!chatInput.trim() || chatLoading) return;
         const userMessage = chatInput.trim();
         setChatInput("");
-        const nextMessages = [...chatMessages, { role: "user", content: userMessage }];
+        const nextMessages: ChatMessage[] = [
+            ...chatMessages,
+            { role: "user", content: userMessage },
+        ];
         setChatMessages(nextMessages);
         setChatLoading(true);
 
         try {
             const scheduleSnapshot = buildScheduleSnapshot();
-            const payloadMessages: Array<ChatMessage | { role: "system"; content: string }> = [
-                ...nextMessages,
-            ];
+            const payloadMessages: ChatPayloadMessage[] = [...nextMessages];
             payloadMessages.splice(payloadMessages.length - 1, 0, {
                 role: "system",
                 content: `[SYSTEM INJECTION] The user is actively viewing the following schedule JSON. If they request changes, you MUST modify this JSON and output the full NEW JSON. If they ask questions, answer based on this schedule.\n\n${JSON.stringify(
@@ -477,7 +480,7 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade }: Cl
             payloadMessages.splice(payloadMessages.length - 1, 0, {
                 role: "system",
                 content:
-                    "[CHAT MODE] Student-facing response only. Provide a brief, self-contained summary (2-4 sentences) that assumes the student has not seen any prior reasoning. Do not include detailed reasoning. If a schedule update is requested, include the full JSON schedule after the summary.",
+                    "[CHAT MODE] Single-pass chat response. Answer the student's request directly. If a schedule update is requested, include the full JSON schedule in a code block.",
             });
 
             const res = await fetch("/api/chat", {

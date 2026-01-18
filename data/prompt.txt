@@ -44,7 +44,7 @@ Follow these rules exactly:
 * **No Downshifts:** Never schedule an easier or prerequisite‑level course after a harder one in the same sequence.
 * Electives must align to interests and focus; avoid generic filler.
 * **Elective Options Pass:** List a short set of viable electives (include CP/Honors/AP), then choose the best fit based on rigor history, interests, focus, and path.
-* **Study Hall Preference:** If `student.study_hall_preferences.interested == "yes"`, include Study Hall within the stated min/max. If "no" or missing, do NOT schedule Study Hall.
+* **No Study Hall Output:** Do NOT schedule Study Hall. If a year has fewer courses, leave the schedule shorter by omitting a course (do not add placeholders).
 
 **5. Aggressive Doubling-Up**
 * You may double‑up in a subject to accelerate interests or prerequisites (e.g., Biology + Chemistry, AP Calc + AP Stats).

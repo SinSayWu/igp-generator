@@ -9,6 +9,7 @@ type TranscriptItem = {
     level: string | null;
     credits: number;
     code: string;
+    grade_level?: number;
 };
 
 type PlannedCourseItem = {
@@ -46,7 +47,19 @@ export async function getStudentContext(userId: string) {
     const history: Record<string, string[]> = {};
 
     student.studentCourses.forEach((sc) => {
-        const gradeStr = sc.gradeLevel ? sc.gradeLevel.toString() : "Unassigned";
+        let effectiveGradeLevel = sc.gradeLevel ?? null;
+        if (effectiveGradeLevel == null && sc.confidenceLevel) {
+            if (sc.confidenceLevel === "middle") {
+                effectiveGradeLevel = 8;
+            } else {
+                const parsed = parseInt(sc.confidenceLevel, 10);
+                if (!Number.isNaN(parsed)) {
+                    effectiveGradeLevel = parsed;
+                }
+            }
+        }
+
+        const gradeStr = effectiveGradeLevel ? effectiveGradeLevel.toString() : "Unassigned";
 
         if (
             sc.status === "COMPLETED" ||
@@ -69,6 +82,7 @@ export async function getStudentContext(userId: string) {
                 level: sc.course.level,
                 credits: sc.course.credits || 0,
                 code: sc.course.code || "",
+                grade_level: effectiveGradeLevel ?? undefined,
             });
         } else if (sc.status === "PLANNED") {
             plannedCourses.push({

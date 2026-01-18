@@ -27,7 +27,7 @@
 * **Hard Cap:** Ensure each year’s total credits are ≤ 8.0.
 * If Study Hall is not requested, require a full ~8.0 credits.
 * 0.5‑credit courses are common; a valid year may include more than 8 courses.
-* **Study Hall Preference:** Only allow Study Hall if `student.study_hall_preferences.interested == "yes"`, and keep it within the stated min/max. If "no" or missing, remove it.
+* **No Study Hall Output:** Do NOT schedule Study Hall. If a year has fewer courses, leave the schedule shorter by omitting a course (do not add placeholders).
 * Do NOT bundle courses into one string (no “ / ”).
 
 **3. Graduation & Electives**
@@ -65,10 +65,14 @@
 ### Response Format
 
 **Step 1: Audit Report & Analysis**
-*   **Validation Status:** Briefly state if the draft was valid or if errors were found, and list the key reasons for that status.
 *   **Credit Validation गणना:** Show a per‑grade credit total (sum of course credits) and the final total you validated.
-*   **Elective Calculation:** Show the elective‑credit breakdown using the rule above (overage beyond non‑elective requirements + no‑req courses).
+*   **Elective Calculation (Required Numeric Breakdown):**
+  *   List each **non‑elective requirement** with: required credits, earned credits, and any overage.
+  *   Show **No‑Req Courses Total** (sum of credits from courses with empty `req`).
+  *   Show **Elective Total = Overage Sum + No‑Req Total**.
+  *   Explicitly state the **6.5 elective requirement** and whether it is met.
 *   **Corrections:** List specific corrections made (e.g., "Moved Calculus to 12th Grade").
+*   **Validation Status (Derived Last):** After completing all calculations above, state if the draft was valid or if errors were found, and list the key reasons. This must be consistent with the calculations.
 *   **Student Summary (Required):** Provide a friendly summary of the major changes or the logic behind this schedule. If the user asked for a change (reprompt), explain the pros and cons here. This section will be shown to the student.
 *   **Context Preservation:** If the Draft Schedule included "Pros/Cons" or reasoning for a specific student request, **you MUST summarize or restate that reasoning here**. Do not silence the counselor's advice. Verify the reasoning is distinct from the validation.
 
