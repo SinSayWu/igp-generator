@@ -513,10 +513,8 @@ export default function ProfileEditor({
                                 setWantsStudyHalls(checked);
                                 if (checked) {
                                     // Set default range when enabling
-                                    if (minStudyHalls === 0 && maxStudyHalls === 0) {
-                                        setMinStudyHalls(0);
-                                        setMaxStudyHalls(2);
-                                    }
+                                    setMinStudyHalls(0);
+                                    setMaxStudyHalls(1);
                                 } else {
                                     setMinStudyHalls(0);
                                     setMaxStudyHalls(0);

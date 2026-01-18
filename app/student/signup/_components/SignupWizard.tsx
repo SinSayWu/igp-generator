@@ -401,11 +401,36 @@ export default function SignupWizard() {
                                 </div>
 
                                 <div className="space-y-3">
+                                    <label className="block text-sm font-bold text-slate-700 uppercase">
+                                        Focus Programs
+                                    </label>
+                                    <p className="text-xs text-slate-500 mb-2">
+                                        If you are part of any specialized programs or academies,
+                                        select them here.
+                                    </p>
+                                    <MultiSelector
+                                        items={schoolData.allPrograms}
+                                        selectedIds={programIds}
+                                        onChange={setProgramIds}
+                                        placeholder="Select programs..."
+                                    />
+                                </div>
+
+                                <div className="space-y-3">
                                     <StudyHallsSection
                                         isEnabled={wantsStudyHalls}
                                         minStudyHalls={minStudyHalls}
                                         maxStudyHalls={maxStudyHalls}
-                                        onToggle={setWantsStudyHalls}
+                                        onToggle={(checked) => {
+                                            setWantsStudyHalls(checked);
+                                            if (checked) {
+                                                setMinStudyHalls(0);
+                                                setMaxStudyHalls(1);
+                                            } else {
+                                                setMinStudyHalls(0);
+                                                setMaxStudyHalls(0);
+                                            }
+                                        }}
                                         onMinChange={setMinStudyHalls}
                                         onMaxChange={setMaxStudyHalls}
                                     />
@@ -441,6 +466,20 @@ export default function SignupWizard() {
                                         onChange={setMySports}
                                         placeholder="Select sports..."
                                     />
+                                </div>
+
+                                <div className="pt-4 border-t border-slate-100">
+                                    <label className="flex items-center gap-2">
+                                        <input
+                                            type="checkbox"
+                                            checked={interestedInNCAA}
+                                            onChange={(e) => setInterestedInNCAA(e.target.checked)}
+                                            className="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                                        />
+                                        <span className="text-slate-700 font-medium">
+                                            I am interested in playing NCAA Sports
+                                        </span>
+                                    </label>
                                 </div>
                             </div>
                         </StepWrapper>
@@ -480,46 +519,32 @@ export default function SignupWizard() {
                                     />
                                 </div>
 
-                                {postHighSchoolPlan !== "Workforce" &&
-                                    postHighSchoolPlan !== "Military" && (
-                                        <>
-                                            <label className="flex items-center gap-2">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={interestedInNCAA}
-                                                    onChange={(e) =>
-                                                        setInterestedInNCAA(e.target.checked)
-                                                    }
-                                                    className="w-5 h-5"
-                                                />
-                                                <span className="text-slate-700 font-medium">
-                                                    Interested in NCAA Sports?
-                                                </span>
+                                {postHighSchoolPlan !== "Workforce" && (
+                                    <>
+                                        <div>
+                                            <label className="block text-sm font-bold text-slate-700 mb-2">
+                                                Target Colleges
                                             </label>
-                                            <div>
-                                                <label className="block text-sm font-bold text-slate-700 mb-2">
-                                                    Target Colleges
-                                                </label>
-                                                <MultiSelector
-                                                    items={schoolData.allColleges}
-                                                    selectedIds={collegeIds}
-                                                    onChange={setCollegeIds}
-                                                    placeholder="Add colleges..."
-                                                />
-                                            </div>
-                                        </>
-                                    )}
-                                <div>
-                                    <label className="block text-sm font-bold text-slate-700 mb-2">
-                                        Focus Programs
-                                    </label>
-                                    <MultiSelector
-                                        items={schoolData.allPrograms}
-                                        selectedIds={programIds}
-                                        onChange={setProgramIds}
-                                        placeholder="Select programs..."
-                                    />
-                                </div>
+                                            <MultiSelector
+                                                items={schoolData.allColleges.filter((c) => {
+                                                    if (postHighSchoolPlan === "4 Year College")
+                                                        return (
+                                                            c.type === "University" ||
+                                                            c.type === "Military"
+                                                        );
+                                                    if (postHighSchoolPlan === "2 Year College")
+                                                        return c.type === "Technical";
+                                                    if (postHighSchoolPlan === "Military")
+                                                        return c.type === "Military";
+                                                    return true;
+                                                })}
+                                                selectedIds={collegeIds}
+                                                onChange={setCollegeIds}
+                                                placeholder="Add colleges..."
+                                            />
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </StepWrapper>
                     )}
