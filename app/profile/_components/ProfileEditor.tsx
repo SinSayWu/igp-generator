@@ -85,7 +85,7 @@ export default function ProfileEditor({
     };
 
     // 1. Core Profile State
-    const [plan, setPlan] = useState(student.postHighSchoolPlan || "");
+    const [plan, setPlan] = useState((student.postHighSchoolPlan || "").trim());
     const [ncaa, setNcaa] = useState(student.interestedInNCAA);
     const [minStudyHalls, setMinStudyHalls] = useState(student.studyHallsPerYear || 0);
     // Fallback to min if max is not set (handles migration from single-value schema)

@@ -28,20 +28,25 @@ export function FutureePlansSection({
             </h2>
 
             <select
+                name="postHighSchoolPlan"
                 value={plan}
                 onChange={(e) => onPlanChange(e.target.value)}
                 className="w-full border p-2 rounded mb-6 focus:ring-2 focus:border-transparent transition bg-white text-sm"
                 style={{ borderColor: "var(--accent-background)" }}
             >
                 <option value="">-- Select a Plan --</option>
-                <option value="College">Four-Year College / University</option>
-                <option value="Vocational">Technical College / Vocational</option>
-                <option value="Workforce">Workforce</option>
+                <option value="4 Year College">4 Year College</option>
+                <option value="2 Year College">2 Year College</option>
+                <option value="Technical College">Technical College</option>
                 <option value="Military">Military</option>
+                <option value="Workforce">Workforce</option>
+                <option value="Other">Other</option>
             </select>
 
             {/* COLLEGE SELECTION GRID */}
-            {(plan === "College" || plan === "Vocational") && (
+            {["4 Year College", "2 Year College", "Technical College", "Military"].includes(
+                plan
+            ) && (
                 <div
                     className="border rounded-lg p-4"
                     style={{ borderColor: "var(--accent-background)" }}
@@ -53,8 +58,13 @@ export function FutureePlansSection({
                     <div className="space-y-3">
                         {colleges
                             .filter((college) => {
-                                if (plan === "Vocational") return college.type === "Technical";
-                                if (plan === "College") return college.type === "University";
+                                if (plan === "2 Year College" || plan === "Technical College")
+                                    return college.type === "Technical";
+                                if (plan === "4 Year College")
+                                    return (
+                                        college.type === "University" || college.type === "Military"
+                                    );
+                                if (plan === "Military") return college.type === "Military";
                                 return true;
                             })
                             .map((college) => {

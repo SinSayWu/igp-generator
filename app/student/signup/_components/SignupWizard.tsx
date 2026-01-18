@@ -583,8 +583,9 @@ export default function SignupWizard({ existingStudent, existingSchoolData }: Pr
                                         <option value="">-- Select Plan --</option>
                                         <option value="4 Year College">4 Year College</option>
                                         <option value="2 Year College">2 Year College</option>
-                                        <option value="Workforce">Workforce</option>
+                                        <option value="Technical College">Technical College</option>
                                         <option value="Military">Military</option>
+                                        <option value="Workforce">Workforce</option>
                                         <option value="Other">Other</option>
                                     </select>
                                 </div>
@@ -601,9 +602,12 @@ export default function SignupWizard({ existingStudent, existingSchoolData }: Pr
                                     />
                                 </div>
 
-                                {["4 Year College", "2 Year College", "Military"].includes(
-                                    postHighSchoolPlan
-                                ) && (
+                                {[
+                                    "4 Year College",
+                                    "2 Year College",
+                                    "Technical College",
+                                    "Military",
+                                ].includes(postHighSchoolPlan) && (
                                     <>
                                         <div>
                                             <label className="block text-sm font-bold text-slate-700 mb-2">
@@ -616,7 +620,10 @@ export default function SignupWizard({ existingStudent, existingSchoolData }: Pr
                                                             c.type === "University" ||
                                                             c.type === "Military"
                                                         );
-                                                    if (postHighSchoolPlan === "2 Year College")
+                                                    if (
+                                                        postHighSchoolPlan === "2 Year College" ||
+                                                        postHighSchoolPlan === "Technical College"
+                                                    )
                                                         return c.type === "Technical";
                                                     if (postHighSchoolPlan === "Military")
                                                         return c.type === "Military";
