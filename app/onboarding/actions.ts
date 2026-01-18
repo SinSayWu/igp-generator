@@ -12,14 +12,14 @@ export async function verifySchoolCode(code: number) {
     return !!school;
 }
 
+// Types for the onboarding/profile update payload
 interface MyCourse {
     id: string;
-    name: string;
     status: string;
-    grade?: string;
+    grade?: string | null;
     gradeLevel?: number;
-    confidence?: string;
-    stress?: string;
+    confidence?: string | null;
+    stress?: string | null;
 }
 
 interface OnboardingData {
@@ -29,6 +29,7 @@ interface OnboardingData {
     courses: MyCourse[];
     subjectInterests: string[];
     studyHallsPerYear: number;
+    maxStudyHallsPerYear: number;
     clubIds: string[];
     sportIds: string[];
     collegeIds: string[];
@@ -52,6 +53,7 @@ export async function completeOnboarding(userId: string, data: OnboardingData) {
             // Step 3
             subjectInterests,
             studyHallsPerYear,
+            maxStudyHallsPerYear,
 
             // Step 4
             clubIds,
@@ -73,6 +75,7 @@ export async function completeOnboarding(userId: string, data: OnboardingData) {
                 bio,
                 subjectInterests: subjectInterests || [],
                 studyHallsPerYear: studyHallsPerYear || 0,
+                maxStudyHallsPerYear: maxStudyHallsPerYear || studyHallsPerYear || 0,
                 postHighSchoolPlan,
                 careerInterest,
                 interestedInNCAA,
@@ -86,7 +89,7 @@ export async function completeOnboarding(userId: string, data: OnboardingData) {
                 // Courses
                 studentCourses: {
                     deleteMany: {},
-                    create: courses.map((c) => ({
+                    create: data.courses.map((c) => ({
                         courseId: c.id,
                         status: c.status as CourseStatus,
                         grade: c.grade || null,

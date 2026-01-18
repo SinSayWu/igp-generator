@@ -2,23 +2,22 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Club, Sport, Course, College, Program } from "@prisma/client";
+import { Club, Sport, Course, College, Program, Student, StudentCourse } from "@prisma/client";
 import { getSchoolData, signupAndProfileSetup, checkEmailExists } from "../actions";
+import { completeOnboarding } from "@/app/onboarding/actions";
 import { StudyHallsSection } from "@/app/profile/_components/sections/StudyHallsSection";
 
 // --- Types ---
 
-interface MyCourse {
+type MyCourse = {
     id: string;
     name: string;
     status: string;
     grade?: string;
     gradeLevel?: number;
-    confidence?: string;
-    stress?: string;
-}
+};
 
-interface SchoolData {
+type SchoolData = {
     schoolId: string;
     schoolName: string;
     allClubs: Club[];
@@ -26,18 +25,54 @@ interface SchoolData {
     allCourses: Course[];
     allPrograms: Program[];
     allColleges: College[];
+};
+
+interface Props {
+    existingStudent?:
+        | (Student & {
+              clubs: Club[];
+              sports: Sport[];
+              studentCourses: (StudentCourse & { course: Course })[];
+              targetColleges: College[];
+              focusPrograms: Program[];
+          })
+        | null;
+    existingSchoolData?: SchoolData | null;
 }
 
-export default function SignupWizard() {
-    const [step, setStep] = useState(0); // 0 = Account, 1 = Basic Profile, ...
+export default function SignupWizard({ existingStudent, existingSchoolData }: Props) {
+    // Helper to calculate initial step for existing students
+    const getInitialStep = () => {
+        if (!existingStudent) return 0;
+
+        // Logic from OnboardingWizard
+        if (
+            existingStudent.postHighSchoolPlan ||
+            existingStudent.careerInterest ||
+            existingStudent.targetColleges.length > 0 ||
+            existingStudent.focusPrograms.length > 0
+        )
+            return 5;
+        if (existingStudent.clubs.length > 0 || existingStudent.sports.length > 0) return 4;
+        if (
+            (existingStudent.subjectInterests && existingStudent.subjectInterests.length > 0) ||
+            (existingStudent.studyHallsPerYear || 0) > 0
+        )
+            return 3;
+        if (existingStudent.studentCourses.length > 0) return 2;
+        return 1;
+    };
+
+    const [step, setStep] = useState(getInitialStep()); // 0 = Account, 1 = Basic Profile, ...
     const [isPending, startTransition] = useTransition();
     const router = useRouter();
     const [globalError, setGlobalError] = useState("");
 
-    // --- Fetched Data (Empty until Step 0 is done) ---
-    const [schoolData, setSchoolData] = useState<SchoolData | null>(null);
+    // --- Fetched Data (Empty until Step 0 is done, or pre-filled) ---
+    const [schoolData, setSchoolData] = useState<SchoolData | null>(existingSchoolData || null);
 
     // --- State: Account (Step 0) ---
+    // If existing, we don't really use this, but we keep state for type safety
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
@@ -47,35 +82,62 @@ export default function SignupWizard() {
 
     // --- State: Profile ---
     // Step 1: Basic Info
-    const [gradeLevel, setGradeLevel] = useState(9);
-    const [age, setAge] = useState(14);
-    const [bio, setBio] = useState("");
+    const [gradeLevel, setGradeLevel] = useState(existingStudent?.gradeLevel || 9);
+    const [age, setAge] = useState(existingStudent?.age || 14);
+    const [bio, setBio] = useState(existingStudent?.bio || "");
 
     // Step 2: Courses
-    const [myCourses, setMyCourses] = useState<MyCourse[]>([]);
+    const [myCourses, setMyCourses] = useState<MyCourse[]>(
+        existingStudent?.studentCourses?.map((sc) => ({
+            id: sc.courseId,
+            name: sc.course.name,
+            status: sc.status,
+            grade: sc.grade || undefined,
+            gradeLevel: sc.gradeLevel || undefined,
+        })) || []
+    );
 
     // Step 3: Interests
-    const [subjectInterests, setSubjectInterests] = useState<string[]>([]);
-    const [wantsStudyHalls, setWantsStudyHalls] = useState<boolean>(false);
-    const [minStudyHalls, setMinStudyHalls] = useState(1);
-    const [maxStudyHalls, setMaxStudyHalls] = useState(1);
+    const [subjectInterests, setSubjectInterests] = useState<string[]>(
+        existingStudent?.subjectInterests || []
+    );
+    const [wantsStudyHalls, setWantsStudyHalls] = useState<boolean>(
+        (existingStudent?.maxStudyHallsPerYear || existingStudent?.studyHallsPerYear || 0) > 0
+    );
+    const [minStudyHalls, setMinStudyHalls] = useState(existingStudent?.studyHallsPerYear || 0);
+    const [maxStudyHalls, setMaxStudyHalls] = useState(
+        existingStudent?.maxStudyHallsPerYear || existingStudent?.studyHallsPerYear || 0
+    );
 
     // Step 4: Activities
-    const [myClubs, setMyClubs] = useState<string[]>([]);
-    const [mySports, setMySports] = useState<string[]>([]);
+    const [myClubs, setMyClubs] = useState<string[]>(
+        existingStudent?.clubs?.map((c) => c.id) || []
+    );
+    const [mySports, setMySports] = useState<string[]>(
+        existingStudent?.sports?.map((s) => s.id) || []
+    );
 
     // Step 5: Future
-    const [postHighSchoolPlan, setPostHighSchoolPlan] = useState("");
-    const [careerInterest, setCareerInterest] = useState("");
-    const [interestedInNCAA, setInterestedInNCAA] = useState(false);
-    const [programIds, setProgramIds] = useState<string[]>([]);
-    const [collegeIds, setCollegeIds] = useState<string[]>([]);
+    const [postHighSchoolPlan, setPostHighSchoolPlan] = useState(
+        existingStudent?.postHighSchoolPlan || ""
+    );
+    const [careerInterest, setCareerInterest] = useState(existingStudent?.careerInterest || "");
+    const [interestedInNCAA, setInterestedInNCAA] = useState(
+        existingStudent?.interestedInNCAA || false
+    );
+    const [programIds, setProgramIds] = useState<string[]>(
+        existingStudent?.focusPrograms?.map((p) => p.id) || []
+    );
+    const [collegeIds, setCollegeIds] = useState<string[]>(
+        existingStudent?.targetColleges?.map((c) => c.id) || []
+    );
 
     // --- Handlers ---
 
     const handleNext = async () => {
         setGlobalError("");
         if (step === 0) {
+            // ... (Existing logic for new users)
             // Validate Account Info
             if (!firstName || !lastName || !email || !password || !confirmPassword || !schoolCode) {
                 setGlobalError("Please fill in all fields.");
@@ -92,9 +154,8 @@ export default function SignupWizard() {
                 // Check Email existence first
                 const emailExists = await checkEmailExists(email);
                 if (emailExists) {
-                    setGlobalError(
-                        "User with this email already exists. Please login or use a different email."
-                    );
+                    alert("User with this email already exists. Redirecting to login...");
+                    router.push("/login?callbackUrl=/student/signup");
                     return;
                 }
 
@@ -102,7 +163,7 @@ export default function SignupWizard() {
                 if (res && "error" in res) {
                     setGlobalError((res as { error: string }).error);
                 } else {
-                    setSchoolData(res as SchoolData);
+                    setSchoolData(res);
                     setStep(1); // Move to Profile Setup
                 }
             });
@@ -120,27 +181,48 @@ export default function SignupWizard() {
     const handleComplete = () => {
         startTransition(async () => {
             try {
-                await signupAndProfileSetup({
-                    firstName,
-                    lastName,
-                    email,
-                    password,
-                    schoolCode: Number(schoolCode),
-                    gradeLevel,
-                    age,
-                    bio,
-                    courses: myCourses,
-                    subjectInterests,
-                    studyHallsPerYear: wantsStudyHalls ? minStudyHalls : 0,
-                    maxStudyHallsPerYear: wantsStudyHalls ? maxStudyHalls : 0,
-                    clubIds: myClubs,
-                    sportIds: mySports,
-                    collegeIds,
-                    programIds,
-                    postHighSchoolPlan,
-                    careerInterest,
-                    interestedInNCAA,
-                });
+                if (existingStudent) {
+                    // Update existing profile (reuses Onboarding action logic basically)
+                    await completeOnboarding(existingStudent.userId, {
+                        gradeLevel,
+                        age,
+                        bio,
+                        courses: myCourses,
+                        subjectInterests,
+                        studyHallsPerYear: wantsStudyHalls ? minStudyHalls : 0 /* Legacy compat */,
+                        maxStudyHallsPerYear: wantsStudyHalls ? maxStudyHalls : 0,
+                        clubIds: myClubs,
+                        sportIds: mySports,
+                        collegeIds,
+                        programIds,
+                        postHighSchoolPlan,
+                        careerInterest,
+                        interestedInNCAA,
+                    });
+                } else {
+                    // Create NEW profile
+                    await signupAndProfileSetup({
+                        firstName,
+                        lastName,
+                        email,
+                        password,
+                        schoolCode: Number(schoolCode),
+                        gradeLevel,
+                        age,
+                        bio,
+                        courses: myCourses,
+                        subjectInterests,
+                        studyHallsPerYear: wantsStudyHalls ? minStudyHalls : 0,
+                        maxStudyHallsPerYear: wantsStudyHalls ? maxStudyHalls : 0,
+                        clubIds: myClubs,
+                        sportIds: mySports,
+                        collegeIds,
+                        programIds,
+                        postHighSchoolPlan,
+                        careerInterest,
+                        interestedInNCAA,
+                    });
+                }
                 // Success
                 router.push("/dashboard");
             } catch (err) {
@@ -519,7 +601,9 @@ export default function SignupWizard() {
                                     />
                                 </div>
 
-                                {postHighSchoolPlan !== "Workforce" && (
+                                {["4 Year College", "2 Year College", "Military"].includes(
+                                    postHighSchoolPlan
+                                ) && (
                                     <>
                                         <div>
                                             <label className="block text-sm font-bold text-slate-700 mb-2">
