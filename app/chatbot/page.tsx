@@ -8,6 +8,8 @@ type Message = {
     role: "user" | "assistant" | "system";
     content: string;
     hasSchedule?: boolean;
+    rawContent?: string;
+    showThought?: boolean;
 };
 
 type ScheduleItem = string | { name: string; status: string; id?: string };
@@ -35,7 +37,6 @@ export default function ChatbotPage() {
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
     const [schedule, setSchedule] = useState<Schedule | null>(null);
-    const [debugMode, setDebugMode] = useState(false);
 
     // Map of "Course Name" -> Course Object
     const [courseMap, setCourseMap] = useState<Record<string, CourseData>>({});
@@ -109,6 +110,13 @@ export default function ChatbotPage() {
                 payloadMessages.splice(payloadMessages.length - 1, 0, systemInjection as Message);
             }
 
+            const chatModeInjection = {
+                role: "system",
+                content:
+                    "[CHAT MODE] Student-facing response only. Provide a brief, self-contained summary (2-4 sentences) that assumes the student has not seen any prior reasoning. Do not include detailed reasoning. If a schedule update is requested, include the full JSON schedule after the summary.",
+            };
+            payloadMessages.splice(payloadMessages.length - 1, 0, chatModeInjection as Message);
+
             const res = await fetch("/api/chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -119,6 +127,7 @@ export default function ChatbotPage() {
 
             const data = await res.json();
             const assistantContent = data.choices[0].message.content;
+            const thoughtContent = data?.debug?.auditContent || assistantContent;
 
             // Extract JSON if present
             const jsonMatch = assistantContent.match(/```json\s*([\s\S]*?)\s*```/);
@@ -159,7 +168,9 @@ export default function ChatbotPage() {
                 {
                     role: "assistant",
                     content: displayContent,
+                    rawContent: thoughtContent,
                     hasSchedule: foundSchedule, // Custom flag we'll use in render
+                    showThought: false,
                 } as Message & { hasSchedule?: boolean },
             ]);
         } catch (error) {
@@ -199,17 +210,10 @@ export default function ChatbotPage() {
                         <h2 className="text-xl font-bold">IGP Chat Assistant</h2>
                         <p className="text-indigo-100 text-sm">Plan your future.</p>
                     </div>
-                    <button
-                        onClick={() => setDebugMode(!debugMode)}
-                        className={`text-xs px-2 py-1 rounded border ${debugMode ? "bg-white text-indigo-600 border-white" : "border-indigo-400 text-indigo-100 hover:bg-indigo-700"}`}
-                    >
-                        {debugMode ? "Debug ON" : "Debug OFF"}
-                    </button>
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
                     {messages.map((m, i) => {
-                        const isHiddenReasoning = m.hasSchedule && !debugMode;
                         return (
                             <div
                                 key={i}
@@ -222,12 +226,35 @@ export default function ChatbotPage() {
                                             : "bg-slate-100 text-slate-800 rounded-bl-none"
                                     }`}
                                 >
-                                    {isHiddenReasoning ? (
-                                        <div className="italic text-slate-500 flex items-center gap-2">
-                                            <span>✅ Schedule generated from reasoning.</span>
+                                    <div className="whitespace-pre-wrap">{m.content}</div>
+                                    {m.role === "assistant" && m.rawContent && (
+                                        <div className="mt-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setMessages((prev) =>
+                                                        prev.map((msg, idx) =>
+                                                            idx === i
+                                                                ? {
+                                                                      ...msg,
+                                                                      showThought: !msg.showThought,
+                                                                  }
+                                                                : msg
+                                                        )
+                                                    );
+                                                }}
+                                                className="text-xs text-indigo-600 hover:text-indigo-700 font-semibold"
+                                            >
+                                                {m.showThought
+                                                    ? "Hide thought process"
+                                                    : "View thought process"}
+                                            </button>
+                                            {m.showThought && (
+                                                <div className="mt-2 whitespace-pre-wrap rounded-lg border border-slate-200 bg-white p-2 text-xs text-slate-600">
+                                                    {m.rawContent}
+                                                </div>
+                                            )}
                                         </div>
-                                    ) : (
-                                        <div className="whitespace-pre-wrap">{m.content}</div>
                                     )}
                                 </div>
                             </div>
@@ -261,6 +288,12 @@ export default function ChatbotPage() {
                                 onChange={(e) => setInput(e.target.value)}
                                 placeholder="Type a message..."
                                 className="flex-1 px-4 py-2 border border-slate-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter" && !e.shiftKey) {
+                                        e.preventDefault();
+                                        sendMessage(e as unknown as React.FormEvent);
+                                    }
+                                }}
                             />
                             <button
                                 type="submit"
@@ -410,19 +443,7 @@ export default function ChatbotPage() {
                                                     </div>
                                                 );
                                             })}
-                                            {/* Fill up to 8 slots */}
-                                            {Array.from({
-                                                length: Math.max(0, 8 - gradeCourses.length),
-                                            }).map((_, idx) => (
-                                                <div
-                                                    key={`empty-${idx}`}
-                                                    className="p-4 h-16 flex items-center justify-center text-center text-sm"
-                                                >
-                                                    <span className="text-slate-400 text-xs italic">
-                                                        Study Hall
-                                                    </span>
-                                                </div>
-                                            ))}
+                                            {/* No padding to 8 slots; show only scheduled courses */}
                                         </div>
                                     );
                                 })}
