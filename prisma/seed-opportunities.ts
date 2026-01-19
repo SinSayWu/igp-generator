@@ -24,21 +24,12 @@ async function main() {
             paidDesc = op.paid;
         }
 
-        // Handle within45Min which might be "varies"
-        let isWithin45 = false;
-        if (typeof op.within_45_min_of_clemson === "boolean") {
-            isWithin45 = op.within_45_min_of_clemson;
-        } else if (typeof op.within_45_min_of_clemson === "string") {
-            isWithin45 = op.within_45_min_of_clemson.toLowerCase() === "true";
-        }
-
         await prisma.opportunity.upsert({
             where: { originalId: op.id },
             update: {
                 title: op.title,
                 organization: op.organization,
                 locationJson: JSON.stringify(op.location),
-                within45Min: isWithin45,
                 type: op.type,
                 paid: isPaid,
                 paidDescription: paidDesc,
@@ -54,7 +45,6 @@ async function main() {
                 title: op.title,
                 organization: op.organization,
                 locationJson: JSON.stringify(op.location),
-                within45Min: isWithin45,
                 type: op.type,
                 paid: isPaid,
                 paidDescription: paidDesc,
