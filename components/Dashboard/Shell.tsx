@@ -7,7 +7,7 @@ import Extracurriculars from "./Extracurriculars";
 import Colleges from "./Colleges";
 import Jobs from "./Jobs";
 import Goals from "./Goals";
-import { StudentCourseData, ClubData, SportData, CollegeData, CourseCatalogItem } from "./types";
+import { StudentCourseData, ClubData, SportData, CollegeData, CourseCatalogItem, RecommendationData } from "./types";
 
 type TabId =
     | "overview"
@@ -35,6 +35,7 @@ type DashboardUser = {
         };
         studentCourses: StudentCourseData[];
         clubs: ClubData[];
+        clubRecommendations: RecommendationData[];
         sports: SportData[];
         targetColleges: CollegeData[];
         collegePlanSummary?: string | null;
@@ -156,6 +157,7 @@ export default function DashboardShell({ user, courseCatalog = [] }: DashboardSh
                     <Extracurriculars
                         clubs={user.student?.clubs ?? []}
                         sports={user.student?.sports ?? []}
+                        initialRecommendations={user.student?.clubRecommendations ?? []}
                     />
                 )}
                 {safeActiveTab === "colleges" && (

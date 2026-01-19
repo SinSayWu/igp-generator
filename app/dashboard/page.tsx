@@ -64,6 +64,14 @@ export default async function DashboardPage() {
                             studentLeaders: true, // Added for type match
                         },
                     },
+                    clubRecommendations: {
+                        select: {
+                            id: true,
+                            reason: true,
+                            timing: true,
+                            club: true, 
+                        },
+                    },
                     sports: {
                         select: {
                             id: true,

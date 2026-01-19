@@ -3,11 +3,22 @@
 import { Student } from "@prisma/client";
 
 interface AboutMeSectionProps {
-    student: Student;
+    student: Student & { user: { firstName: string; lastName: string } };
     rigorLevels: string[];
+    bio: string;
+    onBioChange: (val: string) => void;
+    desiredCourseRigor: string;
+    onRigorChange: (val: string) => void;
 }
 
-export function AboutMeSection({ student, rigorLevels }: AboutMeSectionProps) {
+export function AboutMeSection({
+    student,
+    rigorLevels,
+    bio,
+    onBioChange,
+    desiredCourseRigor,
+    onRigorChange,
+}: AboutMeSectionProps) {
     return (
         <div className="border rounded-lg p-6" style={{ borderColor: "var(--accent-background)" }}>
             <h2 className="text-xl font-bold mb-6" style={{ color: "var(--foreground)" }}>
@@ -17,14 +28,9 @@ export function AboutMeSection({ student, rigorLevels }: AboutMeSectionProps) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
                     <label className="block text-sm font-semibold text-gray-800 mb-2">Name</label>
-                    <input
-                        type="text"
-                        name="name"
-                        defaultValue={student.name || ""}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:border-transparent transition"
-                        style={{ borderColor: "var(--accent-background)" }}
-                        placeholder="Your name"
-                    />
+                    <div className="text-base font-medium text-slate-800 py-2">
+                        {student.user.firstName} {student.user.lastName}
+                    </div>
                 </div>
                 <div>
                     <label className="block text-sm font-semibold text-gray-800 mb-2">
@@ -53,7 +59,8 @@ export function AboutMeSection({ student, rigorLevels }: AboutMeSectionProps) {
                     </label>
                     <select
                         name="desiredCourseRigor"
-                        defaultValue={student.desiredCourseRigor || ""}
+                        value={desiredCourseRigor}
+                        onChange={(e) => onRigorChange(e.target.value)}
                         className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:border-transparent transition"
                         style={{ borderColor: "var(--accent-background)" }}
                     >
@@ -69,7 +76,8 @@ export function AboutMeSection({ student, rigorLevels }: AboutMeSectionProps) {
                     <label className="block text-sm font-semibold text-gray-800 mb-2">Bio</label>
                     <textarea
                         name="bio"
-                        defaultValue={student.bio || ""}
+                        value={bio}
+                        onChange={(e) => onBioChange(e.target.value)}
                         className="w-full px-4 py-2 border rounded-lg h-24 focus:ring-2 focus:border-transparent transition resize-none"
                         style={{ borderColor: "var(--accent-background)" }}
                         placeholder="Tell us about yourself..."

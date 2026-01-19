@@ -130,6 +130,8 @@ model Student {
   clubs  Club[]
   sports Sport[]
 
+  clubRecommendations ClubRecommendation[]
+
   // NEW: Course relationship through junction table
   studentCourses StudentCourse[]
 
@@ -167,10 +169,6 @@ model College {
   students Student[]
 }
 
-// --------------------------------------
-// ACTIVITIES & CATALOG
-// --------------------------------------
-
 model Club {
   id             String  @id @default(cuid())
   name           String
@@ -185,9 +183,27 @@ model Club {
 
   // Students who joined this club
   students Student[]
+  
+  recommendedTo ClubRecommendation[]
 
   // Unique name PER school (Two schools can both have "Beta Club")
   @@unique([name, schoolId])
+}
+
+model ClubRecommendation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  reason String
+  timing String // "NOW" | "FUTURE"
+
+  studentId String
+  student   Student @relation(fields: [studentId], references: [userId], onDelete: Cascade)
+
+  clubId String
+  club   Club   @relation(fields: [clubId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, clubId])
 }
 
 model Sport {
