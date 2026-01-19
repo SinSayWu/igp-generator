@@ -156,7 +156,7 @@ export default function DashboardShell({ user, courseCatalog = [] }: DashboardSh
 
             {/* Main content */}
             <main className="flex-1 p-6 bg-white dark:bg-gray-100">
-                {safeActiveTab === "overview" && <Overview user={user} goals={user.student?.goals ?? []} />}
+                {safeActiveTab === "overview" && <Overview user={user} />}
                 {safeActiveTab === "classes" && (
                     <ClassesPage
                         courses={user.student?.studentCourses ?? []}
@@ -187,7 +187,7 @@ export default function DashboardShell({ user, courseCatalog = [] }: DashboardSh
                         goals={user.student?.goals ?? []}
                     />
                 )}
-                {safeActiveTab === "goals" && <Goals />}
+                {safeActiveTab === "goals" && <Goals user={user} goals={user.student?.goals ?? []} />}
                 {safeActiveTab === "chatbot" && (
                     <div className="flex flex-col gap-6">
                         <h2 className="text-2xl font-bold">AI ChatBot</h2>

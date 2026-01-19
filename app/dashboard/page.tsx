@@ -19,6 +19,14 @@ export default async function DashboardPage() {
         include: {
             student: {
                 include: {
+                    _count: {
+                        select: {
+                            clubs: true,
+                            sports: true,
+                            studentCourses: true,
+                            targetColleges: true,
+                        }
+                    },
                     studentCourses: {
                         include: {
                             course: true,
