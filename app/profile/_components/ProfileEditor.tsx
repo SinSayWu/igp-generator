@@ -21,6 +21,7 @@ type StudentWithRelations = Student & {
     targetColleges: College[];
     focusPrograms: Program[];
     savedOpportunities: Opportunity[];
+    user: { firstName: string; lastName: string };
 };
 
 type Props = {
@@ -92,6 +93,9 @@ export default function ProfileEditor({
     // 1. Core Profile State
     const [plan, setPlan] = useState((student.postHighSchoolPlan || "").trim());
     const [ncaa, setNcaa] = useState(student.interestedInNCAA);
+    const [bio, setBio] = useState(student.bio || "");
+    const [desiredCourseRigor, setDesiredCourseRigor] = useState(student.desiredCourseRigor || "");
+
     const [minStudyHalls, setMinStudyHalls] = useState(student.studyHallsPerYear || 0);
     // Fallback to min if max is not set (handles migration from single-value schema)
     const [maxStudyHalls, setMaxStudyHalls] = useState(
@@ -370,6 +374,8 @@ export default function ProfileEditor({
     }, [
         plan,
         ncaa,
+        bio,
+        desiredCourseRigor,
         minStudyHalls,
         maxStudyHalls,
         courseData,
@@ -518,7 +524,14 @@ export default function ProfileEditor({
                     {/* --- MAIN SECTIONS WRAPPED IN CARDS --- */}
 
                     <SectionCard>
-                        <AboutMeSection student={student} rigorLevels={schoolRigorLevels} />
+                        <AboutMeSection
+                            student={student}
+                            rigorLevels={schoolRigorLevels}
+                            bio={bio}
+                            onBioChange={setBio}
+                            desiredCourseRigor={desiredCourseRigor}
+                            onRigorChange={setDesiredCourseRigor}
+                        />
                     </SectionCard>
 
                     <SectionCard>

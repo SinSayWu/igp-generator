@@ -46,3 +46,10 @@ export type CollegeData = {
     requirements: string[];
     suggestions: string[];
 };
+
+export type RecommendationData = {
+    id: string;
+    reason: string;
+    timing: string;
+    club: ClubData;
+};

@@ -29,8 +29,7 @@ export default async function StudentProfileForm({ userId }: { userId: string })
             },
             targetColleges: true,
             focusPrograms: true,
-            savedOpportunities: true, // Ensure this relation is included
-        } as any, // Cast the include object to any to bypass potential type issues
+        } as any, 
     });
 
     // Validate student exists and is assigned to a school

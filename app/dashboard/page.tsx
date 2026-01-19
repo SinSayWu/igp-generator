@@ -24,7 +24,40 @@ export default async function DashboardPage() {
                             course: true,
                         },
                     },
-                    clubs: true,
+                    clubs: {
+                        select: {
+                            id: true,
+                            name: true,
+                            category: true,
+                            description: true, // Added for type match
+                            teacherLeader: true, // Added for type match
+                            studentLeaders: true, // Added for type match
+                        },
+                    },
+                    clubRecommendations: {
+                        select: {
+                            id: true,
+                            reason: true,
+                            timing: true,
+                            club: true, 
+                        },
+                    },
+                    sports: {
+                        select: {
+                            id: true,
+                            name: true,
+                            season: true,
+                        },
+                    },
+                    targetColleges: {
+                        select: {
+                            id: true,
+                            name: true,
+                            type: true,
+                            requirements: true,
+                            suggestions: true,
+                        },
+                    },
                 },
             },
         },
