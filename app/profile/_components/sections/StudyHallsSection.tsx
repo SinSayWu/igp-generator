@@ -65,8 +65,8 @@ export function StudyHallsSection({
                             <div
                                 className="absolute h-full bg-[#d70026]"
                                 style={{
-                                    left: `${((minStudyHalls - 1) / 2) * 100}%`,
-                                    right: `${100 - ((maxStudyHalls - 1) / 2) * 100}%`,
+                                    left: `${(minStudyHalls / 3) * 100}%`,
+                                    right: `${100 - (maxStudyHalls / 3) * 100}%`,
                                 }}
                             />
                         </div>
@@ -75,7 +75,7 @@ export function StudyHallsSection({
                         <div className="relative w-full h-2">
                             <input
                                 type="range"
-                                min="1"
+                                min="0"
                                 max="3"
                                 value={minStudyHalls}
                                 onChange={(e) => {
@@ -85,13 +85,13 @@ export function StudyHallsSection({
                                 className="absolute top-1/2 -translate-y-1/2 w-full h-2 appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-[#d70026] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:hover:scale-110 [&::-webkit-slider-thumb]:transition-transform z-[var(--min-z,20)]"
                                 style={
                                     {
-                                        "--min-z": minStudyHalls > 2 ? "20" : "10",
+                                        "--min-z": minStudyHalls > 1 ? "20" : "10",
                                     } as React.CSSProperties
                                 }
                             />
                             <input
                                 type="range"
-                                min="1"
+                                min="0"
                                 max="3"
                                 value={maxStudyHalls}
                                 onChange={(e) => {
@@ -109,7 +109,7 @@ export function StudyHallsSection({
 
                         {/* Markers */}
                         <div className="flex justify-between w-full px-1 mt-2">
-                            {[1, 2, 3].map((num) => (
+                            {[0, 1, 2, 3].map((num) => (
                                 <div key={num} className="flex flex-col items-center gap-1">
                                     <div
                                         className={`w-0.5 h-1 ${num >= minStudyHalls && num <= maxStudyHalls ? "bg-red-300" : "bg-slate-300"}`}

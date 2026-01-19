@@ -26,6 +26,7 @@ export async function getSchoolData(schoolCode: number) {
     return {
         schoolId: school.id,
         schoolName: school.name,
+        rigorLevels: school.rigorLevels,
         allClubs: school.clubs,
         allSports: school.sports,
         allCourses: school.courses,
@@ -69,6 +70,7 @@ export interface SignupData {
     postHighSchoolPlan: string;
     careerInterest: string;
     interestedInNCAA: boolean;
+    desiredCourseRigor?: string;
     middleName?: string;
 }
 
@@ -94,6 +96,7 @@ export async function signupAndProfileSetup(data: SignupData) {
         postHighSchoolPlan,
         careerInterest,
         interestedInNCAA,
+        desiredCourseRigor,
     } = data;
 
     // 1. Basic Check
@@ -128,6 +131,7 @@ export async function signupAndProfileSetup(data: SignupData) {
         postHighSchoolPlan,
         careerInterest,
         interestedInNCAA,
+        ...(desiredCourseRigor ? { desiredCourseRigor } : {}),
         clubs: {
             connect: clubIds.map((id) => ({ id })),
         },

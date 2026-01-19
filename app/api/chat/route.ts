@@ -54,6 +54,12 @@ export const dynamic = "force-dynamic";
 export async function POST(req: Request) {
     try {
         const { messages } = (await req.json()) as { messages: IncomingMessage[] };
+        const generateAllFuture = messages.some(
+            (m) => m.content && m.content.includes("[GENERATE_ALL_FUTURE]")
+        );
+        const sanitizedMessages = messages.filter(
+            (m) => !(m.content && m.content.includes("[GENERATE_ALL_FUTURE]"))
+        );
 
         // 1. Authenticate and Fetch Real Student Data
         const session = await getSession();
@@ -90,21 +96,39 @@ export async function POST(req: Request) {
 
         // 2. Read and Construct System Prompt
         const promptTemplate = fs.readFileSync(path.join(dataDir, "prompt.txt"), "utf8");
+        const parseStudentGrade = (): number | null => {
+            try {
+                const parsed = JSON.parse(studentDataStr) as
+                    | { grade?: number; gradeLevel?: number }
+                    | Array<{ grade?: number; gradeLevel?: number }>;
+                const student = Array.isArray(parsed) ? parsed[0] : parsed;
+                const gradeValue = Number(student?.grade ?? student?.gradeLevel);
+                return Number.isFinite(gradeValue) ? gradeValue : null;
+            } catch {
+                return null;
+            }
+        };
+
+        const currentGrade = parseStudentGrade();
+        const planYearsAhead = generateAllFuture ? Math.max(0, 12 - (currentGrade ?? 12)) : 1;
+
         const systemPrompt = promptTemplate
             .replace("{{CLASSES}}", classes)
             .replace("{{GRADUATION_REQS}}", graduationReqs)
             .replace("{{STUDENTS}}", studentDataStr)
-            .replace("{{N}}", "1"); // Only plan next year
+            .replace("{{N}}", String(planYearsAhead));
 
         // Detect if this is a "reprompt" (conversational update)
         // We look for the [SYSTEM INJECTION] tag we added in the frontend
-        const isConversationalUpdate = messages.some(
+        const isConversationalUpdate = sanitizedMessages.some(
             (m) => m.content && m.content.includes("[SYSTEM INJECTION]")
         );
-        const isChatMode = messages.some((m) => m.content && m.content.includes("[CHAT MODE]"));
+        const isChatMode = sanitizedMessages.some(
+            (m) => m.content && m.content.includes("[CHAT MODE]")
+        );
 
         // Modify prompt for updates to ensure Pros/Cons analysis
-        const finalMessages = [{ role: "system", content: systemPrompt }, ...messages];
+        const finalMessages = [{ role: "system", content: systemPrompt }, ...sanitizedMessages];
 
         if (isChatMode) {
             finalMessages.push({

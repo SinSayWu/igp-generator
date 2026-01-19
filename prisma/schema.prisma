@@ -20,6 +20,7 @@ model School {
   name              String
   createdAt         DateTime @default(now())
   backgroundInfo    String?  @db.Text()
+  rigorLevels       String[] @default([])
 
   // People
   students Student[]
@@ -99,12 +100,13 @@ model Administrator {
 
 model Student {
   // ... (Grade, GPA, Bio, etc. remain the same) ...
-  gradeLevel       Int
-  graduationYear   Int
-  age              Int?
-  bio              String?
-  interests        String[]
-  subjectInterests String[] // e.g., "Science", "Math", "English", "History"
+  gradeLevel         Int
+  graduationYear     Int
+  age                Int?
+  bio                String?
+  interests          String[]
+  subjectInterests   String[] // e.g., "Science", "Math", "English", "History"
+  desiredCourseRigor String?
 
   collegePlanSummary String? @db.Text()
 

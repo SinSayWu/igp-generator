@@ -1,3 +1,6 @@
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
 type DebugInfo = { draft: string; audit: string };
 
 type DebugModalProps = {
@@ -49,9 +52,11 @@ export default function DebugModal({ open, debugInfo, onClose }: DebugModalProps
                             </span>
                         </div>
                         <div className="flex-1 overflow-auto p-4">
-                            <pre className="text-xs font-mono text-gray-600 whitespace-pre-wrap">
-                                {debugInfo.draft}
-                            </pre>
+                            <div className="prose prose-slate max-w-none text-xs">
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                    {debugInfo.draft}
+                                </ReactMarkdown>
+                            </div>
                         </div>
                     </div>
 
@@ -65,9 +70,11 @@ export default function DebugModal({ open, debugInfo, onClose }: DebugModalProps
                             </span>
                         </div>
                         <div className="flex-1 overflow-auto p-4">
-                            <pre className="text-xs font-mono text-indigo-900 whitespace-pre-wrap">
-                                {debugInfo.audit}
-                            </pre>
+                            <div className="prose prose-indigo max-w-none text-xs">
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                    {debugInfo.audit}
+                                </ReactMarkdown>
+                            </div>
                         </div>
                     </div>
                 </div>

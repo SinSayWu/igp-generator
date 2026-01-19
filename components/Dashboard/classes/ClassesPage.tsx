@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { useRouter } from "next/navigation";
 import type { CourseStatus } from "@prisma/client";
 import { addCourse } from "@/app/actions/add-course";
@@ -428,9 +430,13 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade }: Cl
                 body: JSON.stringify({
                     messages: [
                         {
+                            role: "system",
+                            content: "[GENERATE_ALL_FUTURE]",
+                        },
+                        {
                             role: "user",
                             content:
-                                "Please generate my potential future courses for the next school year based on my history.",
+                                "Please generate my potential future courses for the rest of high school based on my history.",
                         },
                     ],
                 }),
@@ -663,6 +669,16 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade }: Cl
                 plannedCount={plannedCourses.length}
             />
 
+            <ClassesGrid
+                scheduleByGrade={scheduleByGrade}
+                courseMap={courseMap}
+                onDeleteRequest={handleDeleteRequest}
+                onAddCourse={openAddCourseModal}
+                onEditCourse={openEditCourseModal}
+                currentGrade={currentGrade}
+                generatingFuture={generating}
+            />
+
             <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div>
@@ -689,7 +705,11 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade }: Cl
                                             : "bg-white text-slate-700 border border-slate-200"
                                     }`}
                                 >
-                                    <div className="whitespace-pre-wrap">{msg.content}</div>
+                                    <div className="prose prose-slate max-w-none">
+                                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                            {msg.content}
+                                        </ReactMarkdown>
+                                    </div>
                                     {msg.role === "assistant" && msg.rawContent && (
                                         <div className="mt-2">
                                             <button
@@ -756,16 +776,6 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade }: Cl
                     </div>
                 </div>
             </section>
-
-            <ClassesGrid
-                scheduleByGrade={scheduleByGrade}
-                courseMap={courseMap}
-                onDeleteRequest={handleDeleteRequest}
-                onAddCourse={openAddCourseModal}
-                onEditCourse={openEditCourseModal}
-                currentGrade={currentGrade}
-                generatingFuture={generating}
-            />
 
             <AddCourseModal
                 open={isAddCourseOpen}

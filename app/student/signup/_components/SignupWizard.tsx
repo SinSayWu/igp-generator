@@ -20,6 +20,7 @@ type MyCourse = {
 type SchoolData = {
     schoolId: string;
     schoolName: string;
+    rigorLevels: string[];
     allClubs: Club[];
     allSports: Sport[];
     allCourses: Course[];
@@ -95,6 +96,9 @@ export default function SignupWizard({ existingStudent, existingSchoolData }: Pr
             grade: sc.grade || undefined,
             gradeLevel: sc.gradeLevel || undefined,
         })) || []
+    );
+    const [desiredCourseRigor, setDesiredCourseRigor] = useState(
+        existingStudent?.desiredCourseRigor || ""
     );
 
     // Step 3: Interests
@@ -198,6 +202,7 @@ export default function SignupWizard({ existingStudent, existingSchoolData }: Pr
                         postHighSchoolPlan,
                         careerInterest,
                         interestedInNCAA,
+                        desiredCourseRigor,
                     });
                 } else {
                     // Create NEW profile
@@ -221,6 +226,7 @@ export default function SignupWizard({ existingStudent, existingSchoolData }: Pr
                         postHighSchoolPlan,
                         careerInterest,
                         interestedInNCAA,
+                        desiredCourseRigor,
                     });
                 }
                 // Success
@@ -410,6 +416,26 @@ export default function SignupWizard({ existingStudent, existingSchoolData }: Pr
                             <p className="text-sm text-slate-500 mb-6">
                                 Add courses you have taken or are currently taking.
                             </p>
+                            <div className="mb-6">
+                                <label className="block text-sm font-bold text-slate-700 mb-1">
+                                    Course Rigor Preference (Optional)
+                                </label>
+                                <select
+                                    value={desiredCourseRigor}
+                                    onChange={(e) => setDesiredCourseRigor(e.target.value)}
+                                    className="w-full border-slate-300 rounded-lg p-3"
+                                >
+                                    <option value="">No preference</option>
+                                    {(schoolData.rigorLevels?.length
+                                        ? schoolData.rigorLevels
+                                        : ["CP", "Honors", "AP"]
+                                    ).map((level) => (
+                                        <option key={level} value={level}>
+                                            {level}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
                             <CourseSelector
                                 allCourses={schoolData.allCourses}
                                 myCourses={myCourses}
@@ -507,7 +533,7 @@ export default function SignupWizard({ existingStudent, existingSchoolData }: Pr
                                             setWantsStudyHalls(checked);
                                             if (checked) {
                                                 setMinStudyHalls(0);
-                                                setMaxStudyHalls(1);
+                                                setMaxStudyHalls(3);
                                             } else {
                                                 setMinStudyHalls(0);
                                                 setMaxStudyHalls(0);

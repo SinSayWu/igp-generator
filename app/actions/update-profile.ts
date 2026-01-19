@@ -45,6 +45,10 @@ export async function updateStudentProfile(userId: string, formData: FormData) {
             ? undefined
             : interestedInNCAARaw === "on" || interestedInNCAARaw === "true";
 
+    const desiredCourseRigorRaw = formData.get("desiredCourseRigor");
+    const desiredCourseRigor =
+        typeof desiredCourseRigorRaw === "string" ? desiredCourseRigorRaw.trim() : undefined;
+
     // NEW: Extract study halls
     const rawStudyHalls = formData.get("studyHallsPerYear");
     const studyHallsPerYear = rawStudyHalls ? parseInt(rawStudyHalls as string) : undefined;
@@ -64,6 +68,9 @@ export async function updateStudentProfile(userId: string, formData: FormData) {
             ...(postHighSchoolPlan === undefined ? {} : { postHighSchoolPlan }),
             ...(careerInterest === undefined ? {} : { careerInterest }),
             ...(interestedInNCAA === undefined ? {} : { interestedInNCAA }),
+            ...(desiredCourseRigor === undefined
+                ? {}
+                : { desiredCourseRigor: desiredCourseRigor || null }),
             ...(studyHallsPerYear == null ? {} : { studyHallsPerYear }),
             ...(maxStudyHallsPerYear == null ? {} : { maxStudyHallsPerYear }),
 

@@ -30,6 +30,7 @@ type Props = {
     allCourses: Course[];
     allColleges: College[];
     allPrograms: Program[];
+    schoolRigorLevels: string[];
 };
 
 interface SelectableItem {
@@ -65,6 +66,7 @@ export default function ProfileEditor({
     allCourses,
     allColleges,
     allPrograms,
+    schoolRigorLevels,
 }: Props) {
     const [isPending, startTransition] = useTransition();
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -463,7 +465,7 @@ export default function ProfileEditor({
                     {/* --- MAIN SECTIONS WRAPPED IN CARDS --- */}
 
                     <SectionCard>
-                        <AboutMeSection student={student} />
+                        <AboutMeSection student={student} rigorLevels={schoolRigorLevels} />
                     </SectionCard>
 
                     <SectionCard>
@@ -517,7 +519,7 @@ export default function ProfileEditor({
                                 setWantsStudyHalls(checked);
                                 if (checked) {
                                     // Set default range when enabling
-                                    setMinStudyHalls(1);
+                                    setMinStudyHalls(0);
                                     setMaxStudyHalls(3);
                                 } else {
                                     setMinStudyHalls(0);

@@ -27,6 +27,7 @@ Follow these rules exactly:
 * If Study Hall is **not** requested, you must reach a full ~8.0 credits.
 * 0.5‑credit courses are common; you may need more than 8 courses.
 * Study Hall only if `student.study_hall_preferences.interested == "yes"` (0 credits).
+* If Study Hall is opted-in, schedule **between** `student.study_hall_preferences.min_per_year` and `student.study_hall_preferences.max_per_year` study hall periods per year.
 * Do NOT combine courses in one string (no “ / ”); each course is its own entry.
 
 **3. Programs, Prereqs, Electives**
@@ -44,7 +45,7 @@ Follow these rules exactly:
 * **No Downshifts:** Never schedule an easier or prerequisite‑level course after a harder one in the same sequence.
 * Electives must align to interests and focus; avoid generic filler.
 * **Elective Options Pass:** List a short set of viable electives (include CP/Honors/AP), then choose the best fit based on rigor history, interests, focus, and path.
-* **No Study Hall Output:** Do NOT schedule Study Hall. If a year has fewer courses, leave the schedule shorter by omitting a course (do not add placeholders).
+* **Study Hall Strictness:** If study halls are allowed, do not exceed the max per year and do not go below the min per year.
 
 **5. Aggressive Doubling-Up**
 * You may double‑up in a subject to accelerate interests or prerequisites (e.g., Biology + Chemistry, AP Calc + AP Stats).

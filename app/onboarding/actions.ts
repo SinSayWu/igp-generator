@@ -37,6 +37,7 @@ interface OnboardingData {
     postHighSchoolPlan: string;
     careerInterest: string;
     interestedInNCAA: boolean;
+    desiredCourseRigor?: string;
 }
 
 export async function completeOnboarding(userId: string, data: OnboardingData) {
@@ -65,6 +66,7 @@ export async function completeOnboarding(userId: string, data: OnboardingData) {
             postHighSchoolPlan,
             careerInterest,
             interestedInNCAA,
+            desiredCourseRigor,
         } = data;
 
         await prisma.student.update({
@@ -79,6 +81,7 @@ export async function completeOnboarding(userId: string, data: OnboardingData) {
                 postHighSchoolPlan,
                 careerInterest,
                 interestedInNCAA,
+                ...(desiredCourseRigor ? { desiredCourseRigor } : { desiredCourseRigor: null }),
 
                 // Set relations
                 clubs: { set: [], connect: clubIds.map((id) => ({ id })) },

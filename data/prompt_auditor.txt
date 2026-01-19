@@ -27,7 +27,7 @@
 * **Hard Cap:** Ensure each year’s total credits are ≤ 8.0.
 * If Study Hall is not requested, require a full ~8.0 credits.
 * 0.5‑credit courses are common; a valid year may include more than 8 courses.
-* **No Study Hall Output:** Do NOT schedule Study Hall. If a year has fewer courses, leave the schedule shorter by omitting a course (do not add placeholders).
+* If Study Hall is opted-in, enforce **between** `student.study_hall_preferences.min_per_year` and `student.study_hall_preferences.max_per_year` study hall periods per year.
 * Do NOT bundle courses into one string (no “ / ”).
 
 **3. Graduation & Electives**
@@ -44,6 +44,7 @@
 **4. Interest Alignment & Filler**
 * No empty placeholders (no “Free Slot”/“TBD”).
 * Study Hall only if opted‑in; otherwise replace with interest‑aligned electives.
+* If study halls are opted‑in, do not exceed the max per year and do not go below the min per year.
 * Avoid generic filler unless required or explicitly requested.
 * Optional adds must align with interests, pathway, and focus.
 * Ensure the planner used a short options list and selected the best fit by rigor history, interests, focus, and path.
@@ -65,7 +66,7 @@
 ### Response Format
 
 **Step 1: Audit Report & Analysis**
-*   **Credit Validation गणना:** Show a per‑grade credit total (sum of course credits) and the final total you validated.
+*   **Credit Validation:** Show a per‑grade credit total (sum of course credits) and the final total you validated.
 *   **Elective Calculation (Required Numeric Breakdown):**
   *   List each **non‑elective requirement** with: required credits, earned credits, and any overage.
   *   Show **No‑Req Courses Total** (sum of credits from courses with empty `req`).

@@ -4,9 +4,10 @@ import { Student } from "@prisma/client";
 
 interface AboutMeSectionProps {
     student: Student;
+    rigorLevels: string[];
 }
 
-export function AboutMeSection({ student }: AboutMeSectionProps) {
+export function AboutMeSection({ student, rigorLevels }: AboutMeSectionProps) {
     return (
         <div className="border rounded-lg p-6" style={{ borderColor: "var(--accent-background)" }}>
             <h2 className="text-xl font-bold mb-6" style={{ color: "var(--foreground)" }}>
@@ -21,13 +22,32 @@ export function AboutMeSection({ student }: AboutMeSectionProps) {
                     <select
                         name="gradeLevel"
                         defaultValue={student.gradeLevel || 9}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:border-transparent transition"
+                        className="w-full px-4 py-2 border rounded-lg bg-slate-100 text-slate-500 cursor-not-allowed"
                         style={{ borderColor: "var(--accent-background)" }}
+                        disabled
                     >
                         <option value="9">Freshman (9th)</option>
                         <option value="10">Sophomore (10th)</option>
                         <option value="11">Junior (11th)</option>
                         <option value="12">Senior (12th)</option>
+                    </select>
+                </div>
+                <div>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2">
+                        Course Rigor Preference (Optional)
+                    </label>
+                    <select
+                        name="desiredCourseRigor"
+                        defaultValue={student.desiredCourseRigor || ""}
+                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:border-transparent transition"
+                        style={{ borderColor: "var(--accent-background)" }}
+                    >
+                        <option value="">No preference</option>
+                        {rigorLevels.map((level) => (
+                            <option key={level} value={level}>
+                                {level}
+                            </option>
+                        ))}
                     </select>
                 </div>
                 <div>

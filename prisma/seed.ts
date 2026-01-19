@@ -16,12 +16,15 @@ async function main() {
     // Create D.W. Daniel High School
     const danielHigh = await prisma.school.upsert({
         where: { schoolStudentCode: 42069 },
-        update: {},
+        update: {
+            rigorLevels: ["CP", "Honors", "AP"],
+        },
         create: {
             name: "D.W. Daniel High School",
             schoolStudentCode: 42069,
             schoolAdminCode: 69420,
             backgroundInfo: "Home of the Lions",
+            rigorLevels: ["CP", "Honors", "AP"],
         },
     });
 

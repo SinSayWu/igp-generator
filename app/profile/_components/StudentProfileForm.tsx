@@ -64,6 +64,11 @@ export default async function StudentProfileForm({ userId }: { userId: string })
         orderBy: { name: "asc" },
     });
 
+    const school = await prisma.school.findUnique({
+        where: { id: student.schoolId },
+        select: { rigorLevels: true },
+    });
+
     // --- STEP 3: Render ProfileEditor with all data ---
     // ProfileEditor is a client component that handles UI, state, and form submission
     return (
@@ -75,6 +80,7 @@ export default async function StudentProfileForm({ userId }: { userId: string })
             allCourses={allCourses}
             allColleges={allColleges}
             allPrograms={schoolPrograms}
+            schoolRigorLevels={school?.rigorLevels ?? ["CP", "Honors", "AP"]}
         />
     );
 }

@@ -119,7 +119,7 @@ export async function getStudentContext(userId: string) {
     const studentProfile = {
         id: `${student.user.firstName} ${student.user.lastName}`, // Using real name
         grade: student.gradeLevel,
-        difficulty: "CP/Honors", // This might need to be derived or stored in DB. Defaulting for now.
+        difficulty: student.desiredCourseRigor || "CP",
         interests: [...student.interests],
         subject_interests: [...student.subjectInterests], // Passed to help AI
         completed_courses: completedCourses,
@@ -128,9 +128,12 @@ export async function getStudentContext(userId: string) {
         transcript: transcript,
         planned_courses: plannedCourses,
         study_hall_preferences: {
-            interested: student.studyHallsPerYear && student.studyHallsPerYear > 0 ? "yes" : "no",
-            min_per_year: 0,
-            max_per_year: student.studyHallsPerYear || 0,
+            interested:
+                (student.maxStudyHallsPerYear || 0) > 0 || (student.studyHallsPerYear || 0) > 0
+                    ? "yes"
+                    : "no",
+            min_per_year: student.studyHallsPerYear || 0,
+            max_per_year: student.maxStudyHallsPerYear || student.studyHallsPerYear || 0,
         },
         program_intent: programIntent,
         target_colleges: student.targetColleges.map((c) => c.name),
