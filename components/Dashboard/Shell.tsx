@@ -160,7 +160,7 @@ export default function DashboardShell({ user, courseCatalog = [] }: DashboardSh
                     color: "var(--foreground-2)",
                     borderBottom: "2px solid var(--accent-background)",
                 }}
-                className="p-4 border-b border-black md:border-stone-800 print:hidden"
+                className="p-4 border-b border-black md:border-stone-800 dashboard-header print:hidden"
             >
                 {/* Top row with title and welcome message */}
                 <div className="flex justify-between items-center mb-4">

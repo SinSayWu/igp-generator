@@ -165,6 +165,12 @@ ITS LOWK NOT THAT HARD ITS PRETTY SELF EXPLANATORY */
 
 /* NAVBAR STUFF */
 
+@media print {
+    .navbar, .dashboard-header {
+        display: none !important;
+    }
+}
+
 .navbar {
     width: 100%;
     background: var(--button-color);

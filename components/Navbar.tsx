@@ -20,7 +20,7 @@ export default async function Navbar() {
     }
 
     return (
-        <nav className="navbar print:bg-transparent print:border-none">
+        <nav className="navbar">
             <Link href="/" className="nav-brand">
                 <div className="nav-logo-wrap">
                     <Image src={logo} alt="logo" fill className="nav-logo" />
