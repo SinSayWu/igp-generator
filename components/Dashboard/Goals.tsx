@@ -78,18 +78,18 @@ export default function Goals() {
           value={newGoalTitle}
           onChange={e => setNewGoalTitle(e.target.value)}
           placeholder="New goal title"
-          className="border rounded px-2 py-1 flex-1"
+          className="border border-black rounded-xl px-2 py-1 flex-1"
         />
         <select
           value={newGoalPriority}
           onChange={e => setNewGoalPriority(e.target.value as GoalItem["priority"])}
-          className="border rounded px-2 py-1"
+          className="border border-black rounded-xl px-2 py-1"
         >
           <option value="High">High</option>
           <option value="Medium">Medium</option>
           <option value="Low">Low</option>
         </select>
-        <button onClick={addGoal} className="px-4 py-1 bg-var(--button-color) text-white rounded">
+        <button onClick={addGoal} className="px-4 py-1 bg-var(--button-color) text-white border border-black rounded-xl">
           Add Goal
         </button>
       </div>
@@ -99,14 +99,14 @@ export default function Goals() {
         {goals
           .sort((a, b) => ({ High: 3, Medium: 2, Low: 1 }[b.priority] - { High: 3, Medium: 2, Low: 1 }[a.priority]))
           .map(goal => (
-            <div key={goal.id} className={`border rounded-lg p-4 ${goal.completed ? "bg-green-100" : ""}`}>
+            <div key={goal.id} className={`border border-black rounded-xl p-4 ${goal.completed ? "bg-green-100" : ""}`}>
               <div className="flex justify-between items-center">
                 <p className="font-semibold">{goal.title}</p>
                 <div className="flex gap-2 items-center">
                   <span className="text-sm font-bold">{goal.priority}</span>
                   <button
                     onClick={() => toggleGoal(goal.id)}
-                    className={`px-3 py-1 font-bold rounded ${goal.completed ? "bg-gray-300 text-gray-600" : "bg-var(--button-color) text-white"}`}
+                    className={`px-3 py-1 font-bold border border-black rounded-xl ${goal.completed ? "bg-gray-300 text-gray-600" : "bg-var(--button-color) text-white"}`}
                   >
                     {goal.completed ? "Undo" : "Complete"}
                   </button>
@@ -116,11 +116,11 @@ export default function Goals() {
               {/* Steps */}
               <div className="ml-4 mt-2 flex flex-col gap-2">
                 {(goal.steps || []).map(step => (
-                  <div key={step.id} className="flex justify-between items-center border rounded p-2">
+                  <div key={step.id} className="flex justify-between items-center border border-black rounded-xl p-2">
                     <p className={`ml-2 ${step.completed ? "line-through text-gray-500" : ""}`}>{step.title}</p>
                     <button
                       onClick={() => toggleStep(goal.id, step.id)}
-                      className={`px-2 py-0.5 rounded ${step.completed ? "bg-gray-300 text-gray-600" : "bg-var(--button-color) text-white"}`}
+                      className={`px-2 py-0.5 border border-black rounded-md ${step.completed ? "bg-gray-300 text-gray-600" : "bg-var(--button-color) text-white"}`}
                     >
                       {step.completed ? "Undo" : "Done"}
                     </button>
@@ -146,14 +146,14 @@ function AddStepInput({ goalId, addStep }: { goalId: string; addStep: (goalId: s
         value={input}
         onChange={e => setInput(e.target.value)}
         placeholder="New step"
-        className="border rounded px-2 py-1 flex-1"
+        className="border border-black rounded-xl px-2 py-1 flex-1"
       />
       <button
         onClick={() => {
           addStep(goalId, input);
           setInput("");
         }}
-        className="px-3 py-1 bg-var(--button-color) text-white rounded"
+        className="px-3 py-1 bg-var(--button-color) border border-black text-white rounded-xl"
       >
         Add Step
       </button>

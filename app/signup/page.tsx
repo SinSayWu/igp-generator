@@ -2,8 +2,8 @@ import Link from "next/link";
 
 export default function Signup() {
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
+        <div className="min-h-screen flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-md w-full space-y-8 bg-white p-8 border border-black rounded-2xl">
                 <div className="text-center">
                     <h1 className="text-4xl font-extrabold text-[#d70026] tracking-tight">
                         Join Summit
@@ -16,7 +16,7 @@ export default function Signup() {
                 <div className="mt-8 space-y-4">
                     <Link
                         href="/student/signup"
-                        className="group relative w-full flex flex-col items-center justify-center py-6 px-4 border-2 border-red-100 rounded-xl hover:border-[#d70026] bg-white hover:bg-red-50 transition-all duration-200"
+                        className="group relative w-full flex flex-col items-center justify-center py-6 px-4 border border-black rounded-xl bg-white hover:bg-gray-50 transition-all duration-200"
                     >
                          <span className="text-3xl mb-2">🎓</span>
                         <span className="text-lg font-bold text-gray-900 group-hover:text-[#d70026]">
@@ -29,7 +29,7 @@ export default function Signup() {
 
                     <Link
                         href="/admin/signup"
-                        className="group relative w-full flex flex-col items-center justify-center py-6 px-4 border-2 border-gray-100 rounded-xl hover:border-gray-400 bg-gray-50 hover:bg-gray-100 transition-all duration-200"
+                        className="group relative w-full flex flex-col items-center justify-center py-6 px-4 border border-black rounded-xl bg-white hover:bg-gray-50 transition-all duration-200"
                     >
                          <span className="text-3xl mb-2">🛡️</span>
                         <span className="text-lg font-bold text-gray-900 group-hover:text-gray-700">

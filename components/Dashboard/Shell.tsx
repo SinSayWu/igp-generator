@@ -5,7 +5,7 @@ import Overview from "./Overview";
 import ClassesPage from "./Classes";
 import Extracurriculars from "./Extracurriculars";
 import Colleges from "./Colleges";
-import Jobs from "./Jobs";
+import Opportunities from "./Opportunities";
 import Goals from "./Goals";
 import { StudentCourseData, ClubData, SportData, CollegeData, CourseCatalogItem } from "./types";
 
@@ -23,6 +23,7 @@ type DashboardUser = {
     lastName: string;
     role: string;
     student?: {
+        userId: string;
         schoolId: string | null;
         gradeLevel: number; // Added
         postHighSchoolPlan: string | null;
@@ -83,7 +84,7 @@ export default function DashboardShell({ user, courseCatalog = [] }: DashboardSh
                     badge: studentCounts.targetColleges,
                 });
             }
-            result.push({ id: "jobs", label: "Jobs & Internships" });
+            result.push({ id: "jobs", label: "Opportunities" });
             result.push({ id: "chatbot", label: "ChatBot" });
             result.push({ id: "goals", label: "Goals" });
         } else {
@@ -109,7 +110,7 @@ export default function DashboardShell({ user, courseCatalog = [] }: DashboardSh
                     color: "var(--foreground-2)",
                     borderBottom: "2px solid var(--accent-background)",
                 }}
-                className="shadow p-4 border-b-2"
+                className="p-4 border-b border-black md:border-stone-800"
             >
                 {/* Top row with title and welcome message */}
                 <div className="flex justify-between items-center mb-4">
@@ -124,7 +125,7 @@ export default function DashboardShell({ user, courseCatalog = [] }: DashboardSh
                             key={tab.id}
                             className={
                                 safeActiveTab === tab.id
-                                    ? "border-b-2 border-[var(--accent-background)]"
+                                    ? "border-b border-[var(--accent-background)]"
                                     : "opacity-70 hover:opacity-100"
                             }
                             onClick={() => setActiveTab(tab.id)}
@@ -156,6 +157,7 @@ export default function DashboardShell({ user, courseCatalog = [] }: DashboardSh
                     <Extracurriculars
                         clubs={user.student?.clubs ?? []}
                         sports={user.student?.sports ?? []}
+                        studentId={user.student?.userId || ""}
                     />
                 )}
                 {safeActiveTab === "colleges" && (
@@ -164,7 +166,7 @@ export default function DashboardShell({ user, courseCatalog = [] }: DashboardSh
                         initialSummary={user.student?.collegePlanSummary ?? ""}
                     />
                 )}
-                {safeActiveTab === "jobs" && <Jobs />}
+                {safeActiveTab === "jobs" && <Opportunities studentId={user.student?.userId || ""} />}
                 {safeActiveTab === "goals" && <Goals />}
                 {safeActiveTab === "chatbot" && (
                     <div className="flex flex-col gap-6">

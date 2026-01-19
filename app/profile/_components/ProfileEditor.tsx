@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition, ReactNode, useEffect, useRef, useCallback } from "react";
-import { Club, Sport, Course, Student, College, Program, StudentCourse } from "@prisma/client";
+import { Club, Sport, Course, Student, College, Program, StudentCourse, Opportunity } from "@prisma/client";
 
 import { updateStudentProfile } from "@/app/actions/update-profile";
 import { deleteAccount } from "@/app/actions/delete-account";
@@ -20,6 +20,7 @@ type StudentWithRelations = Student & {
     studentCourses: (StudentCourse & { course: Course })[];
     targetColleges: College[];
     focusPrograms: Program[];
+    savedOpportunities: Opportunity[];
 };
 
 type Props = {
@@ -30,6 +31,7 @@ type Props = {
     allCourses: Course[];
     allColleges: College[];
     allPrograms: Program[];
+    allOpportunities: Opportunity[];
     schoolRigorLevels: string[];
 };
 
@@ -40,7 +42,7 @@ interface SelectableItem {
     type?: "club" | "sport" | "course"; // Added for specific icon/badge styling
 }
 
-type RawActivityItem = Club | Sport | Course;
+type RawActivityItem = Club | Sport | Course | Opportunity;
 
 // --- UTILITY COMPONENTS ---
 
@@ -50,7 +52,7 @@ type RawActivityItem = Club | Sport | Course;
  */
 const SectionCard = ({ children, className = "" }: { children: ReactNode; className?: string }) => (
     <div
-        className={`bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden transition-all hover:shadow-md ${className}`}
+        className={`bg-white border border-black rounded-2xl overflow-hidden ${className}`}
     >
         <div className="p-6 sm:p-8">{children}</div>
     </div>
@@ -66,6 +68,7 @@ export default function ProfileEditor({
     allCourses,
     allColleges,
     allPrograms,
+    allOpportunities,
     schoolRigorLevels,
 }: Props) {
     const [isPending, startTransition] = useTransition();
@@ -92,10 +95,10 @@ export default function ProfileEditor({
     const [minStudyHalls, setMinStudyHalls] = useState(student.studyHallsPerYear || 0);
     // Fallback to min if max is not set (handles migration from single-value schema)
     const [maxStudyHalls, setMaxStudyHalls] = useState(
-        student.maxStudyHallsPerYear || student.studyHallsPerYear || 0
+        (student as any).maxStudyHallsPerYear || student.studyHallsPerYear || 0
     );
     const [wantsStudyHalls, setWantsStudyHalls] = useState(
-        (student.maxStudyHallsPerYear || 0) > 0 || (student.studyHallsPerYear || 0) > 0
+        ((student as any).maxStudyHallsPerYear || 0) > 0 || (student.studyHallsPerYear || 0) > 0
     );
 
     // 2. Course Data State (Grades, Stress, etc.)
@@ -104,7 +107,7 @@ export default function ProfileEditor({
     >(
         new Map(
             student.studentCourses
-                .filter((sc) => sc.status !== "PLANNED") // Filter first
+                .filter((sc) => (sc.status as any) !== "PLANNED") // Filter first
                 .map((sc) => [
                     sc.courseId,
                     {
@@ -130,26 +133,29 @@ export default function ProfileEditor({
 
     // 4. Activity Lists & Logic
     const formatItem = (
-        item: RawActivityItem,
+        item: any,
         type: "club" | "sport" | "course"
     ): SelectableItem => {
         let detail: string | null = null;
-        if ("category" in item) {
-            const club = item as Club;
-            detail = club.category;
-            if (club.teacherLeader) {
-                detail += ` • Sponsor: ${club.teacherLeader}`;
+        if (item.category) {
+            detail = item.category;
+            if (item.teacherLeader) {
+                detail += ` • Sponsor: ${item.teacherLeader}`;
             }
-        } else if ("season" in item) detail = item.season;
-        else if ("department" in item) {
-            // Enhanced Course Detail: "Math | AP | 1.0cr"
+        } else if (item.season) {
+            detail = item.season;
+        } else if (item.department) {
             const parts = [item.department];
             if (item.level) parts.push(item.level);
             if (item.credits) parts.push(`${item.credits}cr`);
             detail = parts.join(" • ");
+        } else if (item.organization) {
+            detail = item.organization;
+            if (item.type) detail += ` • ${item.type}`;
         }
 
-        return { id: item.id, name: item.name, detail, type };
+        const name = item.title || item.name;
+        return { id: item.id, name, detail, type };
     };
 
     const [myClubs, setMyClubs] = useState<SelectableItem[]>(
@@ -160,13 +166,24 @@ export default function ProfileEditor({
     );
     const [myCourses, setMyCourses] = useState<SelectableItem[]>(
         student.studentCourses
-            .filter((sc) => sc.status !== "PLANNED") // Filter out PLANNED courses from the UI list
+            .filter((sc) => (sc.status as any) !== "PLANNED") // Filter out PLANNED courses from the UI list
             .map((i) => formatItem(i.course, "course"))
+    );
+
+    const [myOpportunities, setMyOpportunities] = useState<SelectableItem[]>(
+        student.savedOpportunities.map((i) => formatItem(i, "course")) // Using course type for visual or maybe I should add opportunity type
     );
 
     const [selClub, setSelClub] = useState("");
     const [selSport, setSelSport] = useState("");
     const [selCourse, setSelCourse] = useState("");
+    const [selOp, setSelOp] = useState("");
+
+    // 5. LLM State
+    const [clubRecs, setClubRecs] = useState<any[]>([]);
+    const [opRecs, setOpRecs] = useState<any[]>([]);
+    const [generatingClubs, setGeneratingClubs] = useState(false);
+    const [generatingOps, setGeneratingOps] = useState(false);
 
     const [pendingCourseData, setPendingCourseData] = useState<{
         status: string;
@@ -255,6 +272,39 @@ export default function ProfileEditor({
             const newData = new Map(courseData);
             newData.delete(id);
             setCourseData(newData);
+        }
+    };
+
+    const handleRecommend = async (type: "club" | "opportunity") => {
+        if (type === "club") setGeneratingClubs(true);
+        else setGeneratingOps(true);
+
+        try {
+            const res = await fetch("/api/llm/recommendations", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ studentId: student.userId, type }),
+            });
+            const data = await res.json();
+            if (data.recommendations) {
+                if (type === "club") setClubRecs(data.recommendations);
+                else setOpRecs(data.recommendations);
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            if (type === "club") setGeneratingClubs(false);
+            else setGeneratingOps(false);
+        }
+    };
+
+    const addFromRec = (rec: any) => {
+        if (rec.actionPlan) {
+            // It's a club
+            addItem(rec.id, allClubs, myClubs, setMyClubs, setSelClub, "club");
+        } else {
+            // It's an opportunity
+            addItem(rec.id, allOpportunities, myOpportunities, setMyOpportunities, setSelOp, "course");
         }
     };
 
@@ -377,14 +427,14 @@ export default function ProfileEditor({
                                 <button
                                     type="button"
                                     onClick={() => setShowDeleteConfirm(false)}
-                                    className="flex-1 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors"
+                                    className="flex-1 px-4 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="button"
                                     onClick={confirmDelete}
-                                    className="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl shadow-lg shadow-red-200 hover:shadow-red-300 transition-all active:scale-95"
+                                    className="flex-1 px-4 py-3 bg-red-600 text-white font-bold rounded-xl shadow-lg shadow-red-200 active:scale-95"
                                 >
                                     {isPending ? "Deleting..." : "Delete Account"}
                                 </button>
@@ -416,6 +466,9 @@ export default function ProfileEditor({
                         ))}
                         {mySports.map((i) => (
                             <input key={i.id} type="hidden" name="sportIds" value={i.id} />
+                        ))}
+                        {myOpportunities.map((i) => (
+                            <input key={i.id} type="hidden" name="opportunityIds" value={i.id} />
                         ))}
                         {selectedProgramIds.map((id) => (
                             <input key={id} type="hidden" name="programIds" value={id} />
@@ -520,7 +573,7 @@ export default function ProfileEditor({
                                 if (checked) {
                                     // Set default range when enabling
                                     setMinStudyHalls(0);
-                                    setMaxStudyHalls(3);
+                                    setMaxStudyHalls((student as any).maxStudyHallsPerYear || 0);
                                 } else {
                                     setMinStudyHalls(0);
                                     setMaxStudyHalls(0);
@@ -570,6 +623,10 @@ export default function ProfileEditor({
                             }
                             onRemove={(id) => removeItem(id, myClubs, setMyClubs)}
                             placeholder="Select a club..."
+                            recommendations={clubRecs}
+                            isGenerating={generatingClubs}
+                            onRecommend={() => handleRecommend("club")}
+                            onAddFromRec={addFromRec}
                         />
                     </div>
 
@@ -604,6 +661,25 @@ export default function ProfileEditor({
                         onToggleCourseExpand={toggleCourseExpand}
                     />
 
+                    {/* --- OPPORTUNITIES SECTION --- */}
+                    <SectionTable
+                        title="Opportunities"
+                        icon="🌟"
+                        items={myOpportunities}
+                        allRawItems={allOpportunities}
+                        selectedId={selOp}
+                        onSelect={setSelOp}
+                        onAdd={() =>
+                            addItem(selOp, allOpportunities, myOpportunities, setMyOpportunities, setSelOp, "course")
+                        }
+                        onRemove={(id) => removeItem(id, myOpportunities, setMyOpportunities)}
+                        placeholder="Select an opportunity..."
+                        recommendations={opRecs}
+                        isGenerating={generatingOps}
+                        onRecommend={() => handleRecommend("opportunity")}
+                        onAddFromRec={addFromRec}
+                    />
+
                     {/* --- DANGER ZONE --- */}
                     <div className="mt-12 border-t border-slate-200 pt-8">
                         <h3 className="text-lg font-bold text-red-600 mb-4">Danger Zone</h3>
@@ -618,7 +694,7 @@ export default function ProfileEditor({
                             <button
                                 type="button"
                                 onClick={handleDeleteAccount}
-                                className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-sm transition-colors text-sm"
+                                className="bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-sm text-sm"
                             >
                                 Delete Account
                             </button>
@@ -668,7 +744,7 @@ export default function ProfileEditor({
                                 <button
                                     type="submit"
                                     disabled={isPending}
-                                    className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold py-2 px-5 rounded-full shadow-md transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
+                                    className="bg-indigo-600 text-white text-sm font-bold py-2 px-5 rounded-full shadow-md active:scale-95 flex items-center gap-2"
                                 >
                                     Save
                                 </button>
@@ -715,6 +791,10 @@ interface SectionTableProps {
     }) => void;
     expandedCourses?: Set<string>;
     onToggleCourseExpand?: (courseId: string) => void;
+    recommendations?: any[];
+    isGenerating?: boolean;
+    onRecommend?: () => void;
+    onAddFromRec?: (rec: any) => void;
 }
 
 function SectionTable({
@@ -734,6 +814,10 @@ function SectionTable({
     onPendingCourseDataChange,
     expandedCourses,
     onToggleCourseExpand,
+    recommendations = [],
+    isGenerating = false,
+    onRecommend,
+    onAddFromRec,
 }: SectionTableProps) {
     const availableItems = allRawItems.filter(
         (raw) => !items.some((existing) => existing.id === raw.id)
@@ -749,8 +833,8 @@ function SectionTable({
         if (!isCourseSection) return;
         if (selectedId) {
             const item = allRawItems.find((i) => i.id === selectedId);
-            if (item && item.name !== searchTerm) {
-                setSearchTerm(item.name);
+            if (item && ("name" in item ? item.name : "title" in item ? item.title : "") !== searchTerm) {
+                setSearchTerm("name" in item ? item.name : "title" in item ? item.title : "");
             }
         } else {
             setSearchTerm("");
@@ -769,18 +853,16 @@ function SectionTable({
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    const filteredItems = availableItems.filter((item) => {
+    const filteredItems = availableItems.filter((item: any) => {
         if (!searchTerm) return true;
         const lowerSearch = searchTerm.toLowerCase();
-        const detail =
-            ("department" in item && item.department) ||
-            ("category" in item && item.category) ||
-            ("season" in item && item.season) ||
-            "";
-        const code = "code" in item ? String(item.code || "") : "";
+        
+        const detail = item.department || item.category || item.season || item.organization || "";
+        const code = String(item.code || "");
+        const name = item.title || item.name || "";
 
         return (
-            item.name.toLowerCase().includes(lowerSearch) ||
+            name.toLowerCase().includes(lowerSearch) ||
             String(detail).toLowerCase().includes(lowerSearch) ||
             code.toLowerCase().includes(lowerSearch)
         );
@@ -803,14 +885,65 @@ function SectionTable({
                 <h3 className="font-bold text-lg text-slate-800 flex items-center gap-2">
                     {icon && <span>{icon}</span>} {title}
                 </h3>
-                {items.length > 0 && (
-                    <span className="bg-indigo-100 text-indigo-700 text-xs font-bold px-2.5 py-0.5 rounded-full">
-                        {items.length} Added
-                    </span>
+                {onRecommend && (
+                    <button
+                        type="button"
+                        onClick={onRecommend}
+                        disabled={isGenerating}
+                        className="text-xs font-bold text-[#d70026] border-2 border-[#d70026] px-3 py-1.5 bg-[#d70026] text-white transition-all disabled:opacity-50"
+                    >
+                        {isGenerating ? "Analyzing..." : "Find Recommended"}
+                    </button>
                 )}
             </div>
 
             <div className="p-6 flex-1 flex flex-col gap-6">
+                {/* AI Recommendations */}
+                {recommendations.length > 0 && (
+                    <div className="mb-6 animate-in fade-in slide-in-from-top-4">
+                        <h4 className="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
+                            <span>✨</span> Suggested for You
+                        </h4>
+                        <div className="grid grid-cols-1 gap-4">
+                            {recommendations.map((rec, idx) => {
+                                const isAdded = items.some(i => i.id === rec.id);
+                                return (
+                                    <div key={idx} className="border-2 border-black p-4 bg-white relative">
+                                        <div className="flex justify-between items-start mb-2">
+                                            <h5 className="font-bold text-slate-900">{rec.name || rec.title}</h5>
+                                            {!isAdded && onAddFromRec && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => onAddFromRec(rec)}
+                                                    className="text-xs font-bold bg-black text-white px-3 py-1 border-2 border-black transition-all"
+                                                >
+                                                    Add to List
+                                                </button>
+                                            )}
+                                        </div>
+                                        <p className="text-sm text-slate-600 mb-3 italic">"{rec.justification || rec.matchReason}"</p>
+                                        {rec.actionPlan && (
+                                            <div className="bg-slate-50 border border-slate-200 p-3 text-xs">
+                                                <p className="font-bold text-slate-900 mb-1">Action Plan:</p>
+                                                <p className="text-slate-600">{rec.actionPlan}</p>
+                                            </div>
+                                        )}
+                                        {rec.generatedTags && (
+                                            <div className="flex gap-2 mt-2">
+                                                {rec.generatedTags.map((tag: string) => (
+                                                    <span key={tag} className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 px-2 py-0.5 border border-slate-200">
+                                                        {tag}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+
                 {/* List of Items */}
                 <div className="flex flex-wrap gap-3">
                     {items.length === 0 ? (
@@ -830,7 +963,7 @@ function SectionTable({
                                         ${
                                             isExpanded
                                                 ? "border-indigo-200 bg-indigo-50/30 ring-1 ring-indigo-200 w-full"
-                                                : "border-slate-200 hover:border-indigo-300 bg-white hover:shadow-md max-w-xs"
+                                                : "border-slate-200 bg-white shadow-md max-w-xs"
                                         }
                                     `}
                                 >
@@ -868,7 +1001,7 @@ function SectionTable({
                                                 <button
                                                     type="button"
                                                     onClick={() => onToggleCourseExpand(item.id)}
-                                                    className="text-xs font-medium text-indigo-600 hover:bg-indigo-50 px-3 py-1.5 rounded transition"
+                                                    className="text-xs font-medium text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded transition"
                                                 >
                                                     {isExpanded ? "Done" : "Details"}
                                                 </button>
@@ -876,7 +1009,7 @@ function SectionTable({
                                             <button
                                                 type="button"
                                                 onClick={() => onRemove(item.id)}
-                                                className="text-slate-400 hover:text-red-500 hover:bg-red-50 p-1.5 rounded transition"
+                                                className="text-slate-400 bg-red-50 p-1.5 rounded transition"
                                                 title="Remove"
                                             >
                                                 <svg
@@ -1133,7 +1266,8 @@ function SectionTable({
                                             pendingCourseData.status === "IN_PROGRESS") && (
                                             <div>
                                                 <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
-                                                    Grade <span className="text-red-500">*</span>
+                                                    Grade{" "}
+                                                    <span className="text-red-500">*</span>
                                                 </label>
                                                 <select
                                                     required
@@ -1270,39 +1404,29 @@ function SectionTable({
                                                     </div>
                                                 ) : (
                                                     filteredItems.map((item) => {
-                                                        let detail: string | null = null;
-                                                        if ("department" in item) {
-                                                            const parts = [item.department];
-                                                            if (item.level) parts.push(item.level);
-                                                            if (item.credits)
-                                                                parts.push(`${item.credits}cr`);
-                                                            detail = parts.join(" • ");
-                                                        } else if ("category" in item) {
-                                                            const club = item as Club;
-                                                            detail = club.category;
-                                                            if (club.teacherLeader) {
-                                                                detail += ` • Sponsor: ${club.teacherLeader}`;
-                                                            }
-                                                        } else if ("season" in item) {
-                                                            detail = (item as Sport).season;
-                                                        }
+                                                        const detail = "availableGrades" in item ? (item as any).level : "category" in item ? (item as any).teacherLeader : "";
+                                                        const creditsStr = "credits" in item ? String((item as any).credits || "") : "";
+                                                        const name = "title" in item ? (item as any).title : (item as any).name;
                                                         return (
                                                             <button
                                                                 key={item.id}
                                                                 type="button"
                                                                 onClick={() => {
                                                                     onSelect(item.id);
-                                                                    setSearchTerm(item.name);
+                                                                    setSearchTerm(name);
                                                                     setIsDropdownOpen(false);
                                                                 }}
-                                                                className="w-full text-left px-4 py-2 text-sm hover:bg-slate-50 flex items-center justify-between group"
+                                                                className="w-full text-left px-4 py-2 text-sm flex items-center justify-between group"
                                                             >
-                                                                <span className="font-medium text-slate-700 group-hover:text-indigo-700">
-                                                                    {item.name}
+                                                                <span className="font-bold text-slate-400 capitalize">
+                                                                    {(item as any).type || "activity"}
+                                                                </span>
+                                                                <span className="font-bold text-slate-700">
+                                                                    {(item as any).name || (item as any).title}
                                                                 </span>
                                                                 {detail && (
-                                                                    <span className="text-xs text-slate-400 group-hover:text-indigo-400">
-                                                                        {detail}
+                                                                    <span className="text-xs text-slate-400">
+                                                                        {detail} {creditsStr && `(${creditsStr})`}
                                                                     </span>
                                                                 )}
                                                             </button>
@@ -1321,25 +1445,12 @@ function SectionTable({
                                         >
                                             <option value="">{placeholder}</option>
                                             {availableItems.map((item) => {
-                                                let detail: string | null = null;
-                                                if ("department" in item) {
-                                                    const parts = [item.department];
-                                                    if (item.level) parts.push(item.level);
-                                                    if (item.credits)
-                                                        parts.push(`${item.credits}cr`);
-                                                    detail = parts.join(" • ");
-                                                } else if ("category" in item) {
-                                                    const club = item as Club;
-                                                    detail = club.category;
-                                                    if (club.teacherLeader) {
-                                                        detail += ` • Sponsor: ${club.teacherLeader}`;
-                                                    }
-                                                } else if ("season" in item) {
-                                                    detail = (item as Sport).season;
-                                                }
+                                                const detail = "availableGrades" in item ? (item as any).level : "category" in item ? (item as any).teacherLeader : "";
+                                                const creditsStr = "credits" in item ? String((item as any).credits || "") : "";
+                                                const name = "title" in item ? (item as any).title : (item as any).name;
                                                 return (
                                                     <option key={item.id} value={item.id}>
-                                                        {item.name} {detail ? `(${detail})` : ""}
+                                                        {name}
                                                     </option>
                                                 );
                                             })}

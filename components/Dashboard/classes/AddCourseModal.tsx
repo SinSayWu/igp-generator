@@ -67,9 +67,9 @@ export default function AddCourseModal({
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
             <div
                 ref={modalRef}
-                className="relative w-[900px] max-w-[96vw] max-h-[90vh] bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-visible flex flex-col"
+                className="relative w-[900px] max-w-[96vw] max-h-[90vh] bg-white rounded-2xl border border-black overflow-visible flex flex-col"
             >
-                <div className="px-8 py-5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                <div className="px-8 py-5 bg-slate-50 border-b border-black flex items-center justify-between">
                     <div className="text-lg font-semibold text-slate-800">
                         Add a taken or in-progress course
                     </div>
@@ -247,7 +247,7 @@ export default function AddCourseModal({
                     )}
                 </div>
 
-                <div className="border-t border-slate-200 px-8 py-6 bg-white overflow-visible">
+                <div className="border-t border-black px-8 py-6 bg-white overflow-visible">
                     <div className="flex flex-col sm:flex-row gap-3">
                         <div className="relative flex-1" ref={dropdownRef}>
                             <input
@@ -260,7 +260,7 @@ export default function AddCourseModal({
                                 ref={courseSearchRef}
                             />
                             {isCourseDropdownOpen && (
-                                <div className="absolute z-[90] left-0 right-0 bottom-full mb-2 max-h-72 overflow-y-auto bg-white border border-slate-200 rounded-lg shadow-lg">
+                                <div className="absolute z-[90] left-0 right-0 bottom-full mb-2 max-h-72 overflow-y-auto bg-white border border-black rounded-xl">
                                     {filteredCourses.length === 0 ? (
                                         <div className="p-4 text-base text-slate-500 text-center">
                                             No matches found
@@ -304,11 +304,11 @@ export default function AddCourseModal({
                                     onClick={onDeleteCourse}
                                     disabled={isMutating}
                                     className={`
-                                        px-5 py-3 rounded-lg text-base font-semibold transition-all
+                                        px-5 py-3 rounded-xl text-base font-semibold transition-all border border-black
                                         ${
                                             isMutating
                                                 ? "bg-rose-100 text-rose-300 cursor-not-allowed"
-                                                : "bg-rose-500 text-white hover:bg-rose-600 hover:shadow-md active:scale-95"
+                                                : "bg-rose-500 text-white hover:bg-rose-600 active:scale-95"
                                         }
                                     `}
                                 >
@@ -319,14 +319,7 @@ export default function AddCourseModal({
                                 type="button"
                                 onClick={onAddCourse}
                                 disabled={!selectedCourseId || !isPendingValid() || isMutating}
-                                className={`
-                                    px-6 py-3 rounded-lg text-base font-bold shadow-sm transition-all
-                                    ${
-                                        selectedCourseId && isPendingValid() && !isMutating
-                                            ? "bg-slate-800 text-white hover:bg-slate-900 hover:shadow-md active:scale-95"
-                                            : "bg-slate-100 text-slate-400 cursor-not-allowed"
-                                    }
-                                `}
+                                className="px-6 py-3 rounded-xl text-base font-bold transition-all"
                             >
                                 {editingCourseId ? "Save" : "Add Course"}
                             </button>

@@ -19,6 +19,7 @@ export default async function StudentProfileForm({ userId }: { userId: string })
     const student = await prisma.student.findUnique({
         where: { userId: userId },
         include: {
+            user: true,
             clubs: true,
             sports: true,
             studentCourses: {
@@ -28,34 +29,35 @@ export default async function StudentProfileForm({ userId }: { userId: string })
             },
             targetColleges: true,
             focusPrograms: true,
-        },
+            savedOpportunities: true, // Ensure this relation is included
+        } as any, // Cast the include object to any to bypass potential type issues
     });
 
     // Validate student exists and is assigned to a school
-    if (!student || !student.schoolId) {
+    if (!student || !(student as any).schoolId) { // Cast student to any for schoolId access if needed
         return <div>Error: Student not assigned to a school.</div>;
     }
 
     // --- STEP 2: Fetch all available options for the student's school ---
     // Activities & Courses (school-specific)
     const allClubs = await prisma.club.findMany({
-        where: { schoolId: student.schoolId },
+        where: { schoolId: (student as any).schoolId },
         orderBy: { name: "asc" },
     });
 
     const allSports = await prisma.sport.findMany({
-        where: { schoolId: student.schoolId },
+        where: { schoolId: (student as any).schoolId },
         orderBy: { name: "asc" },
     });
 
     const allCourses = await prisma.course.findMany({
-        where: { schoolId: student.schoolId },
+        where: { schoolId: (student as any).schoolId },
         orderBy: [{ department: "asc" }, { name: "asc" }],
     });
 
     // Programs & Pathways (school-specific)
     const schoolPrograms = await prisma.program.findMany({
-        where: { schoolId: student.schoolId },
+        where: { schoolId: (student as any).schoolId },
         orderBy: { name: "asc" },
     });
 
@@ -63,10 +65,14 @@ export default async function StudentProfileForm({ userId }: { userId: string })
     const allColleges = await prisma.college.findMany({
         orderBy: { name: "asc" },
     });
+    
+    const allOpportunities = await (prisma as any).opportunity.findMany({
+        orderBy: { title: "asc" },
+    });
 
     const school = await prisma.school.findUnique({
-        where: { id: student.schoolId },
-        select: { rigorLevels: true },
+        where: { id: (student as any).schoolId },
+        select: { rigorLevels: true } as any,
     });
 
     // --- STEP 3: Render ProfileEditor with all data ---
@@ -74,13 +80,14 @@ export default async function StudentProfileForm({ userId }: { userId: string })
     return (
         <ProfileEditor
             userId={userId}
-            student={student}
-            allClubs={allClubs}
-            allSports={allSports}
-            allCourses={allCourses}
-            allColleges={allColleges}
-            allPrograms={schoolPrograms}
-            schoolRigorLevels={school?.rigorLevels ?? ["CP", "Honors", "AP"]}
+            student={student as any}
+            allClubs={allClubs as any}
+            allSports={allSports as any}
+            allCourses={allCourses as any}
+            allColleges={allColleges as any}
+            allPrograms={schoolPrograms as any}
+            allOpportunities={allOpportunities as any}
+            schoolRigorLevels={(school as any)?.rigorLevels ?? ["CP", "Honors", "AP"]}
         />
     );
 }

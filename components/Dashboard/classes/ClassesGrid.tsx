@@ -51,8 +51,8 @@ export default function ClassesGrid({
         return [...fullCredit, ...halfSlots];
     };
     return (
-        <section className="rounded-xl shadow-lg border border-slate-200 bg-white">
-            <div className="flex items-center justify-between p-6 bg-slate-50 border-b border-slate-200">
+        <section className="rounded-2xl border border-black bg-white">
+            <div className="flex items-center justify-between p-6 bg-slate-50 border-b border-black">
                 <div>
                     <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
                         <span>🗓️</span> Projected 4-Year Plan
@@ -64,7 +64,7 @@ export default function ClassesGrid({
             </div>
 
             <div className="px-6 pt-6 pb-6">
-                <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
                     <strong className="font-semibold">
                         Only add courses you’ve taken or are taking.
                     </strong>
@@ -73,7 +73,7 @@ export default function ClassesGrid({
             </div>
 
             <div className="bg-white relative mt-2">
-                <div className="flex divide-x divide-slate-200 border-b border-slate-200 bg-slate-50">
+                <div className="flex divide-x divide-black border-b border-black bg-slate-50">
                     {[
                         { key: "MS", label: "Middle School" },
                         { key: "9", label: "9th Grade" },
@@ -93,7 +93,7 @@ export default function ClassesGrid({
                         </div>
                     ))}
                 </div>
-                <div className="flex divide-x divide-slate-200">
+                <div className="flex divide-x divide-black">
                     {["MS", "9", "10", "11", "12"].map((gradeKey) => {
                         const gradeCourses = scheduleByGrade[gradeKey] || [];
                         const isFuture = isFutureGrade(gradeKey);
@@ -141,7 +141,7 @@ export default function ClassesGrid({
                         return (
                             <div
                                 key={gradeKey}
-                                className={`relative flex-1 divide-y divide-slate-100 ${
+                                className={`relative flex-1 divide-y divide-black/10 ${
                                     showLoading ? "overflow-hidden" : ""
                                 }`}
                             >

@@ -1,0 +1,1047 @@
+[
+  {
+    "id": "op-001",
+    "title": "Clemson University Summer Scholars (various 1-week courses)",
+    "organization": "Clemson University",
+    "location": { "mode": "in_person", "city": "Clemson", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "pre_college_program",
+    "paid": false,
+    "time_of_year": "Summer",
+    "time_commitment": {
+      "duration_weeks": 1,
+      "typical_hours_per_day": "Full-day program (classes + activities)",
+      "schedule": "Multiple 1-week sessions each summer (dates vary by course/session)"
+    },
+    "eligibility": "Rising grades 7–12 (up to age 17 at time of camp); course-specific grade requirements",
+    "deadline_or_application_window": "Registration opens mid-January; courses fill on a rolling basis",
+    "description": "One-week immersive courses on Clemson’s campus across many fields (engineering, architecture, music production, etc.).",
+    "link": "https://www.clemson.edu/summer/summer-scholars/"
+  },
+  {
+    "id": "op-002",
+    "title": "Summer Scholars: General Engineering (example course)",
+    "organization": "Clemson University Summer Scholars",
+    "location": { "mode": "in_person", "city": "Clemson", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "pre_college_program",
+    "paid": false,
+    "time_of_year": "Summer",
+    "time_commitment": {
+      "duration_weeks": 1,
+      "typical_hours_per_day": "Full-day",
+      "schedule": "Offered in select 1-week summer sessions (see course schedule)"
+    },
+    "eligibility": "High school grades vary by session/course; check course listing",
+    "deadline_or_application_window": "Rolling until filled",
+    "description": "Intro to multiple engineering disciplines with lab activities, tours, and STEM kits.",
+    "link": "https://www.clemson.edu/summer/summer-scholars/classes/general-engineering-high.html"
+  },
+  {
+    "id": "op-003",
+    "title": "Clemson Bioengineering Pre-College: Summer Science for High School Students",
+    "organization": "Clemson University Department of Bioengineering",
+    "location": { "mode": "in_person", "city": "Clemson", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "pre_college_program",
+    "paid": false,
+    "time_of_year": "Summer",
+    "time_commitment": {
+      "duration_weeks": 1,
+      "typical_hours_per_day": "Full-day",
+      "schedule": "One-week summer course (annual; dates posted by department)"
+    },
+    "eligibility": "High school students (course-specific requirements apply)",
+    "deadline_or_application_window": "Varies by year; typically spring/early summer",
+    "description": "Week-long introduction to bioengineering with surgery class and multiple labs (e.g., bioinstrumentation, cell culture).",
+    "link": "https://www.clemson.edu/cecas/departments/bioe/academics/pre-college.html"
+  },
+  {
+    "id": "op-004",
+    "title": "Prisma Health MedEx Academy (Tier I)",
+    "organization": "Prisma Health",
+    "location": { "mode": "in_person", "city": "Greenville", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "summer_program",
+    "paid": false,
+    "time_of_year": "Summer",
+    "time_commitment": {
+      "duration_weeks": 4,
+      "typical_hours_per_week": "Program schedule set by cohort (often weekday-based)",
+      "schedule": "Summer (annual)"
+    },
+    "eligibility": "Rising high school seniors; GPA and other requirements may apply (see program page)",
+    "deadline_or_application_window": "Applications typically open late fall; close in early spring",
+    "description": "Healthcare immersion with exposure to clinical environments, professional development, and career exploration.",
+    "link": "https://academics.prismahealth.org/academics/education/medex-academy"
+  },
+  {
+    "id": "op-005",
+    "title": "Prisma Health Youth Apprenticeship (CNA pathway)",
+    "organization": "Prisma Health Academics",
+    "location": { "mode": "in_person", "city": "Greenville", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "apprenticeship",
+    "paid": true,
+    "time_of_year": "School year + Summer",
+    "time_commitment": {
+      "duration_months": 18,
+      "typical_hours_per_week": "Part-time work + training (set by program)",
+      "schedule": "School-year + summer components (cohort-based)"
+    },
+    "eligibility": "High school students in eligible districts; age and academic requirements apply (see program page)",
+    "deadline_or_application_window": "Cohort-based; apply during published window",
+    "description": "Earn CNA training/experience while in high school through structured apprenticeship with clinical hours.",
+    "link": "https://academics.prismahealth.org/academic-programs/youth-apprenticeship"
+  },
+  {
+    "id": "op-006",
+    "title": "AnMed High School Summer Volunteer Program",
+    "organization": "AnMed Health",
+    "location": { "mode": "in_person", "city": "Anderson", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "volunteer",
+    "paid": false,
+    "time_of_year": "Summer",
+    "time_commitment": {
+      "duration_weeks": 2,
+      "typical_hours_per_week": "Mon–Fri, 8:30am–4:00pm (session-based)",
+      "schedule": "Two summer sessions (dates vary yearly)"
+    },
+    "eligibility": "Completed 9th grade; at least 15 years old by start date",
+    "deadline_or_application_window": "Spring (before summer sessions)",
+    "description": "Hospital volunteering supporting staff and visitors (transport, restocking, errands).",
+    "link": "https://anmed.org/volunteer/student"
+  },
+  {
+    "id": "op-007",
+    "title": "Prisma Health Teen Volunteer Application (system-wide)",
+    "organization": "Prisma Health",
+    "location": { "mode": "in_person", "city": "Multiple", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "volunteer",
+    "paid": false,
+    "time_of_year": "Year-round (summer-heavy)",
+    "time_commitment": {
+      "duration_weeks": "Varies (summer + ongoing options depending on campus)",
+      "typical_hours_per_week": "Shift-based (varies by department)",
+      "schedule": "Year-round + summer intakes"
+    },
+    "eligibility": "Teen volunteer track for ages 14–17 (campus-specific requirements may apply)",
+    "deadline_or_application_window": "Varies by campus; commonly spring intake for summer",
+    "description": "Hospital volunteer opportunities across Prisma facilities (roles vary by location).",
+    "link": "https://prismahealth.org/volunteers"
+  },
+  {
+    "id": "op-008",
+    "title": "Vitruvian Health (Hamilton) Summer Teen Volunteer Program",
+    "organization": "Vitruvian Health",
+    "location": { "mode": "in_person", "city": "Greenville", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "volunteer",
+    "paid": false,
+    "time_of_year": "Summer",
+    "time_commitment": {
+      "duration_weeks": "Summer (program-based)",
+      "typical_hours_per_week": "A few hours per week (shift-based)",
+      "schedule": "Summer"
+    },
+    "eligibility": "Ages 16–17 for the Summer Teen Volunteer program (see page for details)",
+    "deadline_or_application_window": "Seasonal (summer intake)",
+    "description": "Teen volunteer program in a healthcare setting; roles and schedules assigned by the site.",
+    "link": "https://vitruvianhealth.com/volunteer-at-hamilton/"
+  },
+  {
+    "id": "op-009",
+    "title": "Pickens County Library System Volunteer Program",
+    "organization": "Pickens County Library System",
+    "location": { "mode": "in_person", "city": "Multiple (Easley/Clemson/Pickens/Liberty)", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "volunteer",
+    "paid": false,
+    "time_of_year": "Year-round",
+    "time_commitment": {
+      "duration_weeks": "Ongoing",
+      "typical_hours_per_week": "Flexible (scheduled with branch)",
+      "schedule": "Year-round"
+    },
+    "eligibility": "Age 16+; parental consent required under 18",
+    "deadline_or_application_window": "Rolling",
+    "description": "Library volunteer roles such as shelving/straightening, Adopt-a-Shelf, outreach support, and more.",
+    "link": "https://pickenscountylibrarysystem.com/volunteer/"
+  },
+  {
+    "id": "op-010",
+    "title": "Pickens County Library Teen Advisory Board",
+    "organization": "Pickens County Library System",
+    "location": { "mode": "in_person", "city": "Pickens County", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "youth_advisory",
+    "paid": false,
+    "time_of_year": "School year",
+    "time_commitment": {
+      "duration_weeks": "School-year (typical)",
+      "typical_hours_per_month": "Meeting-based (varies)",
+      "schedule": "Regular meetings (check local branch)"
+    },
+    "eligibility": "Ages 12–18 enrolled in middle or high school",
+    "deadline_or_application_window": "Rolling/seasonal",
+    "description": "Help plan teen library programs and advise on services for teens.",
+    "link": "https://pickenscountylibrarysystem.com/wp-content/uploads/2018/03/teenadvisoryapp.pdf"
+  },
+  {
+    "id": "op-011",
+    "title": "Greenville County Library Teen Volunteer Options",
+    "organization": "Greenville County Library System",
+    "location": { "mode": "in_person", "city": "Greenville", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "volunteer",
+    "paid": false,
+    "time_of_year": "Year-round",
+    "time_commitment": {
+      "duration_weeks": "Ongoing",
+      "typical_hours_per_shift": "Often 1–2 hours (event-based) or flexible tasks",
+      "schedule": "Year-round"
+    },
+    "eligibility": "Teens (age requirements vary by activity/branch)",
+    "deadline_or_application_window": "Rolling",
+    "description": "Teen service times and other volunteer roles supporting library events and operations.",
+    "link": "https://www.greenvillelibrary.org/volunteer"
+  },
+  {
+    "id": "op-012",
+    "title": "The Children’s Museum of the Upstate Volunteer Program",
+    "organization": "The Children’s Museum of the Upstate",
+    "location": { "mode": "in_person", "city": "Greenville", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "volunteer",
+    "paid": false,
+    "time_of_year": "Year-round",
+    "time_commitment": {
+      "duration_weeks": "Ongoing",
+      "typical_hours_per_shift": "Shift-based",
+      "schedule": "Year-round"
+    },
+    "eligibility": "Teen and adult volunteers (age-specific roles may apply)",
+    "deadline_or_application_window": "Rolling",
+    "description": "Help guests, support exhibits/programs, and assist museum operations.",
+    "link": "https://www.tcmupstate.org/greenville/volunteer/"
+  },
+  {
+    "id": "op-013",
+    "title": "Greenville Theatre Volunteers (front-of-house + backstage)",
+    "organization": "Greenville Theatre",
+    "location": { "mode": "in_person", "city": "Greenville", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "volunteer",
+    "paid": false,
+    "time_of_year": "Year-round (production seasons)",
+    "time_commitment": {
+      "duration_weeks": "Production-based",
+      "typical_hours_per_shift": "Show/event shifts",
+      "schedule": "Evenings/weekends during runs"
+    },
+    "eligibility": "Teens and adults (some roles may have age minimums)",
+    "deadline_or_application_window": "Rolling",
+    "description": "Ushering, ticketing, concessions, set help, costumes, and more depending on needs.",
+    "link": "https://www.greenvilletheatre.org/participate/volunteer/"
+  },
+  {
+    "id": "op-014",
+    "title": "Clemson Little Theatre (Pendleton Playhouse) Volunteers",
+    "organization": "Clemson Little Theatre",
+    "location": { "mode": "in_person", "city": "Pendleton", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "volunteer",
+    "paid": false,
+    "time_of_year": "Year-round (production seasons)",
+    "time_commitment": {
+      "duration_weeks": "Production-based",
+      "typical_hours_per_week": "Varies by role (rehearsals/build days/show runs)",
+      "schedule": "Evenings/weekends"
+    },
+    "eligibility": "Open to community volunteers; minors need parent consent/supervision depending on task",
+    "deadline_or_application_window": "Rolling",
+    "description": "Help with productions: ushering, sets, tech, costumes, and auditions for shows.",
+    "link": "https://www.clemsonlittletheatre.org/get-involved"
+  },
+  {
+    "id": "op-015",
+    "title": "Greenville Zoo Volunteers (Teen opportunities)",
+    "organization": "Greenville Zoo",
+    "location": { "mode": "in_person", "city": "Greenville", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "volunteer",
+    "paid": false,
+    "time_of_year": "Year-round",
+    "time_commitment": {
+      "duration_weeks": "Ongoing",
+      "typical_hours_per_shift": "Event/program shifts",
+      "schedule": "Weekends + seasonal events"
+    },
+    "eligibility": "Teen volunteer roles available (training/orientation required; see zoo page)",
+    "deadline_or_application_window": "Rolling/intake-based",
+    "description": "Support education programs, engage visitors, and assist zoo operations.",
+    "link": "https://www.greenvillezoo.com/168/Volunteers"
+  },
+  {
+    "id": "op-016",
+    "title": "Roper Mountain Science Center Volunteers",
+    "organization": "Roper Mountain Science Center",
+    "location": { "mode": "in_person", "city": "Greenville", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "volunteer",
+    "paid": false,
+    "time_of_year": "Year-round (summer camps included)",
+    "time_commitment": {
+      "duration_weeks": "Ongoing",
+      "typical_hours_per_shift": "Event/camp shifts",
+      "schedule": "Weekends + summer camps"
+    },
+    "eligibility": "Teen volunteers typically accepted with training; requirements vary by role",
+    "deadline_or_application_window": "Rolling/seasonal",
+    "description": "Help run science programs, public events, camps, and exhibit support.",
+    "link": "https://www.ropermountain.org/pages.asp?titleid=volunteers"
+  },
+  {
+    "id": "op-017",
+    "title": "City of Greenville Youth Commission",
+    "organization": "City of Greenville",
+    "location": { "mode": "in_person", "city": "Greenville", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "civic_leadership",
+    "paid": false,
+    "time_of_year": "School year",
+    "time_commitment": {
+      "duration_months": 9,
+      "typical_hours_per_month": "Meeting-based (twice monthly, plus projects)",
+      "schedule": "School-year"
+    },
+    "eligibility": "High school students who live in or attend school in Greenville (see city page)",
+    "deadline_or_application_window": "Annual (spring application cycle)",
+    "description": "Youth advisory body that engages with city leadership and community issues.",
+    "link": "https://greenvillesc.gov/1247/Youth-Commission"
+  },
+  {
+    "id": "op-018",
+    "title": "Greenville County Youth Board (Phoenix Center)",
+    "organization": "Phoenix Center",
+    "location": { "mode": "in_person", "city": "Greenville", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "youth_board",
+    "paid": false,
+    "time_of_year": "School year",
+    "time_commitment": {
+      "duration_months": 9,
+      "typical_hours_per_month": "Two meetings/month + events",
+      "schedule": "School-year"
+    },
+    "eligibility": "Rising 9th–12th graders in Greenville County (see Phoenix Center page)",
+    "deadline_or_application_window": "Annual intake",
+    "description": "Substance-use prevention youth board focused on leadership and community outreach.",
+    "link": "https://phoenixcenter.org/service/youth-board/"
+  },
+  {
+    "id": "op-019",
+    "title": "Junior Leadership Pickens County",
+    "organization": "Greater Easley Chamber of Commerce",
+    "location": { "mode": "in_person", "city": "Pickens County", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "leadership_program",
+    "paid": false,
+    "time_of_year": "School year",
+    "time_commitment": {
+      "duration_months": 9,
+      "typical_hours_per_month": "Monthly sessions + activities",
+      "schedule": "School-year (junior year)"
+    },
+    "eligibility": "High school juniors in Pickens County (selection-based; one per school typical)",
+    "deadline_or_application_window": "Late summer/early fall",
+    "description": "Leadership development with community exposure to business, government, and civic life.",
+    "link": "https://easleychamber.net/junior-leadership-pickens-county"
+  },
+  {
+    "id": "op-020",
+    "title": "Junior Leadership Anderson",
+    "organization": "Anderson Area Chamber of Commerce",
+    "location": { "mode": "in_person", "city": "Anderson", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "leadership_program",
+    "paid": false,
+    "time_of_year": "Spring",
+    "time_commitment": {
+      "duration_months": 5,
+      "typical_hours_per_month": "Monthly themed sessions",
+      "schedule": "Spring semester (typical)"
+    },
+    "eligibility": "High school juniors in Anderson area (selection-based)",
+    "deadline_or_application_window": "Fall (typical)",
+    "description": "Leadership program that explores community sectors and develops youth leadership skills.",
+    "link": "https://www.andersonscchamber.com/leadership-programs"
+  },
+  {
+    "id": "op-021",
+    "title": "YMCA Youth in Government (SC)",
+    "organization": "YMCA of Greenville / YMCA YIG",
+    "location": { "mode": "hybrid", "city": "Greenville", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "civic_program",
+    "paid": false,
+    "time_of_year": "Fall–Winter",
+    "time_commitment": {
+      "duration_months": 6,
+      "typical_hours_per_week": "Club meetings + conference prep",
+      "schedule": "Fall–winter (conference-based)"
+    },
+    "eligibility": "High school students (grades 9–12) in SC (often through school delegations)",
+    "deadline_or_application_window": "Varies by school/delegation",
+    "description": "Model government program culminating in a statewide conference simulating SC government.",
+    "link": "http://www.ymcagreenville.org/programs/outreach-development/sc-youth-government"
+  },
+  {
+    "id": "op-022",
+    "title": "Palmetto Boys State",
+    "organization": "American Legion (SC)",
+    "location": { "mode": "in_person", "city": "Anderson", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "civic_leadership",
+    "paid": false,
+    "time_of_year": "Summer",
+    "time_commitment": {
+      "duration_days": 7,
+      "typical_hours_per_day": "Full-day program",
+      "schedule": "Summer (annual)"
+    },
+    "eligibility": "Rising high school seniors (boys), selection-based",
+    "deadline_or_application_window": "Spring (through local American Legion posts/schools)",
+    "description": "Week-long mock government leadership program with elections, legislation, and civic training.",
+    "link": "https://palmettoboysstate.com/"
+  },
+  {
+    "id": "op-023",
+    "title": "Palmetto Girls State",
+    "organization": "American Legion Auxiliary (SC)",
+    "location": { "mode": "in_person", "city": "Clinton", "state": "SC" },
+    "within_45_min_of_clemson": false,
+    "type": "civic_leadership",
+    "paid": false,
+    "time_of_year": "Summer",
+    "time_commitment": {
+      "duration_days": 7,
+      "typical_hours_per_day": "Full-day program",
+      "schedule": "Summer (annual)"
+    },
+    "eligibility": "Rising high school seniors (girls), selection-based",
+    "deadline_or_application_window": "Spring (through local ALA units/schools)",
+    "description": "Week-long mock government leadership program for young women.",
+    "link": "https://palmettogirlsstate.net/"
+  },
+  {
+    "id": "op-024",
+    "title": "Tri-County Technical College Maker Academy: Robotics (EIT Summer Workshop)",
+    "organization": "Tri-County Technical College",
+    "location": { "mode": "in_person", "city": "Pendleton", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "stem_workshop",
+    "paid": false,
+    "time_of_year": "Summer",
+    "time_commitment": {
+      "duration_days": "Multi-day workshop (varies)",
+      "typical_hours_per_day": "Posted per workshop",
+      "schedule": "Summer"
+    },
+    "eligibility": "Typically middle/high school students (see workshop listing for grade cutoffs)",
+    "deadline_or_application_window": "Registration deadline posted per workshop",
+    "description": "Hands-on robotics workshop hosted by TCTC’s Engineering & Industrial Technology programs.",
+    "link": "https://www.tctc.edu/eit-summer-workshop-robotics/"
+  },
+  {
+    "id": "op-025",
+    "title": "SC GSSM GoSciTech Day Camp (Tri-County Technical College location)",
+    "organization": "SC Governor’s School for Science & Mathematics",
+    "location": { "mode": "in_person", "city": "Pendleton", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "stem_camp",
+    "paid": false,
+    "time_of_year": "Summer",
+    "time_commitment": {
+      "duration_days": 4,
+      "typical_hours_per_day": "Day camp schedule (posted per year)",
+      "schedule": "Summer (week-based; location-specific)"
+    },
+    "eligibility": "Middle/high school grade bands vary by course (see GoSciTech course list)",
+    "deadline_or_application_window": "Spring (annual)",
+    "description": "Day camp STEM courses hosted at technical colleges; includes TCTC as a location in posted schedules.",
+    "link": "https://www.scgssm.org/summer-camps/goscitech-day-camp/locations-courses-offered"
+  },
+  {
+    "id": "op-026",
+    "title": "Anderson University Summer Institute: Art & Design (example offering)",
+    "organization": "Anderson University",
+    "location": { "mode": "in_person", "city": "Anderson", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "pre_college_program",
+    "paid": false,
+    "time_of_year": "Summer",
+    "time_commitment": {
+      "duration_days": "Day-camp length varies by institute",
+      "typical_hours_per_day": "Day camp",
+      "schedule": "Summer (course-specific dates)"
+    },
+    "eligibility": "Rising grades 9–12 (for many institutes; verify per offering)",
+    "deadline_or_application_window": "Varies by institute; register before capacity closes",
+    "description": "Pre-college summer institutes across multiple areas (arts, film, music, business, engineering, etc.).",
+    "link": "https://andersonuniversity.edu/summer-institute/"
+  },
+  {
+    "id": "op-027",
+    "title": "Anderson University Summer: Filmmaker’s Camp (example offering)",
+    "organization": "Anderson University",
+    "location": { "mode": "in_person", "city": "Anderson", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "pre_college_program",
+    "paid": false,
+    "time_of_year": "Summer",
+    "time_commitment": {
+      "duration_days": 6,
+      "typical_hours_per_day": "Camp schedule (posted by program)",
+      "schedule": "Summer (course-specific dates)"
+    },
+    "eligibility": "High school-age students (see AU summer page)",
+    "deadline_or_application_window": "Varies by camp; register before filled",
+    "description": "Hands-on filmmaking camp exploring production, editing, and storytelling.",
+    "link": "https://anderson.edu/admissions/pre-college-programs/summer/"
+  },
+  {
+    "id": "op-028",
+    "title": "Anderson University Engineering Summer Institute (example listing)",
+    "organization": "Anderson University (College of Engineering)",
+    "location": { "mode": "in_person", "city": "Anderson", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "pre_college_program",
+    "paid": false,
+    "time_of_year": "Summer",
+    "time_commitment": {
+      "duration_days": "Multi-day (posted by program)",
+      "typical_hours_per_day": "Day program",
+      "schedule": "Summer (deadline posted on listing)"
+    },
+    "eligibility": "High school students interested in engineering (see registration page)",
+    "deadline_or_application_window": "Register by posted deadline",
+    "description": "Engineering exposure through partner tours and hands-on engineering activities.",
+    "link": "https://andersonuniversity.edu/auevent/engineering-summer-camp/"
+  },
+  {
+    "id": "op-029",
+    "title": "ACE Mentor Program (Architecture/Construction/Engineering) – Upstate SC",
+    "organization": "ACE Mentor Program",
+    "location": { "mode": "in_person", "city": "Greenville", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "mentorship",
+    "paid": false,
+    "time_of_year": "School year",
+    "time_commitment": {
+      "duration_months": 6,
+      "typical_hours_per_week": "After-school weekly meetings",
+      "schedule": "School-year"
+    },
+    "eligibility": "High school students (grades 9–12) interested in A/C/E fields",
+    "deadline_or_application_window": "Fall intake (varies by affiliate)",
+    "description": "Free mentorship program with industry professionals using a project-based design challenge.",
+    "link": "https://www.acementor.org/students"
+  },
+  {
+    "id": "op-030",
+    "title": "Riley Institute Emerging Public Leaders (EPL)",
+    "organization": "The Riley Institute at Furman University",
+    "location": { "mode": "in_person", "city": "Greenville", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "leadership_program",
+    "paid": false,
+    "time_of_year": "Summer + School year",
+    "time_commitment": {
+      "duration_months": 10,
+      "typical_hours_per_month": "Summer institute + year-long community project work",
+      "schedule": "Summer + senior year"
+    },
+    "eligibility": "Rising high school seniors in South Carolina (selection-based)",
+    "deadline_or_application_window": "Spring of junior year (typical)",
+    "description": "Leadership training + implementation of a community service project during senior year.",
+    "link": "https://furman.edu/riley/emerging-public-leaders/"
+  },
+  {
+    "id": "op-031",
+    "title": "Michelin Youth Apprenticeship (Advanced Manufacturing)",
+    "organization": "Michelin North America",
+    "location": { "mode": "in_person", "city": "Upstate (various)", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "apprenticeship",
+    "paid": true,
+    "time_of_year": "School year + Summer",
+    "time_commitment": {
+      "duration_years": 2,
+      "typical_hours_per_week": "Work-based learning + classroom instruction (program-defined)",
+      "schedule": "Junior–senior years"
+    },
+    "eligibility": "High school students in participating districts; selection-based",
+    "deadline_or_application_window": "Cohort-based (apply during school recruiting window)",
+    "description": "Paid youth apprenticeship combining work experience and training for manufacturing careers.",
+    "link": "https://michelinmedia.com/pages/blog/detail/article/c/a851/"
+  },
+  {
+    "id": "op-032",
+    "title": "Youth Volunteer Corps (Anderson County)",
+    "organization": "United Way of Anderson County",
+    "location": { "mode": "in_person", "city": "Anderson", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "service_program",
+    "paid": false,
+    "time_of_year": "Year-round (summer options)",
+    "time_commitment": {
+      "duration_weeks": "Ongoing + summer options",
+      "typical_hours_per_event": "Project-based",
+      "schedule": "Weekends/summer service weeks"
+    },
+    "eligibility": "Youth ages 11–18 (see program page)",
+    "deadline_or_application_window": "Rolling",
+    "description": "Organized youth service projects across the county with nonprofit partners.",
+    "link": "https://www.unitedwayofanderson.org/yvc"
+  },
+  {
+    "id": "op-033",
+    "title": "City of Seneca Recreation Worker (sports officiating/operations)",
+    "organization": "City of Seneca Recreation Department",
+    "location": { "mode": "in_person", "city": "Seneca", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "job",
+    "paid": true,
+    "time_of_year": "Year-round (seasonal peaks)",
+    "time_commitment": {
+      "duration_weeks": "Seasonal/ongoing",
+      "typical_hours_per_week": "Event/game-based shifts",
+      "schedule": "Evenings/weekends (sports schedules)"
+    },
+    "eligibility": "Must be at least 16 years old (see city listing)",
+    "deadline_or_application_window": "Rolling (as needed)",
+    "description": "Contract-based recreation work supporting sports leagues and events (paid per assigned duties).",
+    "link": "https://seneca.sc.us/recreation-department-home/get-involved/recreation-worker"
+  },
+  {
+    "id": "op-034",
+    "title": "Blood Drive Student Leadership (Student Scholarships / Drive Host)",
+    "organization": "The Blood Connection",
+    "location": { "mode": "hybrid", "city": "Upstate SC", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "leadership_service",
+    "paid": false,
+    "time_of_year": "Year-round",
+    "time_commitment": {
+      "duration_weeks": "Drive-planning period varies",
+      "typical_hours_total": "Planning + event day",
+      "schedule": "Year-round; peak during school year"
+    },
+    "eligibility": "High school students (coordination with school/community site required)",
+    "deadline_or_application_window": "Set by preferred drive date",
+    "description": "Organize a blood drive; leadership experience and potential scholarship incentives based on collection goals.",
+    "link": "https://thebloodconnection.org/host-a-drive/student-scholarships/"
+  },
+  {
+    "id": "op-035",
+    "title": "Lifeguard – City of Clemson (Central/Clemson Recreation Center)",
+    "organization": "City of Clemson",
+    "location": { "mode": "in_person", "city": "Clemson", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "job",
+    "paid": true,
+    "time_of_year": "Year-round (seasonal peaks)",
+    "time_commitment": {
+      "duration_weeks": "Seasonal/ongoing",
+      "typical_hours_per_week": "Part-time shifts",
+      "schedule": "Pool schedule (summer + year-round as posted)"
+    },
+    "eligibility": "Typically 15+ and certified lifeguard/CPR (verify on current posting)",
+    "deadline_or_application_window": "As posted (varies)",
+    "description": "Part-time lifeguard role at City recreation facilities (certifications required).",
+    "link": "https://www.governmentjobs.com/careers/cityofclemson/jobs/newprint/1909543"
+  },
+  {
+    "id": "op-036",
+    "title": "Clemson University Camps & Youth Programs Directory",
+    "organization": "Clemson University",
+    "location": { "mode": "in_person", "city": "Clemson", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "program_directory",
+    "paid": false,
+    "time_of_year": "Summer (mostly) + Year-round (some)",
+    "time_commitment": {
+      "duration_weeks": "Varies by camp",
+      "typical_hours_per_week": "Varies",
+      "schedule": "Summer (mostly), plus select school-year programs"
+    },
+    "eligibility": "Varies widely by camp (grade/age dependent)",
+    "deadline_or_application_window": "Varies by camp",
+    "description": "Central listing of Clemson-affiliated camps (academic, outdoor, athletics, etc.).",
+    "link": "https://www.clemson.edu/summer/camps/index.html"
+  },
+  {
+    "id": "op-037",
+    "title": "Carolina Youth Symphony",
+    "organization": "Carolina Youth Symphony",
+    "location": { "mode": "in_person", "city": "Greenville", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "arts_program",
+    "paid": false,
+    "time_of_year": "School year",
+    "time_commitment": {
+      "duration_months": 9,
+      "typical_hours_per_week": "Weekly rehearsals + concerts",
+      "schedule": "School-year"
+    },
+    "eligibility": "Audition-based; youth musicians (typically middle/high school)",
+    "deadline_or_application_window": "Auditions typically late spring/early summer",
+    "description": "Youth orchestras with weekly rehearsals and performance schedule.",
+    "link": "https://carolinayouthsymphony.org/"
+  },
+  {
+    "id": "op-038",
+    "title": "Civil Air Patrol Cadet Program (local squadron participation)",
+    "organization": "Civil Air Patrol (USAF Auxiliary)",
+    "location": { "mode": "in_person", "city": "Anderson", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "youth_program",
+    "paid": false,
+    "time_of_year": "Year-round",
+    "time_commitment": {
+      "duration_weeks": "Ongoing",
+      "typical_hours_per_week": "Weekly meeting + optional weekend activities",
+      "schedule": "Year-round"
+    },
+    "eligibility": "Ages 12–18 (see CAP eligibility rules)",
+    "deadline_or_application_window": "Rolling enrollment",
+    "description": "Leadership, aerospace education, and emergency services training for teens.",
+    "link": "https://www.gocivilairpatrol.com/join/cadets"
+  },
+  {
+    "id": "op-039",
+    "title": "Big Brothers Big Sisters – High School Bigs",
+    "organization": "Big Brothers Big Sisters of the Upstate",
+    "location": { "mode": "in_person", "city": "Greenville", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "mentorship",
+    "paid": false,
+    "time_of_year": "School year",
+    "time_commitment": {
+      "duration_months": 6,
+      "typical_hours_per_week": "About 1 hour/week (school-based match time) + transportation time",
+      "schedule": "School-year"
+    },
+    "eligibility": "High school students (often juniors/seniors) at partner schools; training required",
+    "deadline_or_application_window": "School-year intake",
+    "description": "Mentor an elementary student through school-based weekly sessions.",
+    "link": "https://bbbsupstate.com/volunteer/high-school-bigs/"
+  },
+  {
+    "id": "op-040",
+    "title": "SC Governor’s School for the Arts & Humanities – Summer Programs",
+    "organization": "SC Governor’s School for the Arts & Humanities",
+    "location": { "mode": "in_person", "city": "Greenville", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "summer_program",
+    "paid": false,
+    "time_of_year": "Summer",
+    "time_commitment": {
+      "duration_weeks": "Varies (1–5+ depending on art area)",
+      "typical_hours_per_day": "Full-day intensive training",
+      "schedule": "Summer"
+    },
+    "eligibility": "SC residents in specified grades (varies by program); audition/portfolio often required",
+    "deadline_or_application_window": "Typically winter deadlines",
+    "description": "Intensive residential summer arts training in multiple disciplines.",
+    "link": "https://www.scgsah.org/summer-programs"
+  },
+  {
+    "id": "op-041",
+    "title": "Ladder Internships (virtual internships with startups)",
+    "organization": "Ladder Internships",
+    "location": { "mode": "virtual" },
+    "within_45_min_of_clemson": true,
+    "type": "internship",
+    "paid": false,
+    "time_of_year": "Year-round (cohorts)",
+    "time_commitment": {
+      "duration_weeks": 8,
+      "typical_hours_per_week": "10–15",
+      "schedule": "Multiple cohorts year-round"
+    },
+    "eligibility": "High school students; cohort and project requirements vary",
+    "deadline_or_application_window": "Rolling (cohort-based)",
+    "description": "Remote internships with startups across many fields; mentorship and structured support.",
+    "link": "https://www.ladderinternships.com/"
+  },
+  {
+    "id": "op-042",
+    "title": "NASA Internships (high school eligible opportunities vary)",
+    "organization": "NASA (OSTEM)",
+    "location": { "mode": "virtual_or_in_person", "city": "Varies", "state": "Varies" },
+    "within_45_min_of_clemson": false,
+    "type": "internship",
+    "paid": "varies",
+    "time_of_year": "Spring/Summer/Fall (cycle-based)",
+    "time_commitment": {
+      "duration_weeks": "Varies",
+      "typical_hours_per_week": "Varies (often part-time or full-time by role)",
+      "schedule": "Spring/Summer/Fall cycles"
+    },
+    "eligibility": "Some roles allow high school students; citizenship and academic requirements vary by posting",
+    "deadline_or_application_window": "Per posting",
+    "description": "STEM internships and projects; filter for high school eligibility when applying.",
+    "link": "https://stemgateway.nasa.gov/public/s/"
+  },
+  {
+    "id": "op-043",
+    "title": "Smithsonian Digital Volunteers (Transcription Center)",
+    "organization": "Smithsonian Institution",
+    "location": { "mode": "virtual" },
+    "within_45_min_of_clemson": true,
+    "type": "volunteer",
+    "paid": false,
+    "time_of_year": "Year-round",
+    "time_commitment": {
+      "duration_weeks": "Flexible",
+      "typical_hours_per_week": "Self-paced",
+      "schedule": "Year-round"
+    },
+    "eligibility": "Open to the public (including teens); account required",
+    "deadline_or_application_window": "Rolling",
+    "description": "Transcribe historical documents to support open access and research.",
+    "link": "https://transcription.si.edu/"
+  },
+  {
+    "id": "op-044",
+    "title": "Library of Congress By the People (crowdsourced transcription)",
+    "organization": "Library of Congress",
+    "location": { "mode": "virtual" },
+    "within_45_min_of_clemson": true,
+    "type": "volunteer",
+    "paid": false,
+    "time_of_year": "Year-round",
+    "time_commitment": {
+      "duration_weeks": "Flexible",
+      "typical_hours_per_week": "Self-paced",
+      "schedule": "Year-round"
+    },
+    "eligibility": "Open to the public (including teens)",
+    "deadline_or_application_window": "Rolling",
+    "description": "Transcription/annotation of LOC collections to improve accessibility.",
+    "link": "https://crowd.loc.gov/"
+  },
+  {
+    "id": "op-045",
+    "title": "Zooniverse (citizen science projects)",
+    "organization": "Zooniverse",
+    "location": { "mode": "virtual" },
+    "within_45_min_of_clemson": true,
+    "type": "volunteer_research",
+    "paid": false,
+    "time_of_year": "Year-round",
+    "time_commitment": {
+      "duration_weeks": "Flexible",
+      "typical_hours_per_week": "Self-paced",
+      "schedule": "Year-round"
+    },
+    "eligibility": "Open to the public (project-specific requirements may apply)",
+    "deadline_or_application_window": "Rolling",
+    "description": "Contribute to real research projects (astronomy, ecology, history) via microtasks.",
+    "link": "https://www.zooniverse.org/"
+  },
+  {
+    "id": "op-046",
+    "title": "Khan Academy Volunteer Translator",
+    "organization": "Khan Academy",
+    "location": { "mode": "virtual" },
+    "within_45_min_of_clemson": true,
+    "type": "volunteer",
+    "paid": false,
+    "time_of_year": "Year-round",
+    "time_commitment": {
+      "duration_weeks": "Flexible",
+      "typical_hours_per_week": "Self-paced",
+      "schedule": "Year-round"
+    },
+    "eligibility": "Language proficiency required; teens can participate",
+    "deadline_or_application_window": "Rolling",
+    "description": "Help translate educational content into other languages.",
+    "link": "https://www.khanacademy.org/contribute"
+  },
+  {
+    "id": "op-047",
+    "title": "MIT App Inventor Community Contributions (open projects/help forums)",
+    "organization": "MIT App Inventor",
+    "location": { "mode": "virtual" },
+    "within_45_min_of_clemson": true,
+    "type": "skill_building",
+    "paid": false,
+    "time_of_year": "Year-round",
+    "time_commitment": {
+      "duration_weeks": "Flexible",
+      "typical_hours_per_week": "Self-paced",
+      "schedule": "Year-round"
+    },
+    "eligibility": "Open to learners; teens welcome",
+    "deadline_or_application_window": "Rolling",
+    "description": "Build apps and contribute via community support, tutorials, and project sharing.",
+    "link": "https://appinventor.mit.edu/"
+  },
+  {
+    "id": "op-048",
+    "title": "FIRST Robotics (team participation + leadership roles)",
+    "organization": "FIRST",
+    "location": { "mode": "in_person", "city": "Upstate SC (teams vary)", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "competition_team",
+    "paid": false,
+    "time_of_year": "School year",
+    "time_commitment": {
+      "duration_months": 5,
+      "typical_hours_per_week": "Build season can be 6–20+ (team dependent)",
+      "schedule": "Fall–spring"
+    },
+    "eligibility": "High school students (team-specific requirements)",
+    "deadline_or_application_window": "Join at start of school year (typical)",
+    "description": "Engineering competition experience; roles in CAD, programming, business, media, outreach.",
+    "link": "https://www.firstinspires.org/"
+  },
+  {
+    "id": "op-049",
+    "title": "Conrad Challenge (innovation/entrepreneurship competition)",
+    "organization": "Conrad Foundation",
+    "location": { "mode": "virtual" },
+    "within_45_min_of_clemson": true,
+    "type": "competition",
+    "paid": false,
+    "time_of_year": "School year (annual cycle)",
+    "time_commitment": {
+      "duration_months": 5,
+      "typical_hours_per_week": "Team-dependent",
+      "schedule": "School-year cycle"
+    },
+    "eligibility": "Ages 13–18 (see official rules)",
+    "deadline_or_application_window": "Annual cycle (fall registration)",
+    "description": "Teams develop innovations in aerospace, cyber, health, energy, and more; pitch-based.",
+    "link": "https://www.conradchallenge.org/"
+  },
+  {
+    "id": "op-050",
+    "title": "Technovation Girls (AI/tech entrepreneurship)",
+    "organization": "Technovation",
+    "location": { "mode": "virtual_or_in_person", "city": "Varies", "state": "Varies" },
+    "within_45_min_of_clemson": true,
+    "type": "competition_program",
+    "paid": false,
+    "time_of_year": "School year (seasonal)",
+    "time_commitment": {
+      "duration_months": 4,
+      "typical_hours_per_week": "Team-dependent",
+      "schedule": "Seasonal (annual)"
+    },
+    "eligibility": "Girls/non-binary youth (age bands vary by region)",
+    "deadline_or_application_window": "Annual registration window",
+    "description": "Build a tech solution and pitch; includes mentorship and curriculum.",
+    "link": "https://technovationchallenge.org/"
+  },
+  {
+    "id": "op-051",
+    "title": "USACO (USA Computing Olympiad)",
+    "organization": "USA Computing Olympiad",
+    "location": { "mode": "virtual" },
+    "within_45_min_of_clemson": true,
+    "type": "competition",
+    "paid": false,
+    "time_of_year": "Year-round (multiple contest seasons)",
+    "time_commitment": {
+      "duration_weeks": "Flexible",
+      "typical_hours_per_week": "Self-paced practice + contest dates",
+      "schedule": "Multiple contests each year"
+    },
+    "eligibility": "Pre-college students",
+    "deadline_or_application_window": "Register before contest dates",
+    "description": "Algorithmic programming contests; great for building CS problem-solving skills.",
+    "link": "https://usaco.org/"
+  },
+  {
+    "id": "op-052",
+    "title": "Envirothon (South Carolina) – team-based environmental competition",
+    "organization": "NACD Envirothon / SC hosts",
+    "location": { "mode": "in_person", "city": "Varies", "state": "SC" },
+    "within_45_min_of_clemson": "varies",
+    "type": "competition",
+    "paid": false,
+    "time_of_year": "Spring",
+    "time_commitment": {
+      "duration_months": 3,
+      "typical_hours_per_week": "Team practice-dependent",
+      "schedule": "Spring (typical)"
+    },
+    "eligibility": "High school teams (check SC Envirothon host details)",
+    "deadline_or_application_window": "Annual",
+    "description": "Environmental science competition (soils, forestry, wildlife, aquatics, current issue).",
+    "link": "https://envirothon.org/"
+  },
+  {
+    "id": "op-053",
+    "title": "Google Summer of Code (if eligible through open-source org + age rules)",
+    "organization": "Google",
+    "location": { "mode": "virtual" },
+    "within_45_min_of_clemson": true,
+    "type": "open_source_program",
+    "paid": true,
+    "time_of_year": "Summer",
+    "time_commitment": {
+      "duration_weeks": 12,
+      "typical_hours_per_week": "Varies by project size",
+      "schedule": "Summer (annual)"
+    },
+    "eligibility": "Eligibility rules apply and can change year-to-year; check official site",
+    "deadline_or_application_window": "Spring (annual)",
+    "description": "Paid open-source development with mentorship (eligibility varies).",
+    "link": "https://summerofcode.withgoogle.com/"
+  },
+  {
+    "id": "op-054",
+    "title": "National Speech & Debate Association (NSDA) competitions + leadership",
+    "organization": "NSDA",
+    "location": { "mode": "hybrid", "city": "Varies", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "competition_club",
+    "paid": false,
+    "time_of_year": "School year",
+    "time_commitment": {
+      "duration_months": 9,
+      "typical_hours_per_week": "Team practice + tournaments",
+      "schedule": "School-year"
+    },
+    "eligibility": "Member school team participation required",
+    "deadline_or_application_window": "Join through your school team",
+    "description": "Competitive speech and debate with tournament travel and leadership roles.",
+    "link": "https://www.speechanddebate.org/"
+  },
+  {
+    "id": "op-055",
+    "title": "DECA competitions + chapter leadership",
+    "organization": "DECA Inc.",
+    "location": { "mode": "in_person", "city": "Varies", "state": "SC" },
+    "within_45_min_of_clemson": true,
+    "type": "competition_club",
+    "paid": false,
+    "time_of_year": "School year",
+    "time_commitment": {
+      "duration_months": 9,
+      "typical_hours_per_week": "Prep-dependent + competitions",
+      "schedule": "School-year"
+    },
+    "eligibility": "Join through your school’s DECA chapter",
+    "deadline_or_application_window": "Join at start of school year (typical)",
+    "description": "Business/marketing/finance competitions and leadership opportunities through DECA.",
+    "link": "https://www.deca.org/"
+  }
+]

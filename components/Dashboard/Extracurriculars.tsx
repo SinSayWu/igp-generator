@@ -5,9 +5,34 @@ import { ClubData, SportData } from "./types";
 type ExtracurricularsProps = {
     clubs: ClubData[];
     sports: SportData[];
+    studentId: string;
 };
 
-export default function Extracurriculars({ clubs, sports }: ExtracurricularsProps) {
+import { useState } from "react";
+
+export default function Extracurriculars({ clubs, sports, studentId }: ExtracurricularsProps) {
+    const [recommendations, setRecommendations] = useState<any[]>([]);
+    const [isGenerating, setIsGenerating] = useState(false);
+
+    const handleRecommendClubs = async () => {
+        setIsGenerating(true);
+        try {
+            const res = await fetch("/api/llm/recommendations", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ studentId, type: "club" }),
+            });
+            const data = await res.json();
+            if (data.recommendations) {
+                setRecommendations(data.recommendations);
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
     const totalActivities = clubs.length + sports.length;
 
     return (
@@ -21,7 +46,7 @@ export default function Extracurriculars({ clubs, sports }: ExtracurricularsProp
             </div>
 
             {/* Summary / Overview */}
-            <div className="grid grid-cols-3 gap-6 border rounded-lg p-6">
+            <div className="grid grid-cols-3 gap-6 border border-black rounded-2xl p-6">
                 <div>
                     <p className="text-sm text-gray-500">Total Activities</p>
                     <p className="text-2xl font-bold">{totalActivities}</p>
@@ -38,9 +63,46 @@ export default function Extracurriculars({ clubs, sports }: ExtracurricularsProp
 
             {/* Clubs */}
             <section>
-                <h2 className="text-xl font-bold mb-4">Clubs & Activities</h2>
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-xl font-bold">Clubs & Activities</h2>
+                    <button
+                        onClick={handleRecommendClubs}
+                        disabled={isGenerating}
+                        className="bg-[#d70026] text-white px-4 py-2 border border-black rounded-xl font-bold text-sm disabled:opacity-50"
+                    >
+                        {isGenerating ? "Finding Matches..." : "✨ AI Recommendations"}
+                    </button>
+                </div>
+
+                {recommendations.length > 0 && (
+                    <div className="mb-10 bg-red-50 border border-black rounded-2xl p-6">
+                        <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                             <span>🎯</span> Recommended for You
+                        </h3>
+                        <div className="grid gap-4">
+                            {recommendations.map((rec) => {
+                                const isAlreadyIn = clubs.some(c => c.id === rec.id || c.name === rec.name);
+                                return (
+                                    <div key={rec.id} className="bg-white border border-black rounded-xl p-4">
+                                        <div className="flex justify-between items-start mb-2">
+                                            <h4 className="font-bold text-lg">{rec.name}</h4>
+                                            <span className={`text-xs font-bold px-2 py-1 border border-black rounded-md ${isAlreadyIn ? 'bg-green-100' : 'bg-yellow-100'}`}>
+                                                {isAlreadyIn ? "In" : "Not In"}
+                                            </span>
+                                        </div>
+                                        <p className="text-sm text-gray-700 font-medium mb-3">"{rec.justification}"</p>
+                                        <div className="bg-gray-50 border-t border-black -mx-4 -mb-4 p-4 mt-2">
+                                            <p className="text-xs font-bold uppercase text-gray-500 mb-1">How to Join:</p>
+                                            <p className="text-sm text-gray-900">{rec.actionPlan}</p>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
                 {clubs.length === 0 ? (
-                    <div className="border-2 border-dashed rounded-lg p-8 text-center text-gray-400">
+                    <div className="border border-black border-dashed rounded-2xl p-8 text-center text-gray-400">
                         No clubs added yet. Add clubs from your Profile page.
                     </div>
                 ) : (
@@ -48,7 +110,7 @@ export default function Extracurriculars({ clubs, sports }: ExtracurricularsProp
                         {clubs.map((club) => (
                             <div
                                 key={club.id}
-                                className="border rounded-lg p-4 flex flex-col gap-2"
+                                className="border border-black rounded-xl p-4 flex flex-col gap-2"
                             >
                                 <div className="flex justify-between items-start">
                                     <div>
@@ -80,7 +142,7 @@ export default function Extracurriculars({ clubs, sports }: ExtracurricularsProp
                                 </div>
 
                                 {club.description && (
-                                    <p className="text-sm text-gray-600 bg-gray-50 p-2 rounded">
+                                    <p className="text-sm text-gray-600 bg-gray-50 p-2 rounded-md">
                                         {club.description}
                                     </p>
                                 )}
@@ -103,7 +165,7 @@ export default function Extracurriculars({ clubs, sports }: ExtracurricularsProp
             <section>
                 <h2 className="text-xl font-bold mb-4">Sports</h2>
                 {sports.length === 0 ? (
-                    <div className="border-2 border-dashed rounded-lg p-8 text-center text-gray-400">
+                    <div className="border border-black border-dashed rounded-2xl p-8 text-center text-gray-400">
                         No sports added yet. Add sports from your Profile page.
                     </div>
                 ) : (
@@ -111,7 +173,7 @@ export default function Extracurriculars({ clubs, sports }: ExtracurricularsProp
                         {sports.map((sport) => (
                             <div
                                 key={sport.id}
-                                className="border rounded-lg p-4 flex justify-between items-center"
+                                className="border border-black rounded-xl p-4 flex justify-between items-center"
                             >
                                 <div>
                                     <p className="font-semibold">{sport.name}</p>

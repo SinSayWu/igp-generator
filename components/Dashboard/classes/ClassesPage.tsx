@@ -622,8 +622,8 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade }: Cl
                         w-full sm:w-auto
                         relative overflow-hidden group
                         bg-gradient-to-r from-indigo-600 to-purple-600 
-                        text-white font-bold py-3 px-6 rounded-xl shadow-lg 
-                        hover:shadow-xl hover:scale-105 transition-all duration-300
+                        text-white font-bold py-3 px-6 rounded-xl 
+                        hover:scale-105 transition-all duration-300
                         disabled:opacity-70 disabled:cursor-not-allowed
                     `}
                         >
@@ -679,7 +679,7 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade }: Cl
                 generatingFuture={generating}
             />
 
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <section className="rounded-2xl border border-black bg-white p-6">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h3 className="text-lg font-semibold text-slate-800">Ask the counselor</h3>
@@ -806,7 +806,7 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade }: Cl
             <section>
                 <h2 className="text-xl font-bold mb-4">Current Classes</h2>
                 {currentCourses.length === 0 ? (
-                    <div className="border-2 border-dashed rounded-lg p-8 text-center text-gray-400">
+                    <div className="grid grid-cols-4 gap-6 border border-black rounded-2xl p-6">
                         No current classes. Add them above or from your Profile page.
                     </div>
                 ) : (

@@ -12,6 +12,7 @@ export async function updateStudentProfile(userId: string, formData: FormData) {
 
     // NEW: Extract Program IDs
     const programIds = formData.getAll("programIds") as string[];
+    const opportunityIds = formData.getAll("opportunityIds") as string[];
 
     // NEW: Extract course data
     const courseIds = formData.getAll("courseIds") as string[];
@@ -122,6 +123,10 @@ export async function updateStudentProfile(userId: string, formData: FormData) {
             focusPrograms: {
                 set: [],
                 connect: programIds.map((id) => ({ id })),
+            },
+            savedOpportunities: {
+                set: [],
+                connect: opportunityIds.map((id) => ({ id })),
             },
         },
     });

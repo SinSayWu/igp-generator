@@ -20,7 +20,7 @@ export function AboutMeSection({ student, rigorLevels }: AboutMeSectionProps) {
                     <input
                         type="text"
                         name="name"
-                        defaultValue={student.name || ""}
+                        defaultValue={(student as any).user ? `${(student as any).user.firstName} ${(student as any).user.lastName}` : ""}
                         className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:border-transparent transition"
                         style={{ borderColor: "var(--accent-background)" }}
                         placeholder="Your name"
@@ -53,7 +53,7 @@ export function AboutMeSection({ student, rigorLevels }: AboutMeSectionProps) {
                     </label>
                     <select
                         name="desiredCourseRigor"
-                        defaultValue={student.desiredCourseRigor || ""}
+                        defaultValue={(student as any).desiredCourseRigor || ""}
                         className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:border-transparent transition"
                         style={{ borderColor: "var(--accent-background)" }}
                     >

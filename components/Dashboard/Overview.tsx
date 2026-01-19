@@ -77,8 +77,8 @@ export default function Overview({ user }: OverviewProps) {
             </p>
 
             <div className="grid gap-6" style={{ gridTemplateColumns: "30% 70%" }}>
-                <div className="border rounded-lg p-2 flex flex-col items-center justify-center">
-                    <div className="border-4 border-gray-300 rounded-lg p-2 w-full h-full flex overflow-hidden relative">
+                <div className="border border-black rounded-xl p-2 flex flex-col items-center justify-center">
+                    <div className="border border-black rounded-xl p-2 w-full h-full flex overflow-hidden relative">
                         {allStages.map((stage) => (
                             <div
                                 key={stage}
@@ -98,12 +98,12 @@ export default function Overview({ user }: OverviewProps) {
                     <p className="mt-2 font-semibold text-center"></p>
                 </div>
 
-                <div className="border rounded-lg p-6 flex flex-col gap-4">
+                <div className="border border-black rounded-2xl p-6 flex flex-col gap-4">
                     <h2 className="text-xl font-bold mb-4">Task Overview</h2>
                     {overviewGoals.map((goal) => (
                         <div
                             key={goal.id}
-                            className={`flex items-center justify-between border p-4 rounded transition-all duration-300 ${
+                            className={`flex items-center justify-between border border-black p-4 rounded-xl transition-all duration-300 ${
                                 goal.completed ? "bg-gray-50 opacity-60 relative" : ""
                             }`}
                         >
@@ -122,7 +122,7 @@ export default function Overview({ user }: OverviewProps) {
                             </div>
                             <button
                                 onClick={() => toggleGoal(goal.id)}
-                                className={`px-4 py-2 font-bold rounded z-20 ${
+                                className={`px-4 py-2 font-bold border border-black rounded-xl z-20 ${
                                     goal.completed
                                         ? "bg-gray-200 text-gray-500 hover:bg-gray-300"
                                         : "bg-[var(--button-color)] hover:bg-[var(--button-color-2)]"

@@ -66,7 +66,7 @@ body {
     color: var(--foreground);
     font: var(--secondary-font);
     font-weight: 1000;
-    border-radius: 15px;
+    border-radius: 12px;
     font-size: 20px;
 }
 
@@ -84,7 +84,8 @@ ITS LOWK NOT THAT HARD ITS PRETTY SELF EXPLANATORY */
     font-weight: 700;
     font-size: large;
     transition: transform 0.1s ease;
-    border-radius: 15px;
+    border-radius: 12px;
+    border: 1px solid black;
 }
 
 .btn:hover {
@@ -106,7 +107,7 @@ ITS LOWK NOT THAT HARD ITS PRETTY SELF EXPLANATORY */
     background: none;
     max-width: none;
     margin: 5%;
-    border-radius: 15px;
+    border-radius: 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -189,10 +190,10 @@ ITS LOWK NOT THAT HARD ITS PRETTY SELF EXPLANATORY */
 
 .signup-inputs {
     padding: 12px;
-    border-radius: 10px;
+    border-radius: 8px;
     background-color: #ffd8c4;
     width: 100%;
-    border: none;
+    border: 1px solid black;
     outline: none;
     box-sizing: border-box;
 }
@@ -201,8 +202,9 @@ ITS LOWK NOT THAT HARD ITS PRETTY SELF EXPLANATORY */
     max-width: 135px;
     background-color: #ffd8c4;
     padding: 10px 10px;
-    border-radius: 10px;
+    border-radius: 8px;
     width: 100%;
+    border: 1px solid black;
 }
 
 .login-container {

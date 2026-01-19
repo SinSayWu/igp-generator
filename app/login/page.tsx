@@ -49,8 +49,8 @@ export default function CreateLoginPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
+        <div className="min-h-screen flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-md w-full space-y-8 bg-white p-8 border border-black rounded-2xl">
                 <div>
                     <h1 className="text-center text-4xl font-extrabold text-[#d70026] tracking-tight">
                         Welcome Back
@@ -60,7 +60,7 @@ export default function CreateLoginPage() {
                     </p>
                 </div>
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-                    <div className="rounded-md shadow-sm space-y-4">
+                    <div className="space-y-4">
                         <div>
                             <label htmlFor="email-address" className="sr-only">
                                 Email address
@@ -71,7 +71,7 @@ export default function CreateLoginPage() {
                                 type="email"
                                 autoComplete="email"
                                 required
-                                className="appearance-none rounded-xl relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-[#d70026] focus:border-[#d70026] focus:z-10 sm:text-sm bg-gray-50 transition-colors"
+                                className="appearance-none relative block w-full px-4 py-3 border border-black rounded-xl placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-black focus:border-black focus:z-10 sm:text-sm bg-white"
                                 placeholder="Email address"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
@@ -87,7 +87,7 @@ export default function CreateLoginPage() {
                                 type="password"
                                 autoComplete="current-password"
                                 required
-                                className="appearance-none rounded-xl relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-[#d70026] focus:border-[#d70026] focus:z-10 sm:text-sm bg-gray-50 transition-colors"
+                                className="appearance-none relative block w-full px-4 py-3 border border-black rounded-xl placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-black focus:border-black focus:z-10 sm:text-sm bg-white"
                                 placeholder="Password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
@@ -105,7 +105,7 @@ export default function CreateLoginPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-[#d70026] hover:bg-[#b00020] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#d70026] shadow-lg shadow-red-200 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
+                            className="group relative w-full flex justify-center py-3 px-4 border border-black rounded-xl text-sm font-bold text-white bg-[#d70026] focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
                         >
                             {loading ? (
                                 <span className="flex items-center gap-2">
@@ -124,7 +124,7 @@ export default function CreateLoginPage() {
                     <div className="text-center">
                          <p className="text-sm text-gray-600">
                             Don't have an account?{" "}
-                            <Link href="/signup" className="font-medium text-[#d70026] hover:text-[#b00020] transition-colors">
+                            <Link href="/signup" className="font-medium text-[#d70026]">
                                 Sign up
                             </Link>
                         </p>

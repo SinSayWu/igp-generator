@@ -242,7 +242,7 @@ export default function SignupWizard({ existingStudent, existingSchoolData }: Pr
 
     return (
         <div className="min-h-screen bg-[var(--background)] flex flex-col items-center py-10 px-4">
-            <div className="w-full max-w-3xl bg-white rounded-2xl shadow-xl overflow-hidden min-h-[600px] flex flex-col border border-stone-200">
+            <div className="w-full max-w-3xl bg-white rounded-2xl overflow-hidden min-h-[600px] flex flex-col border border-black">
                 {/* Header & Progress */}
                 <div className="bg-[var(--foreground)] text-white p-6">
                     <h1 className="text-2xl font-bold mb-2 font-[family-name:var(--primary-font)]">

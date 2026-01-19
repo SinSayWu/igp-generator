@@ -103,7 +103,7 @@ export default function CollegesPage({ colleges, initialSummary = "" }: Colleges
             </div>
 
             {/* Summary Bar */}
-            <div className="grid grid-cols-3 gap-6 border rounded-lg p-6">
+            <div className="grid grid-cols-3 gap-6 border border-black rounded-2xl p-6">
                 <div>
                     <p className="text-sm text-gray-500">Target Colleges</p>
                     <p className="text-2xl font-bold">{colleges.length}</p>
@@ -131,10 +131,10 @@ export default function CollegesPage({ colleges, initialSummary = "" }: Colleges
                         type="button"
                         onClick={handleSummarize}
                         disabled={isSummarizing}
-                        className={`relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full px-5 py-2 text-sm font-semibold text-white shadow-lg transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white ${
+                        className={`relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl px-5 py-2 text-sm font-semibold text-white transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white ${
                             isSummarizing
                                 ? "cursor-not-allowed opacity-60"
-                                : "cursor-pointer hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
+                                : "cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
                         }`}
                     >
                         <span className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-cyan-400" />
@@ -156,13 +156,13 @@ export default function CollegesPage({ colleges, initialSummary = "" }: Colleges
                 </div>
 
                 {summaryError && (
-                    <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                    <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
                         {summaryError}
                     </div>
                 )}
 
                 {summary && (
-                    <div className="rounded-lg border border-slate-200 bg-white p-4">
+                    <div className="rounded-xl border border-black bg-white p-4">
                         <div className="prose prose-slate max-w-none">
                             <ReactMarkdown remarkPlugins={[remarkGfm]}>{summary}</ReactMarkdown>
                         </div>
@@ -174,20 +174,20 @@ export default function CollegesPage({ colleges, initialSummary = "" }: Colleges
             <section>
                 <h2 className="text-xl font-bold mb-4">Your Target Colleges</h2>
                 {colleges.length === 0 ? (
-                    <div className="border-2 border-dashed rounded-lg p-8 text-center text-gray-400">
+                    <div className="border border-black border-dashed rounded-2xl p-8 text-center text-gray-400">
                         No target colleges added yet. Add colleges from your Profile page.
                     </div>
                 ) : (
                     <div className="grid gap-4">
                         {colleges.map((college) => (
-                            <div key={college.id} className="border rounded-lg p-4">
+                            <div key={college.id} className="border border-black rounded-xl p-4">
                                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                                     <div>
                                         <p className="font-semibold text-lg">{college.name}</p>
                                         <p className="text-sm text-gray-500">Target College</p>
                                     </div>
                                     <span
-                                        className="px-3 py-1 text-sm font-medium rounded-full"
+                                        className="px-3 py-1 text-sm font-medium rounded-xl"
                                         style={{
                                             backgroundColor: "var(--button-color)",
                                             color: "var(--foreground)",
@@ -198,7 +198,7 @@ export default function CollegesPage({ colleges, initialSummary = "" }: Colleges
                                 </div>
 
                                 <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
                                         <p className="text-sm font-semibold text-slate-700">
                                             Requirements
                                         </p>
@@ -214,7 +214,7 @@ export default function CollegesPage({ colleges, initialSummary = "" }: Colleges
                                             </p>
                                         )}
                                     </div>
-                                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
                                         <p className="text-sm font-semibold text-slate-700">
                                             Recommendations
                                         </p>
