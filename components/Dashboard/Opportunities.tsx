@@ -72,32 +72,34 @@ export default function Opportunities({ studentId }: OpportunitiesProps) {
 
             {recommendations.length > 0 ? (
                 <div className="grid gap-6">
-                    <div className="bg-red-50 border border-black rounded-2xl p-8">
-                        <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+                    <div className="bg-red-50/50 border border-black rounded-2xl p-8">
+                        <h3 className="text-xl font-bold mb-6 flex items-center gap-2 text-[#d70026]">
                             <span>🚀</span> Top AI Matches for Your Profile
                         </h3>
                         <div className="grid lg:grid-cols-2 gap-6">
                             {recommendations.map((rec) => (
-                                <div key={rec.id} className="bg-white border border-black rounded-xl p-6 flex flex-col justify-between">
+                                <div key={rec.id} className="bg-white border border-black rounded-xl p-6 flex flex-col justify-between transition-all hover:scale-[1.01]">
                                     <div>
                                         <div className="flex justify-between items-start mb-4">
-                                            <h4 className="font-bold text-xl">{rec.title}</h4>
+                                            <h4 className="font-bold text-xl text-slate-900">{rec.title}</h4>
                                             <div className="flex flex-wrap gap-2 justify-end">
-                                                {rec.generatedTags?.map((tag: string) => (
-                                                    <span key={tag} className="text-[10px] uppercase font-black px-2 py-0.5 border border-black bg-gray-50 rounded-md">
+                                                {(rec.generatedTags || []).map((tag: string) => (
+                                                    <span key={tag} className="text-[10px] uppercase font-black px-2 py-0.5 border border-black bg-white text-[#d70026] rounded-md">
                                                         {tag}
                                                     </span>
                                                 ))}
                                             </div>
                                         </div>
-                                        <p className="text-sm font-bold text-[#d70026] mb-2">{rec.organization}</p>
-                                        <p className="text-sm text-gray-700 leading-relaxed mb-4 italic">
-                                            "{rec.matchReason}"
-                                        </p>
+                                        <p className="text-sm font-black text-[#d70026] mb-2 uppercase tracking-tight">{rec.organization}</p>
+                                        <div className="bg-gray-50 border border-black rounded-lg p-3 mb-4">
+                                            <p className="text-sm text-slate-700 leading-relaxed italic">
+                                                "{rec.matchReason}"
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div className="mt-4 pt-4 border-t border-black bg-gray-50 -mx-6 -mb-6 p-6">
-                                        <p className="text-xs font-black uppercase tracking-wider text-gray-500 mb-2">Next Steps:</p>
-                                        <p className="text-sm text-gray-900 font-medium">
+                                    <div className="mt-4 pt-4 border-t border-black">
+                                        <p className="text-xs font-black uppercase tracking-widest text-[#d70026] mb-2 text-opacity-70">Next Steps:</p>
+                                        <p className="text-sm text-slate-900 font-bold leading-snug">
                                             {rec.actionPlan}
                                         </p>
                                     </div>

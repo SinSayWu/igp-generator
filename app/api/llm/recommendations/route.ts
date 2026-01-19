@@ -14,6 +14,7 @@ export async function POST(req: Request) {
     });
     try {
         const { studentId, type } = await req.json();
+        console.log(`[LLM Recommendations] Fetching for studentId: ${studentId}, type: ${type}`);
 
         // 1. Fetch Student Data
         const student = await (prisma as any).student.findUnique({
@@ -27,7 +28,8 @@ export async function POST(req: Request) {
         });
 
         if (!student) {
-            return NextResponse.json({ error: "Student not found" }, { status: 404 });
+            console.error(`[LLM Recommendations] Student not found for ID: ${studentId}`);
+            return NextResponse.json({ error: "Student profile not found. Please complete onboarding." }, { status: 404 });
         }
 
         // 2. Prepare Context (Interests, Profile)
@@ -67,6 +69,12 @@ export async function POST(req: Request) {
         } else if (type === "opportunity") {
             // Fetch all opportunities
             const allOpportunities = await (prisma as any).opportunity.findMany();
+            console.log(`[LLM Recommendations] Found ${allOpportunities.length} total opportunities in DB`);
+
+            if (allOpportunities.length === 0) {
+                return NextResponse.json({ error: "No opportunities found in database to recommend." }, { status: 404 });
+            }
+
             // Filter slightly to reduce token count if needed, but generic "all" is fine for 50 items.
             candidates = allOpportunities.map((o: any) => ({ // Cast 'o' to 'any' for flexible property access
                 id: o.id,

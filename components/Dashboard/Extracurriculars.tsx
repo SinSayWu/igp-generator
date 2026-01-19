@@ -88,12 +88,12 @@ export default function Extracurriculars({ clubs, sports, initialRecommendations
             {showRecommendations && (
                 <section className="animate-in slide-in-from-top-4 fade-in duration-500">
                     <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-xl font-bold text-indigo-900 flex items-center gap-2">
+                        <h2 className="text-xl font-bold text-[#d70026] flex items-center gap-2">
                             <span>🤖</span> AI Recommendations
                         </h2>
                         <button 
                             onClick={() => setShowRecommendations(false)}
-                            className="text-sm text-slate-500 hover:text-slate-700"
+                            className="text-sm text-slate-500 hover:text-[#d70026] font-bold"
                         >
                             Dismiss
                         </button>
@@ -112,33 +112,33 @@ export default function Extracurriculars({ clubs, sports, initialRecommendations
                                 return (
                                 <div
                                     key={club.id}
-                                    className={`group relative bg-white p-5 rounded-xl border shadow-sm hover:shadow-md transition-all duration-200 flex flex-col h-full
-                                        ${isInClub ? 'border-emerald-200 bg-emerald-50/30' : 'border-indigo-100'}`}
+                                    className={`group relative bg-white p-5 rounded-xl border border-black transition-all duration-200 flex flex-col h-full
+                                        ${isInClub ? 'bg-red-50/50' : ''}`}
                                 >
                                     <div className="absolute top-3 right-3 flex flex-col gap-1 items-end">
                                         {isInClub ? (
-                                            <div className="bg-emerald-100 text-emerald-700 text-[10px] uppercase font-bold px-2 py-0.5 rounded-full shadow-sm">
+                                            <div className="bg-[#d70026] text-white text-[10px] uppercase font-black px-2 py-0.5 rounded-md border border-black">
                                                 Joined
                                             </div>
                                         ) : (
-                                            <div className="bg-indigo-600 text-white text-[10px] uppercase font-bold px-2 py-0.5 rounded-full shadow-sm">
+                                            <div className="bg-white text-[#d70026] text-[10px] uppercase font-black px-2 py-0.5 rounded-md border border-black">
                                                 Recommended
                                             </div>
                                         )}
                                         {isFuture && (
-                                            <div className="bg-amber-100 text-amber-700 text-[10px] uppercase font-bold px-2 py-0.5 rounded-full shadow-sm">
-                                                Future Opportunity
+                                            <div className="bg-amber-50 text-amber-700 text-[10px] uppercase font-black px-2 py-0.5 rounded-md border border-amber-200">
+                                                Future Choice
                                             </div>
                                         )}
                                     </div>
                                     
-                                    <h3 className="font-bold text-lg text-slate-800 mb-1 mt-1 pr-16 group-hover:text-indigo-700 transition-colors">
+                                    <h3 className="font-bold text-lg text-slate-900 mb-1 mt-1 pr-16 group-hover:text-[#d70026] transition-colors">
                                         {club.name}
                                     </h3>
                                     
                                     <div className="flex flex-wrap gap-2 mb-3">
-                                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium 
-                                            ${isInClub ? 'bg-emerald-100 text-emerald-800' : 'bg-indigo-50 text-indigo-700'}`}>
+                                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold border border-black
+                                            ${isInClub ? 'bg-white text-[#d70026]' : 'bg-gray-50 text-slate-700'}`}>
                                             {club.category}
                                         </span>
                                     </div>
@@ -154,19 +154,19 @@ export default function Extracurriculars({ clubs, sports, initialRecommendations
                                         )}
                                     </div>
                                     
-                                    <div className="pt-3 border-t border-slate-100 text-xs text-slate-500 space-y-1">
+                                    <div className="pt-3 border-t border-black text-xs text-slate-500 space-y-1">
                                         {!isInClub && (
-                                            <div className="font-semibold text-indigo-600">
+                                            <div className="font-black uppercase tracking-tight text-[#d70026]">
                                                 How to join:
                                             </div>
                                         )}
-                                        <div>
+                                        <div className="font-medium text-slate-700">
                                             {club.teacherLeader ? (
-                                                <span>Contact <span className="font-medium text-slate-700">{club.teacherLeader}</span> to join.</span>
+                                                <span>Contact <span className="font-bold underline decoration-red-200">{club.teacherLeader}</span> to join.</span>
                                             ) : club.studentLeaders ? (
-                                                <span>Contact student leaders <span className="font-medium text-slate-700">{club.studentLeaders}</span> to join.</span>
+                                                <span>Contact student leaders <span className="font-bold underline decoration-red-200">{club.studentLeaders}</span> to join.</span>
                                             ) : (
-                                                <span>Contact the school office/sponsor to learn more.</span>
+                                                <span>Contact the school office/sponsor.</span>
                                             )}
                                         </div>
                                     </div>
