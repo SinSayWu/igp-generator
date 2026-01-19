@@ -9,9 +9,11 @@ type OpportunitiesProps = {
 export default function Opportunities({ studentId }: OpportunitiesProps) {
     const [recommendations, setRecommendations] = useState<any[]>([]);
     const [isGenerating, setIsGenerating] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const handleRecommendOps = async () => {
         setIsGenerating(true);
+        setError(null);
         try {
             const res = await fetch("/api/llm/recommendations", {
                 method: "POST",
@@ -21,9 +23,12 @@ export default function Opportunities({ studentId }: OpportunitiesProps) {
             const data = await res.json();
             if (data.recommendations) {
                 setRecommendations(data.recommendations);
+            } else if (data.error) {
+                setError(data.error);
             }
         } catch (err) {
             console.error(err);
+            setError("Failed to fetch recommendations. Please try again.");
         } finally {
             setIsGenerating(false);
         }
@@ -41,11 +46,29 @@ export default function Opportunities({ studentId }: OpportunitiesProps) {
                 <button
                     onClick={handleRecommendOps}
                     disabled={isGenerating}
-                    className="bg-[#d70026] text-white px-6 py-3 border border-black rounded-xl font-bold text-lg disabled:opacity-50"
+                    className="bg-[#d70026] text-white px-6 py-3 border border-black rounded-xl font-bold transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
                 >
-                    {isGenerating ? "Finding Opportunities..." : "✨ AI Matcher"}
+                    {isGenerating ? (
+                        <span className="flex items-center gap-2">
+                            <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Thinking...
+                        </span>
+                    ) : (
+                        <span className="flex items-center gap-2">
+                            <span>✨</span> AI Matcher
+                        </span>
+                    )}
                 </button>
             </div>
+
+            {error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm font-medium">
+                    {error}
+                </div>
+            )}
 
             {recommendations.length > 0 ? (
                 <div className="grid gap-6">

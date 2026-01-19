@@ -6,11 +6,10 @@ import { cookies } from "next/headers";
 import {Club} from "@prisma/client"
 import OpenAI from "openai";
 
-const openai = new OpenAI({
-    apiKey: process.env.GPT_API_KEY,
-});
-
 export async function recommendClubs() {
+    const openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+    });
     const cookieStore = await cookies();
     const sessionId = cookieStore.get("session")?.value;
     if (!sessionId) {
@@ -53,7 +52,7 @@ export async function recommendClubs() {
 
     // Prepare context strings
     const courseList = student.studentCourses
-        .map((sc) => `${sc.course.name} (${sc.course.level || "Regular"})`)
+        .map((sc) => `${sc.course.name} (${(sc.course as any).level || "Regular"})`)
         .join(", ");
 
     const collegeList = student.targetColleges
@@ -94,7 +93,7 @@ export async function recommendClubs() {
     let parsedRecs: RecResponse = [];
     try {
         const response = await openai.chat.completions.create({
-            model: "gpt-5.2",
+            model: "gpt-4o",
             messages: [{ role: "system", content: prompt }],
         });
 
@@ -126,7 +125,7 @@ export async function recommendClubs() {
             }
 
             // Clear old recommendations
-            await tx.clubRecommendation.deleteMany({
+            await (tx as any).clubRecommendation.deleteMany({
                 where: { studentId: student.userId },
             });
 
@@ -135,7 +134,7 @@ export async function recommendClubs() {
                 // Verify club exists (and belongs to school)
                 const club = availableClubs.find((c) => c.id === rec.id);
                 if (club) {
-                    await tx.clubRecommendation.create({
+                    await (tx as any).clubRecommendation.create({
                         data: {
                             studentId: student.userId,
                             clubId: club.id,
@@ -147,7 +146,7 @@ export async function recommendClubs() {
             }
 
             // Return the freshly created records with club data
-            return await tx.clubRecommendation.findMany({
+            return await (tx as any).clubRecommendation.findMany({
                 where: { studentId: student.userId },
                 include: { club: true },
             });

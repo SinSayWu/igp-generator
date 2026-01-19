@@ -46,14 +46,10 @@ export default function Extracurriculars({ clubs, sports, initialRecommendations
                             onClick={handleRecommend}
                             disabled={isPending}
                             className={`
-                        relative overflow-hidden group
-                        bg-gradient-to-r from-indigo-600 to-purple-600 
-                        text-white font-bold py-3 px-6 rounded-xl shadow-lg 
-                        hover:shadow-xl hover:scale-105 transition-all duration-300
-                        disabled:opacity-70 disabled:cursor-not-allowed
-                    `}
+                                bg-[#d70026] text-white px-6 py-3 border border-black rounded-xl font-bold transition-all 
+                                hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50
+                            `}
                         >
-                            <div className="absolute inset-0 bg-white/20 group-hover:translate-x-full transition-transform duration-700 ease-in-out -skew-x-12 -translate-x-[150%]"></div>
                             {isPending ? (
                                 <span className="flex items-center gap-2">
                                     <svg
@@ -80,7 +76,7 @@ export default function Extracurriculars({ clubs, sports, initialRecommendations
                                 </span>
                             ) : (
                                 <span className="flex items-center gap-2">
-                                    <span>✨</span> Recommend Clubs
+                                    <span>✨</span> AI Matcher
                                 </span>
                             )}
                         </button>
