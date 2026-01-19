@@ -8,9 +8,10 @@ import { CollegeData } from "./types";
 type CollegesProps = {
     colleges: CollegeData[];
     initialSummary?: string | null;
+    onAction?: (action: string) => void;
 };
 
-export default function CollegesPage({ colleges, initialSummary = "" }: CollegesProps) {
+export default function CollegesPage({ colleges, initialSummary = "", onAction }: CollegesProps) {
     const universities = colleges.filter((c) => c.type === "University");
     const technicalSchools = colleges.filter((c) => c.type === "Technical");
     const [summary, setSummary] = useState<string>(initialSummary ?? "");
@@ -85,6 +86,7 @@ export default function CollegesPage({ colleges, initialSummary = "" }: Colleges
             }
 
             setSummary(content);
+            onAction?.("generate");
         } catch (error) {
             console.error(error);
             setSummaryError("Something went wrong generating the summary. Please try again.");
@@ -131,25 +133,19 @@ export default function CollegesPage({ colleges, initialSummary = "" }: Colleges
                         type="button"
                         onClick={handleSummarize}
                         disabled={isSummarizing}
-                        className={`relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl px-5 py-2 text-sm font-semibold text-white transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white ${
+                        className={`relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl px-5 py-2 text-sm font-semibold text-white transition-all focus:outline-none border border-black ${
                             isSummarizing
-                                ? "cursor-not-allowed opacity-60"
-                                : "cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+                                ? "bg-red-400 cursor-not-allowed opacity-60"
+                                : "bg-[#d70026] hover:bg-[#b00020] cursor-pointer"
                         }`}
                     >
-                        <span className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-cyan-400" />
-                        <span className="absolute inset-0 opacity-0 transition-opacity duration-300 hover:opacity-100 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.35),_transparent_55%)]" />
                         <span className="relative inline-flex items-center gap-2">
-                            <span className="text-base">✨</span>
                             <span>
                                 {isSummarizing
                                     ? "Generating..."
                                     : hasSummary
                                       ? "Regenerate College Plan"
                                       : "Generate College Plan"}
-                            </span>
-                            <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] uppercase tracking-wide">
-                                AI
                             </span>
                         </span>
                     </button>

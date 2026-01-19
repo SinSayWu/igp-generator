@@ -81,7 +81,7 @@ export default async function DashboardPage() {
     if (!user) redirect("/");
 
     if (user.role === "STUDENT") {
-        if (!user.student || !user.student.gradeLevel || !user.student.dateOfBirth) {
+        if (!user.student || !user.student.gradeLevel) {
             redirect("/onboarding");
         }
     }

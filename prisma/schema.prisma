@@ -24,228 +24,169 @@ model School {
 }
 
 model User {
-  id            String   @id @default(cuid())
+  id            String         @id @default(cuid())
+  email         String         @unique
+  createdAt     DateTime       @default(now())
   firstName     String
+  gender        String
   lastName      String
   middleName    String?
-  preferredName String?
-  email         String   @unique
-  createdAt     DateTime @default(now())
   passwordHash  String
-  gender        String
-
-  role UserRole
-
-  // Relations to specific role tables
-  student Student?
-  admin   Administrator?
-
-  sessions Session[]
+  preferredName String?
+  role          UserRole
+  admin         Administrator?
+  sessions      Session[]
+  student       Student?
 }
 
 model Session {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   expiresAt DateTime
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Administrator {
-  userId String @id
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  school   School? @relation(fields: [schoolId], references: [id])
+  userId   String  @id
   schoolId String?
+  school   School? @relation(fields: [schoolId], references: [id])
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Student {
-  gradeLevel         Int
-  graduationYear     Int
-  dateOfBirth        DateTime?
-  bio                String?
-  interests          String[]
-  subjectInterests   String[] // e.g., "Science", "Math", "English", "History"
-  desiredCourseRigor String?
-
-  collegePlanSummary String? @db.Text()
-
-  // Future Plans
-  postHighSchoolPlan String?
-  careerInterest     String?
-  interestedInNCAA   Boolean @default(false)
-
-  // Study Halls
-  studyHallsPerYear    Int? @default(0)
-  maxStudyHallsPerYear Int? @default(0)
-
-  // RELATIONSHIPS
-  userId String @id
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  school   School? @relation(fields: [schoolId], references: [id])
-  schoolId String?
-
-  // Activities
-  clubs  Club[] @relation("ClubToStudent")
-  sports Sport[] @relation("SportToStudent")
-
-  clubRecommendations ClubRecommendation[]
-
-  // Course relationship through junction table
-  studentCourses StudentCourse[]
-
-  // Real relationship to Colleges
-  targetColleges College[] @relation("CollegeToStudent")
-  focusPrograms  Program[] @relation("ProgramToStudent")
-  savedOpportunities Opportunity[] @relation("OpportunityToStudent")
+  gradeLevel                 Int
+  graduationYear             Int
+  bio                        String?
+  userId                     String                      @id
+  schoolId                   String?
+  careerInterest             String?
+  interestedInNCAA           Boolean                     @default(false)
+  postHighSchoolPlan         String?
+  interests                  String[]
+  studyHallsPerYear          Int?                        @default(0)
+  subjectInterests           String[]
+  maxStudyHallsPerYear       Int?                        @default(0)
+  collegePlanSummary         String?
+  desiredCourseRigor         String?
+  dateOfBirth                DateTime?
+  latestClubAnalysis         String?
+  latestOpportunityAnalysis  String?
+  latestCourseAnalysis       String?
+  clubRecommendations        ClubRecommendation[]
+  goals                      Goal[]
   opportunityRecommendations OpportunityRecommendation[]
-  
-  // Persisted AI Analysis
-  latestOpportunityAnalysis String? // Markdown analysis for opportunities
-  latestClubAnalysis        String? // Markdown analysis for clubs
-  latestCourseAnalysis      String? // Markdown analysis for courses
-
-  goals Goal[]
+  school                     School?                     @relation(fields: [schoolId], references: [id])
+  user                       User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  studentCourses             StudentCourse[]
+  clubs                      Club[]                      @relation("ClubToStudent")
+  targetColleges             College[]                   @relation("CollegeToStudent")
+  savedOpportunities         Opportunity[]               @relation("OpportunityToStudent")
+  focusPrograms              Program[]                   @relation("ProgramToStudent")
+  sports                     Sport[]                     @relation("SportToStudent")
 }
 
 model Program {
-  id          String  @id @default(cuid())
-  name        String // e.g. "JROTC", "Fine Arts", "Welding"
-  description String? // e.g. "Army JROTC Leadership Track"
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  schoolId    String
+  school      School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  students    Student[] @relation("ProgramToStudent")
 
-  // Link to School (Required - Programs are school-specific)
-  schoolId String
-  school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-
-  // Link to Students
-  students Student[] @relation("ProgramToStudent")
-
-  @@unique([name, schoolId]) // Prevent duplicate program names in the same school
+  @@unique([name, schoolId])
 }
 
 model College {
-  id   String @id @default(cuid())
-  name String @unique
-
-  // Category field (e.g., "University", "Technical", "Military")
-  type String
-
+  id           String    @id @default(cuid())
+  name         String    @unique
   requirements String[]
   suggestions  String[]
-
-  students Student[] @relation("CollegeToStudent")
+  type         String
+  students     Student[] @relation("CollegeToStudent")
 }
 
 model Club {
-  id             String  @id @default(cuid())
+  id             String               @id @default(cuid())
   name           String
-  category       String // e.g. "Service", "Academic"
+  category       String
   description    String?
-  teacherLeader  String?
+  schoolId       String
   studentLeaders String?
+  teacherLeader  String?
+  school         School               @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  recommendedTo  ClubRecommendation[]
+  students       Student[]            @relation("ClubToStudent")
 
-  // Link to School (Required)
-  schoolId String
-  school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-
-  // Students who joined this club
-  students Student[] @relation("ClubToStudent")
-  
-  recommendedTo ClubRecommendation[]
-
-  // Unique name PER school (Two schools can both have "Beta Club")
   @@unique([name, schoolId])
 }
 
 model ClubRecommendation {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
-
-  reason String
-  timing String // "NOW" | "FUTURE"
-
+  reason    String
+  timing    String
   studentId String
-  student   Student @relation(fields: [studentId], references: [userId], onDelete: Cascade)
-
-  clubId String
-  club   Club   @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  clubId    String
+  club      Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  student   Student  @relation(fields: [studentId], references: [userId], onDelete: Cascade)
 
   @@unique([studentId, clubId])
 }
 
 model Sport {
-  id     String @id @default(cuid())
-  name   String
-  season String // "Fall", "Winter", "Spring"
-  gender String // "Men's", "Women's", "Co-ed"
-
-  // Link to School (Required)
+  id       String    @id @default(cuid())
+  name     String
+  season   String
+  gender   String
   schoolId String
-  school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-
+  school   School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   students Student[] @relation("SportToStudent")
 
-  // Unique name PER school
   @@unique([name, schoolId])
 }
 
 model Course {
-  id         String  @id @default(cuid())
-  name       String
-  department String // "Math", "English"
-  code       String? // "MAT-101"
+  id              String          @id @default(cuid())
+  name            String
+  department      String
+  code            String?
+  schoolId        String
+  availableGrades Int[]
+  bundleId        String?
+  countsForGrad   Boolean         @default(true)
+  credits         Float?
+  level           String?
+  prerequisites   String?
+  programTag      String?
+  requirements    String[]
+  school          School          @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  students        StudentCourse[]
 
-  level           String? // "AP", "H", "CP"
-  credits         Float? // 1.0, 0.5
-  availableGrades Int[] // [9, 10, 11, 12]
-  requirements    String[] // ["FINE_ARTS_CREDIT"]
-  countsForGrad   Boolean  @default(true)
-  prerequisites   String? // "ART-DRAWING-1"
-  bundleId        String? // "BUNDLE-..."
-  programTag      String? // "BAND" 
-
-  // Link to School (Required)
-  schoolId String
-  school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-
-  // Course relationship through junction table
-  students StudentCourse[]
-
-  // Unique name PER school
   @@unique([name, schoolId])
 }
 
 model StudentCourse {
-  id String @id @default(cuid())
-
-  // Foreign keys
-  studentId String
-  courseId  String
-
-  // Course information
-  grade           String? // "A", "B+", "C", etc.
+  id              String       @id @default(cuid())
+  studentId       String
+  courseId        String
+  grade           String?
   status          CourseStatus @default(IN_PROGRESS)
-  confidenceLevel String? // "VERY_LOW", "LOW", "NEUTRAL", "HIGH", "VERY_HIGH" - only for IN_PROGRESS and NEXT_SEMESTER
-  stressLevel     String? // "VERY_LOW", "LOW", "NEUTRAL", "HIGH", "VERY_HIGH" - only for IN_PROGRESS and NEXT_SEMESTER
-  gradeLevel      Int? // The grade (9, 10, 11, 12) when this course was/will be taken
+  confidenceLevel String?
+  stressLevel     String?
+  gradeLevel      Int?
+  course          Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  student         Student      @relation(fields: [studentId], references: [userId], onDelete: Cascade)
 
-  // Relations
-  student Student @relation(fields: [studentId], references: [userId], onDelete: Cascade)
-  course  Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
-
-  // Composite unique constraint - one entry per student per course
   @@unique([studentId, courseId])
 }
 
 model Opportunity {
-  id              String    @id @default(cuid())
-  originalId      String?   @unique
+  id              String                      @id @default(cuid())
+  originalId      String?                     @unique
   title           String
   organization    String
   locationJson    String
-
   type            String
   paid            Boolean
   paidDescription String?
@@ -255,39 +196,36 @@ model Opportunity {
   deadline        String
   description     String
   link            String
-  students        Student[] @relation("OpportunityToStudent")
   recommendedTo   OpportunityRecommendation[]
+  students        Student[]                   @relation("OpportunityToStudent")
 }
 
 model OpportunityRecommendation {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-
-  matchReason String
-  actionPlan  String
-  generatedTags String[] @default([])
-
-  studentId String
-  student   Student @relation(fields: [studentId], references: [userId], onDelete: Cascade)
-
+  id            String      @id @default(cuid())
+  createdAt     DateTime    @default(now())
+  matchReason   String
+  actionPlan    String
+  studentId     String
   opportunityId String
+  generatedTags String[]    @default([])
   opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  student       Student     @relation(fields: [studentId], references: [userId], onDelete: Cascade)
 
   @@unique([studentId, opportunityId])
 }
 
 model Goal {
-  id          String   @id @default(cuid())
-  studentId   String
-  student     Student  @relation(fields: [studentId], references: [userId], onDelete: Cascade)
-  title       String
-  status      String   @default("PENDING") // PENDING, COMPLETED
-  priority    String   @default("Medium") // High, Medium, Low
-  steps       Json?    // Array of strings or objects
-  aiAnalysis  String?  // Reasoning/Advice
-  metadata    Json?    // Stores context like time, location, origin opportunity ID
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String   @id @default(cuid())
+  studentId  String
+  title      String
+  status     String   @default("PENDING")
+  priority   String   @default("Medium")
+  steps      Json?
+  aiAnalysis String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  metadata   Json?
+  student    Student  @relation(fields: [studentId], references: [userId], onDelete: Cascade)
 
   @@index([studentId])
 }

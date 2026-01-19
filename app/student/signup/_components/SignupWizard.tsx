@@ -53,14 +53,13 @@ export default function SignupWizard({ existingStudent, existingSchoolData }: Pr
             existingStudent.targetColleges.length > 0 ||
             existingStudent.focusPrograms.length > 0
         )
-            return 5;
-        if (existingStudent.clubs.length > 0 || existingStudent.sports.length > 0) return 4;
+            return 4;
+        if (existingStudent.clubs.length > 0 || existingStudent.sports.length > 0) return 3;
         if (
             (existingStudent.subjectInterests && existingStudent.subjectInterests.length > 0) ||
             (existingStudent.studyHallsPerYear || 0) > 0
         )
-            return 3;
-        if (existingStudent.studentCourses.length > 0) return 2;
+            return 2;
         return 1;
     };
 
@@ -85,15 +84,15 @@ export default function SignupWizard({ existingStudent, existingSchoolData }: Pr
     // Step 1: Basic Info
     const [gradeLevel, setGradeLevel] = useState(existingStudent?.gradeLevel || 9);
     const [birthday, setBirthday] = useState(
-        existingStudent?.dateOfBirth 
-            ? new Date(existingStudent.dateOfBirth).toISOString().split('T')[0] 
+        (existingStudent as any)?.dateOfBirth 
+            ? new Date((existingStudent as any).dateOfBirth).toISOString().split('T')[0] 
             : ""
     );
     const [bio, setBio] = useState(existingStudent?.bio || "");
 
     // Step 2: Courses
     const [myCourses, setMyCourses] = useState<MyCourse[]>(
-        existingStudent?.studentCourses?.map((sc) => ({
+        existingStudent?.studentCourses?.map((sc: any) => ({
             id: sc.courseId,
             name: sc.course.name,
             status: sc.status,
@@ -102,7 +101,7 @@ export default function SignupWizard({ existingStudent, existingSchoolData }: Pr
         })) || []
     );
     const [desiredCourseRigor, setDesiredCourseRigor] = useState(
-        existingStudent?.desiredCourseRigor || ""
+        (existingStudent as any)?.desiredCourseRigor || ""
     );
 
     // Step 3: Interests
@@ -110,11 +109,11 @@ export default function SignupWizard({ existingStudent, existingSchoolData }: Pr
         existingStudent?.subjectInterests || []
     );
     const [wantsStudyHalls, setWantsStudyHalls] = useState<boolean>(
-        (existingStudent?.maxStudyHallsPerYear || existingStudent?.studyHallsPerYear || 0) > 0
+        ((existingStudent as any)?.maxStudyHallsPerYear || existingStudent?.studyHallsPerYear || 0) > 0
     );
     const [minStudyHalls, setMinStudyHalls] = useState(existingStudent?.studyHallsPerYear || 0);
     const [maxStudyHalls, setMaxStudyHalls] = useState(
-        existingStudent?.maxStudyHallsPerYear || existingStudent?.studyHallsPerYear || 0
+        (existingStudent as any)?.maxStudyHallsPerYear || existingStudent?.studyHallsPerYear || 0
     );
 
     // Step 4: Activities
@@ -193,7 +192,7 @@ export default function SignupWizard({ existingStudent, existingSchoolData }: Pr
                     // Update existing profile (reuses Onboarding action logic basically)
                     await completeOnboarding(existingStudent.userId, {
                         gradeLevel,
-                        dateOfBirth: new Date(birthday),
+                        dateOfBirth: birthday ? new Date(birthday) : null,
                         bio,
                         courses: myCourses,
                         subjectInterests,
@@ -217,7 +216,7 @@ export default function SignupWizard({ existingStudent, existingSchoolData }: Pr
                         password,
                         schoolCode: Number(schoolCode),
                         gradeLevel,
-                        dateOfBirth: new Date(birthday),
+                        dateOfBirth: birthday ? new Date(birthday) : null,
                         bio,
                         courses: myCourses,
                         subjectInterests,
@@ -234,7 +233,7 @@ export default function SignupWizard({ existingStudent, existingSchoolData }: Pr
                     });
                 }
                 // Success
-                router.push("/dashboard");
+                router.push("/dashboard?newGoal=true");
             } catch (err) {
                 const message = err instanceof Error ? err.message : "Signup failed";
                 setGlobalError(message);
@@ -262,7 +261,7 @@ export default function SignupWizard({ existingStudent, existingSchoolData }: Pr
                     <div className="relative h-2 bg-black/20 rounded-full overflow-hidden">
                         <div
                             className="absolute top-0 left-0 h-full bg-[var(--button-color)] transition-all duration-500 ease-out"
-                            style={{ width: `${((step + 1) / 6) * 100}%` }}
+                            style={{ width: `${((step + 1) / 5) * 100}%` }}
                         />
                     </div>
                 </div>
@@ -412,43 +411,8 @@ export default function SignupWizard({ existingStudent, existingSchoolData }: Pr
                         </StepWrapper>
                     )}
 
-                    {step === 2 && schoolData && (
-                        <StepWrapper>
-                            <h2 className="text-xl font-bold text-slate-800 mb-2">
-                                Course History
-                            </h2>
-                            <p className="text-sm text-slate-500 mb-6">
-                                Add courses you have taken or are currently taking.
-                            </p>
-                            <div className="mb-6">
-                                <label className="block text-sm font-bold text-slate-700 mb-1">
-                                    Course Rigor Preference (Optional)
-                                </label>
-                                <select
-                                    value={desiredCourseRigor}
-                                    onChange={(e) => setDesiredCourseRigor(e.target.value)}
-                                    className="w-full border-slate-300 rounded-lg p-3"
-                                >
-                                    <option value="">No preference</option>
-                                    {(schoolData.rigorLevels?.length
-                                        ? schoolData.rigorLevels
-                                        : ["CP", "Honors", "AP"]
-                                    ).map((level) => (
-                                        <option key={level} value={level}>
-                                            {level}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <CourseSelector
-                                allCourses={schoolData.allCourses}
-                                myCourses={myCourses}
-                                setMyCourses={setMyCourses}
-                            />
-                        </StepWrapper>
-                    )}
 
-                    {step === 3 && schoolData && (
+                    {step === 2 && schoolData && (
                         <StepWrapper>
                             <h2 className="text-xl font-bold text-slate-800 mb-6 font-[family-name:var(--primary-font)]">
                                 Academic Interests
@@ -551,7 +515,7 @@ export default function SignupWizard({ existingStudent, existingSchoolData }: Pr
                         </StepWrapper>
                     )}
 
-                    {step === 4 && schoolData && (
+                    {step === 3 && schoolData && (
                         <StepWrapper>
                             <h2 className="text-xl font-bold text-slate-800 mb-6">
                                 Extracurriculars
@@ -597,7 +561,7 @@ export default function SignupWizard({ existingStudent, existingSchoolData }: Pr
                         </StepWrapper>
                     )}
 
-                    {step === 5 && schoolData && (
+                    {step === 4 && schoolData && (
                         <StepWrapper>
                             <h2 className="text-xl font-bold text-slate-800 mb-6">Future Plans</h2>
                             <div className="space-y-6">
@@ -681,7 +645,7 @@ export default function SignupWizard({ existingStudent, existingSchoolData }: Pr
                         {step === 0 ? "Cancel" : "Back"}
                     </button>
 
-                    {step < 5 ? (
+                    {step < 4 ? (
                         <button
                             onClick={handleNext}
                             disabled={isPending}

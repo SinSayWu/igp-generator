@@ -25,6 +25,7 @@ type ClassesPageProps = {
     courseCatalog: CourseCatalogItem[];
     currentGrade: number;
     initialAnalysis?: string;
+    onAction?: (action: string) => void;
 };
 
 type PendingCourseData = {
@@ -43,7 +44,7 @@ type ChatMessage = {
 
 type ChatPayloadMessage = ChatMessage | { role: "system"; content: string };
 
-export default function ClassesPage({ courses, courseCatalog, currentGrade, initialAnalysis }: ClassesPageProps) {
+export default function ClassesPage({ courses, courseCatalog, currentGrade, initialAnalysis, onAction }: ClassesPageProps) {
     const router = useRouter();
     const [generating, setGenerating] = useState(false);
     const [isCatalogOpen, setIsCatalogOpen] = useState(false);
@@ -602,9 +603,9 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade, init
                         {debugInfo && (
                             <button
                                 onClick={() => setShowDebug(true)}
-                                className="bg-gray-100 text-gray-600 px-4 py-3 rounded-xl hover:bg-gray-200 transition-colors font-medium flex items-center gap-2 w-full sm:w-auto"
+                                className="bg-white text-gray-600 px-4 py-3 rounded-xl hover:bg-gray-100 transition-colors font-medium flex items-center gap-2 w-full sm:w-auto border border-black"
                             >
-                                🧠 Debug Thought Process
+                                Debug Thought Process
                             </button>
                         )}
                         <button
@@ -612,29 +613,27 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade, init
                             disabled={plannedCourses.length === 0}
                             className={`px-4 py-3 rounded-xl border transition-colors font-medium flex items-center gap-2 disabled:cursor-not-allowed w-full sm:w-auto ${
                                 plannedCourses.length === 0
-                                    ? "bg-white text-slate-500 border-slate-300"
-                                    : "bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100 hover:border-rose-300"
+                                    ? "bg-white text-slate-400 border-slate-200"
+                                    : "bg-white text-red-600 border-black hover:bg-red-50"
                             }`}
                         >
-                            🗑️ Clear Planned Courses
+                            Clear Planned Courses
                         </button>
-                        <button
+                         <button
                             onClick={handleGenerateFuture}
                             disabled={generating}
                             className={`
                         w-full sm:w-auto
-                        relative overflow-hidden group
-                        bg-gradient-to-r from-indigo-600 to-purple-600 
-                        text-white font-bold py-3 px-6 rounded-xl 
-                        hover:scale-105 transition-all duration-300
+                        bg-[#d70026] hover:bg-[#b00020]
+                        text-white font-bold py-3 px-6 rounded-xl border border-black
+                        transition-colors duration-300
                         disabled:opacity-70 disabled:cursor-not-allowed
                     `}
                         >
-                            <div className="absolute inset-0 bg-white/20 group-hover:translate-x-full transition-transform duration-700 ease-in-out -skew-x-12 -translate-x-[150%]"></div>
                             {generating ? (
-                                <span className="flex items-center gap-2">
+                                <span className="flex items-center gap-2 text-white">
                                     <svg
-                                        className="animate-spin h-5 w-5 text-white"
+                                        className="animate-spin h-5 w-5"
                                         xmlns="http://www.w3.org/2000/svg"
                                         fill="none"
                                         viewBox="0 0 24 24"
@@ -656,9 +655,7 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade, init
                                     Thinking...
                                 </span>
                             ) : (
-                                <span className="flex items-center gap-2">
-                                    <span>✨</span> Generate Potential Future Courses
-                                </span>
+                                "Generate Potential Future Courses"
                             )}
                         </button>
                     </div>

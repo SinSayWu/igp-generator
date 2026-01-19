@@ -291,9 +291,9 @@ export default function Goals({ user, goals: initialGoals }: GoalsProps) {
                              <button
                                 onClick={handleSuggestGoals}
                                 disabled={isSuggesting}
-                                className="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 bg-indigo-50 px-2 py-1 rounded-lg border border-indigo-100 hover:bg-indigo-100 transition-colors"
+                                className="text-xs font-bold text-white bg-[#d70026] hover:bg-[#b00020] px-3 py-1.5 rounded-lg border border-black transition-colors"
                              >
-                                {isSuggesting ? "Thinking..." : "✨ Suggest Goals"}
+                                {isSuggesting ? "Thinking..." : "Suggest Goals"}
                              </button>
                         </div>
                         <div className="flex gap-2">
@@ -316,7 +316,7 @@ export default function Goals({ user, goals: initialGoals }: GoalsProps) {
                                 <option value="Low">Low Priority</option>
                             </select>
                             <button 
-                                className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700 disabled:opacity-50"
+                                className="bg-[#d70026] text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#b00020] border border-black disabled:opacity-50"
                                 onClick={handleAddGoal}
                                 disabled={isAdding || !newTitle.trim()}
                             >
@@ -350,7 +350,7 @@ export default function Goals({ user, goals: initialGoals }: GoalsProps) {
                                                 {goal.priority}
                                             </span>
                                         </div>
-                                        <p className="text-xs text-indigo-600 font-semibold mt-1">
+                                        <p className="text-xs text-red-700 font-semibold mt-1">
                                             {expandedGoalId === goal.id ? "Click to collapse" : "Click to view AI plan"}
                                         </p>
                                     </div>

@@ -14,9 +14,11 @@ type ClassesPageProps = {
     courses: StudentCourseData[];
     courseCatalog: CourseCatalogItem[];
     currentGrade: number;
+    initialAnalysis?: string;
+    onAction?: (action: string) => void;
 };
 
-export default function ClassesPage({ courses, courseCatalog, currentGrade }: ClassesPageProps) {
+export default function ClassesPage({ courses, courseCatalog, currentGrade, initialAnalysis, onAction }: ClassesPageProps) {
     const router = useRouter();
     const [generating, setGenerating] = useState(false);
     const [isCatalogOpen, setIsCatalogOpen] = useState(false);
@@ -293,6 +295,7 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade }: Cl
                         </div>
                 console.error("Failed to generate courses:", errData.error || res.statusText);
                 alert(`Error: ${errData.error || "Failed to generate courses"}`);
+                onAction?.("generate");
             }
         } catch (error) {
             console.error(error);
@@ -318,7 +321,7 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade }: Cl
                                 onClick={() => setShowDebug(true)}
                                 className="bg-gray-100 text-gray-600 px-4 py-3 rounded-xl hover:bg-gray-200 transition-colors font-medium flex items-center gap-2"
                             >
-                                🧠 Debug Thought Process
+                                Debug Thought Process
                             </button>
                         )}
                         <button
@@ -326,13 +329,12 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade }: Cl
                             disabled={generating}
                             className={`
                         relative overflow-hidden group
-                        bg-gradient-to-r from-indigo-600 to-purple-600 
-                        text-white font-bold py-3 px-6 rounded-xl shadow-lg 
-                        hover:shadow-xl hover:scale-105 transition-all duration-300
+                        bg-[var(--button-color)] 
+                        text-white font-bold py-3 px-6 rounded-xl border border-black transition-all duration-300
                         disabled:opacity-70 disabled:cursor-not-allowed
                     `}
                         >
-                            <div className="absolute inset-0 bg-white/20 group-hover:translate-x-full transition-transform duration-700 ease-in-out -skew-x-12 -translate-x-[150%]"></div>
+                            <div className="absolute inset-0 bg-white/10 group-hover:translate-x-full transition-transform duration-700 ease-in-out -skew-x-12 -translate-x-[150%]"></div>
                             {generating ? (
                                 <span className="flex items-center gap-2">
                                     <svg
@@ -359,7 +361,7 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade }: Cl
                                 </span>
                             ) : (
                                 <span className="flex items-center gap-2">
-                                    <span>✨</span> Generate Potential Future Courses
+                                     Generate Potential Future Courses
                                 </span>
                             )}
                         </button>
@@ -390,7 +392,7 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade }: Cl
                 <div className="flex items-center justify-between p-6 bg-slate-50 border-b border-slate-200">
                     <div>
                         <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                            <span>🗓️</span> Projected 4-Year Plan
+                            Projected 4-Year Plan
                         </h2>
                         <p className="text-xs text-slate-500 mt-1">
                             Click any cell to add a course you’ve already taken or are currently

@@ -5,7 +5,7 @@ import { getSession } from "@/lib/session";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 
-export async function toggleGoalStep(goalId: string, stepId: string) {
+export async function setGoalStepStatus(goalId: string, stepId: string, completed: boolean) {
     const cookieStore = await cookies();
     const sessionId = cookieStore.get("session")?.value;
     if (!sessionId) return { error: "Not authenticated" };
@@ -14,7 +14,7 @@ export async function toggleGoalStep(goalId: string, stepId: string) {
     if (!session || !session.userId) return { error: "Invalid session" };
 
     try {
-        const goal = await prisma.goal.findUnique({
+        const goal = await (prisma as any).goal.findUnique({
             where: { id: goalId, studentId: session.userId },
         });
 
@@ -23,20 +23,24 @@ export async function toggleGoalStep(goalId: string, stepId: string) {
         }
 
         const steps = goal.steps as any[];
-        const updatedSteps = steps.map((s) => 
-            s.id === stepId ? { ...s, completed: !s.completed } : s
-        );
+        const stepIndex = steps.findIndex(s => s.id === stepId);
+        
+        if (stepIndex === -1) return { error: "Step not found" };
+        if (steps[stepIndex].completed === completed) return { success: true }; // Already in desired state
 
-        // Auto-complete logic
+        const updatedSteps = [...steps];
+        updatedSteps[stepIndex] = { ...steps[stepIndex], completed };
+
+        // Auto-complete logic for the whole goal
         const allCompleted = updatedSteps.every(s => s.completed);
         let status = goal.status;
         if (allCompleted) {
             status = "COMPLETED";
-        } else if (goal.status === "COMPLETED") {
+        } else {
             status = "ACTIVE";
         }
 
-        await prisma.goal.update({
+        await (prisma as any).goal.update({
             where: { id: goalId },
             data: { 
                 steps: updatedSteps,
@@ -47,7 +51,7 @@ export async function toggleGoalStep(goalId: string, stepId: string) {
         revalidatePath("/dashboard");
         return { success: true };
     } catch (error) {
-        console.error("Toggle step error:", error);
+        console.error("Set goal step status error:", error);
         return { error: "Failed to update step" };
     }
 }

@@ -24,7 +24,7 @@ async function main() {
             paidDesc = op.paid;
         }
 
-        await prisma.opportunity.upsert({
+        await (prisma as any).opportunity.upsert({
             where: { originalId: op.id },
             update: {
                 title: op.title,

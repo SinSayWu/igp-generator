@@ -37,11 +37,11 @@ export function SubjectInterestsSection({
                         <label
                             key={subject}
                             className={`flex items-center gap-2 p-2 rounded border cursor-pointer transition-all text-sm ${
-                                isSelected ? "bg-yellow-50" : "bg-white"
+                                isSelected ? "bg-red-50" : "bg-white"
                             }`}
                             style={{
                                 borderColor: isSelected
-                                    ? "var(--foreground)"
+                                    ? "#000000"
                                     : "var(--accent-background)",
                             }}
                         >

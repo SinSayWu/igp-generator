@@ -24,7 +24,7 @@ interface MyCourse {
 
 interface OnboardingData {
     gradeLevel: number;
-    dateOfBirth: Date;
+    dateOfBirth?: Date | null;
     bio: string;
     courses: MyCourse[];
     subjectInterests: string[];
@@ -40,27 +40,20 @@ interface OnboardingData {
     desiredCourseRigor?: string;
 }
 
+import { addDefaultGoal } from "@/app/actions/add-default-goal";
+
 export async function completeOnboarding(userId: string, data: OnboardingData) {
     try {
         const {
-            // Step 1
             gradeLevel,
             dateOfBirth,
             bio,
-
-            // Step 2
-            courses, // Array of { id, status, grade... }
-
-            // Step 3
+            courses,
             subjectInterests,
             studyHallsPerYear,
             maxStudyHallsPerYear,
-
-            // Step 4
             clubIds,
             sportIds,
-
-            // Step 4
             collegeIds,
             programIds,
             postHighSchoolPlan,
@@ -98,17 +91,20 @@ export async function completeOnboarding(userId: string, data: OnboardingData) {
                         grade: c.grade || null,
                         confidenceLevel: c.confidence || null,
                         stressLevel: c.stress || null,
-                        gradeLevel: c.gradeLevel || gradeLevel, // Fallback to current grade if not specified
+                        gradeLevel: c.gradeLevel || gradeLevel,
                     })),
                 },
-            },
+            } as any,
         });
 
+        // Add default goal
+        await addDefaultGoal(userId);
+
         revalidatePath("/dashboard");
+        return { success: true };
     } catch (error) {
         console.error("Onboarding Error:", error);
         throw new Error("Failed to save profile");
     }
 
-    redirect("/dashboard");
 }

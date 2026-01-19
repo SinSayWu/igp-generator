@@ -11,9 +11,10 @@ type ExtracurricularsProps = {
     sports: SportData[];
     initialRecommendations: RecommendationData[];
     initialAnalysis?: string;
+    onAction?: (action: string) => void;
 };
 
-export default function Extracurriculars({ clubs, sports, initialRecommendations = [], initialAnalysis }: ExtracurricularsProps) {
+export default function Extracurriculars({ clubs, sports, initialRecommendations = [], initialAnalysis, onAction }: ExtracurricularsProps) {
     const totalActivities = clubs.length + sports.length;
     // Map initial DB data to the shape the UI expects (which is basically the same, just stricter typing)
     const [recommendations, setRecommendations] = useState<RecommendationData[]>(initialRecommendations);
@@ -33,6 +34,7 @@ export default function Extracurriculars({ clubs, sports, initialRecommendations
                 if (result.debug) {
                     setDebugInfo(result.debug);
                 }
+                onAction?.("generate");
             } else if (result.error) {
                 alert(result.error);
             }
@@ -56,7 +58,7 @@ export default function Extracurriculars({ clubs, sports, initialRecommendations
                                 onClick={() => setShowDebug(true)}
                                 className="bg-gray-100 text-gray-600 px-4 py-3 rounded-xl hover:bg-gray-200 transition-colors font-medium flex items-center gap-2"
                             >
-                                🧠 Debug Thought Process
+                                Debug Thought Process
                             </button>
                         )}
                         <button
@@ -64,7 +66,7 @@ export default function Extracurriculars({ clubs, sports, initialRecommendations
                             disabled={isPending}
                             className={`
                                 bg-[#d70026] text-white px-6 py-3 border border-black rounded-xl font-bold transition-all 
-                                hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50
+                                hover:bg-[#b00020] disabled:opacity-50
                             `}
                         >
                             {isPending ? (
@@ -93,7 +95,7 @@ export default function Extracurriculars({ clubs, sports, initialRecommendations
                                 </span>
                             ) : (
                                 <span className="flex items-center gap-2">
-                                    <span>✨</span> AI Matcher
+                                     AI Matcher
                                 </span>
                             )}
                         </button>
@@ -106,7 +108,7 @@ export default function Extracurriculars({ clubs, sports, initialRecommendations
                 <section className="animate-in slide-in-from-top-4 fade-in duration-500">
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-xl font-bold text-[#d70026] flex items-center gap-2">
-                            <span>🤖</span> AI Recommendations
+                            AI Recommendations
                         </h2>
                         <button 
                             onClick={() => setShowRecommendations(false)}
@@ -121,74 +123,76 @@ export default function Extracurriculars({ clubs, sports, initialRecommendations
                             No matching recommendations found based on your current profile. Try updating your interests!
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {recommendations.map(({ club, reason, timing }) => {
-                                const isInClub = clubs.some(c => c.id === club.id);
-                                const isFuture = timing === "FUTURE";
-                                
-                                return (
-                                <div
-                                    key={club.id}
-                                    className={`group relative bg-white p-5 rounded-xl border border-black transition-all duration-200 flex flex-col h-full
-                                        ${isInClub ? 'bg-red-50/50' : ''}`}
-                                >
-                                    <div className="absolute top-3 right-3 flex flex-col gap-1 items-end">
-                                        {isInClub ? (
-                                            <div className="bg-[#d70026] text-white text-[10px] uppercase font-black px-2 py-0.5 rounded-md border border-black">
-                                                Joined
-                                            </div>
-                                        ) : (
-                                            <div className="bg-white text-[#d70026] text-[10px] uppercase font-black px-2 py-0.5 rounded-md border border-black">
-                                                Recommended
-                                            </div>
-                                        )}
-                                        {isFuture && (
-                                            <div className="bg-amber-50 text-amber-700 text-[10px] uppercase font-black px-2 py-0.5 rounded-md border border-amber-200">
-                                                Future Choice
-                                            </div>
-                                        )}
-                                    </div>
+                        <div className="bg-red-50/50 border border-black rounded-2xl p-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {recommendations.map(({ club, reason, timing }) => {
+                                    const isInClub = clubs.some(c => c.id === club.id);
+                                    const isFuture = timing === "FUTURE";
                                     
-                                    <h3 className="font-bold text-lg text-slate-900 mb-1 mt-1 pr-16 group-hover:text-[#d70026] transition-colors">
-                                        {club.name}
-                                    </h3>
-                                    
-                                    <div className="flex flex-wrap gap-2 mb-3">
-                                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold border border-black
-                                            ${isInClub ? 'bg-white text-[#d70026]' : 'bg-gray-50 text-slate-700'}`}>
-                                            {club.category}
-                                        </span>
-                                    </div>
-
-                                    <div className="mb-4 text-sm text-slate-600 flex-grow">
-                                        <div className="mb-2 italic text-slate-500 text-xs bg-slate-50 p-2 rounded border border-slate-100">
-                                            "{reason}"
-                                        </div>
-                                        {club.description && (
-                                            <p className="line-clamp-3">
-                                                {club.description}
-                                            </p>
-                                        )}
-                                    </div>
-                                    
-                                    <div className="pt-3 border-t border-black text-xs text-slate-500 space-y-1">
-                                        {!isInClub && (
-                                            <div className="font-black uppercase tracking-tight text-[#d70026]">
-                                                How to join:
-                                            </div>
-                                        )}
-                                        <div className="font-medium text-slate-700">
-                                            {club.teacherLeader ? (
-                                                <span>Contact <span className="font-bold underline decoration-red-200">{club.teacherLeader}</span> to join.</span>
-                                            ) : club.studentLeaders ? (
-                                                <span>Contact student leaders <span className="font-bold underline decoration-red-200">{club.studentLeaders}</span> to join.</span>
+                                    return (
+                                    <div
+                                        key={club.id}
+                                        className={`group relative bg-white p-5 rounded-xl border border-black transition-all duration-300 flex flex-col h-full
+                                            ${isInClub ? 'bg-red-50/50' : ''}`}
+                                    >
+                                        <div className="absolute top-3 right-3 flex flex-col gap-1 items-end">
+                                            {isInClub ? (
+                                                <div className="bg-[#d70026] text-white text-[10px] uppercase font-black px-2 py-0.5 rounded-md border border-black">
+                                                    Joined
+                                                </div>
                                             ) : (
-                                                <span>Contact the school office/sponsor.</span>
+                                                <div className="bg-white text-[#d70026] text-[10px] uppercase font-black px-2 py-0.5 rounded-md border border-black">
+                                                    Recommended
+                                                </div>
+                                            )}
+                                            {isFuture && (
+                                                <div className="bg-amber-50 text-amber-700 text-[10px] uppercase font-black px-2 py-0.5 rounded-md border border-amber-200">
+                                                    Future Choice
+                                                </div>
                                             )}
                                         </div>
+                                        
+                                        <h3 className="font-bold text-lg text-slate-900 mb-1 mt-1 pr-16 group-hover:text-[#d70026] transition-colors">
+                                            {club.name}
+                                        </h3>
+                                        
+                                        <div className="flex flex-wrap gap-2 mb-3">
+                                            <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold border border-black
+                                                ${isInClub ? 'bg-white text-[#d70026]' : 'bg-gray-50 text-slate-700'}`}>
+                                                {club.category}
+                                            </span>
+                                        </div>
+
+                                        <div className="mb-4 text-sm text-slate-600 flex-grow">
+                                            <div className="mb-2 italic text-slate-500 text-xs bg-slate-50 p-2 rounded border border-slate-100">
+                                                "{reason}"
+                                            </div>
+                                            {club.description && (
+                                                <p className="line-clamp-3">
+                                                    {club.description}
+                                                </p>
+                                            )}
+                                        </div>
+                                        
+                                        <div className="pt-3 border-t border-black text-xs text-slate-500 space-y-1">
+                                            {!isInClub && (
+                                                <div className="font-black uppercase tracking-tight text-[#d70026]">
+                                                    How to join:
+                                                </div>
+                                            )}
+                                            <div className="font-medium text-slate-700">
+                                                {club.teacherLeader ? (
+                                                    <span>Contact <span className="font-bold underline decoration-red-200">{club.teacherLeader}</span> to join.</span>
+                                                ) : club.studentLeaders ? (
+                                                    <span>Contact student leaders <span className="font-bold underline decoration-red-200">{club.studentLeaders}</span> to join.</span>
+                                                ) : (
+                                                    <span>Contact the school office/sponsor.</span>
+                                                )}
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            )})}
+                                )})}
+                            </div>
                         </div>
                     )}
                 </section>
@@ -310,7 +314,7 @@ export default function Extracurriculars({ clubs, sports, initialRecommendations
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[80vh] overflow-hidden flex flex-col">
                         <div className="p-6 border-b border-gray-200 flex justify-between items-center">
-                            <h3 className="text-xl font-bold">🧠 AI Thought Process</h3>
+                            <h3 className="text-xl font-bold">AI Thought Process</h3>
                             <button
                                 onClick={() => setShowDebug(false)}
                                 className="text-gray-500 hover:text-gray-700 text-2xl leading-none"

@@ -5,6 +5,7 @@ import { CourseStatus, Prisma } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { createSession } from "@/lib/session";
 import { cookies } from "next/headers";
+import { addDefaultGoal } from "@/app/actions/add-default-goal";
 
 export async function getSchoolData(schoolCode: number) {
     const school = await prisma.school.findUnique({
@@ -26,7 +27,7 @@ export async function getSchoolData(schoolCode: number) {
     return {
         schoolId: school.id,
         schoolName: school.name,
-        rigorLevels: school.rigorLevels,
+        rigorLevels: (school as any).rigorLevels || [],
         allClubs: school.clubs,
         allSports: school.sports,
         allCourses: school.courses,
@@ -57,7 +58,7 @@ export interface SignupData {
     password: string;
     schoolCode: number;
     gradeLevel: number;
-    dateOfBirth: Date;
+    dateOfBirth?: Date | null;
     bio: string;
     courses: MyCourse[];
     subjectInterests: string[];
@@ -119,7 +120,7 @@ export async function signupAndProfileSetup(data: SignupData) {
     // Note: We are creating "StudentCourse" records here too
 
     // Prepare nested writes
-    const studentData: Prisma.StudentCreateWithoutUserInput = {
+    const studentData: any = {
         school: { connect: { id: school.id } },
         gradeLevel,
         graduationYear: new Date().getFullYear() + (12 - gradeLevel), // Approximation
@@ -169,12 +170,15 @@ export async function signupAndProfileSetup(data: SignupData) {
                 email,
                 passwordHash,
                 role: "STUDENT",
-                gender: "Not Specified", // Or add to form
+                gender: "Not Specified",
                 student: {
-                    create: studentData,
+                    create: studentData as any,
                 },
             },
         });
+
+        // Add default goal
+        await addDefaultGoal(user.id);
 
         // 5. Create Session
         const { session, expiresAt } = await createSession(user.id);

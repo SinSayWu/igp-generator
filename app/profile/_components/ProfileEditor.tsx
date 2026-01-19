@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useTransition, ReactNode, useEffect, useRef, useCallback } from "react";
-import { Club, Sport, Course, Student, College, Program, StudentCourse, Opportunity } from "@prisma/client";
+import { Club, Sport, Course, Student, College, Program, StudentCourse } from "@prisma/client";
+type Opportunity = any; // Workaround for prisma type sync issue
 
 import { updateStudentProfile } from "@/app/actions/update-profile";
 import { deleteAccount } from "@/app/actions/delete-account";
@@ -9,8 +10,9 @@ import { deleteAccount } from "@/app/actions/delete-account";
 import { AboutMeSection } from "./sections/AboutMeSection";
 import { PathwaysSection } from "./sections/PathwaysSection";
 import { SubjectInterestsSection } from "./sections/SubjectInterestsSection";
-import { FutureePlansSection } from "./sections/FuturePlansSection";
+import { FuturePlansSection } from "./sections/FuturePlansSection";
 import { StudyHallsSection } from "./sections/StudyHallsSection";
+import { setGoalStepStatus } from "@/app/actions/set-goal-step-status";
 
 // --- TYPES & INTERFACES ---
 
@@ -94,7 +96,7 @@ export default function ProfileEditor({
     const [plan, setPlan] = useState((student.postHighSchoolPlan || "").trim());
     const [ncaa, setNcaa] = useState(student.interestedInNCAA);
     const [bio, setBio] = useState(student.bio || "");
-    const [desiredCourseRigor, setDesiredCourseRigor] = useState(student.desiredCourseRigor || "");
+    const [desiredCourseRigor, setDesiredCourseRigor] = useState((student as any).desiredCourseRigor || "");
 
     const [minStudyHalls, setMinStudyHalls] = useState(student.studyHallsPerYear || 0);
     // Fallback to min if max is not set (handles migration from single-value schema)
@@ -104,6 +106,18 @@ export default function ProfileEditor({
     const [wantsStudyHalls, setWantsStudyHalls] = useState(
         ((student as any).maxStudyHallsPerYear || 0) > 0 || (student.studyHallsPerYear || 0) > 0
     );
+
+    // Goal Tracking: View your student profile
+    useEffect(() => {
+        const studentGoals = (student as any).goals || [];
+        const exploreGoal = studentGoals.find((g: any) => g.title === "Explore the Website");
+        if (!exploreGoal) return;
+
+        const profileStep = exploreGoal.steps.find((s: any) => s.title === "View your student profile");
+        if (profileStep && !profileStep.completed) {
+            setGoalStepStatus(exploreGoal.id, profileStep.id, true);
+        }
+    }, [student]);
 
     // 2. Course Data State (Grades, Stress, etc.)
     const [courseData, setCourseData] = useState<
@@ -184,12 +198,7 @@ export default function ProfileEditor({
     const [selOp, setSelOp] = useState("");
 
     // 5. LLM State
-    const [clubRecs, setClubRecs] = useState<any[]>([]);
-    const [opRecs, setOpRecs] = useState<any[]>([]);
-    const [generatingClubs, setGeneratingClubs] = useState(false);
-    const [generatingOps, setGeneratingOps] = useState(false);
-    const [opDebugInfo, setOpDebugInfo] = useState<{ rawResponse: string; prompt: string } | null>(null);
-    const [showOpDebug, setShowOpDebug] = useState(false);
+    const [expandingCourse, setExpandingCourse] = useState<string | null>(null);
 
     const [pendingCourseData, setPendingCourseData] = useState<{
         status: string;
@@ -281,46 +290,8 @@ export default function ProfileEditor({
         }
     };
 
-    const handleRecommend = async (type: "club" | "opportunity") => {
-        if (type === "club") setGeneratingClubs(true);
-        else setGeneratingOps(true);
-
-        try {
-            const res = await fetch("/api/llm/recommendations", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ studentId: student.userId, type }),
-            });
-            const data = await res.json();
-            
-            console.log(`[${type}] API Response:`, data);
-            
-            if (data.recommendations) {
-                if (type === "club") setClubRecs(data.recommendations);
-                else setOpRecs(data.recommendations);
-            }
-            
-            // Capture debug info for opportunities (moved outside recommendations check)
-            if (type === "opportunity" && data.debug) {
-                console.log("[opportunity] Setting debug info:", data.debug);
-                setOpDebugInfo(data.debug);
-            }
-        } catch (err) {
-            console.error(err);
-        } finally {
-            if (type === "club") setGeneratingClubs(false);
-            else setGeneratingOps(false);
-        }
-    };
-
     const addFromRec = (rec: any) => {
-        if (rec.actionPlan) {
-            // It's a club
-            addItem(rec.id, allClubs, myClubs, setMyClubs, setSelClub, "club");
-        } else {
-            // It's an opportunity
-            addItem(rec.id, allOpportunities, myOpportunities, setMyOpportunities, setSelOp, "course");
-        }
+        // Simplified
     };
 
     const handleSubmit = useCallback(
@@ -567,8 +538,8 @@ export default function ProfileEditor({
                     </SectionCard>
 
                     {/* Note: Ensure FuturePlansSection uses <h3> for headers so they pop inside the card */}
-                    <SectionCard className="border-l-4 border-l-indigo-500">
-                        <FutureePlansSection
+                    <SectionCard className="border-l-4 border-l-[#d70026]">
+                        <FuturePlansSection
                             plan={plan}
                             ncaa={ncaa}
                             colleges={allColleges}
@@ -616,7 +587,6 @@ export default function ProfileEditor({
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         <SectionTable
                             title="Sports"
-                            icon="🏆"
                             items={mySports}
                             allRawItems={allSports}
                             selectedId={selSport}
@@ -637,7 +607,6 @@ export default function ProfileEditor({
 
                         <SectionTable
                             title="Clubs & Activities"
-                            icon="🎭"
                             items={myClubs}
                             allRawItems={allClubs}
                             selectedId={selClub}
@@ -647,17 +616,12 @@ export default function ProfileEditor({
                             }
                             onRemove={(id) => removeItem(id, myClubs, setMyClubs)}
                             placeholder="Select a club..."
-                            recommendations={clubRecs}
-                            isGenerating={generatingClubs}
-                            onRecommend={() => handleRecommend("club")}
-                            onAddFromRec={addFromRec}
                         />
                     </div>
 
                     {/* Full width for courses */}
                     <SectionTable
                         title="Academic Courses"
-                        icon="📚"
                         isCourseSection
                         items={myCourses}
                         allRawItems={allCourses}
@@ -688,7 +652,6 @@ export default function ProfileEditor({
                     {/* --- OPPORTUNITIES SECTION --- */}
                     <SectionTable
                         title="Opportunities"
-                        icon="🌟"
                         items={myOpportunities}
                         allRawItems={allOpportunities}
                         selectedId={selOp}
@@ -698,12 +661,6 @@ export default function ProfileEditor({
                         }
                         onRemove={(id) => removeItem(id, myOpportunities, setMyOpportunities)}
                         placeholder="Select an opportunity..."
-                        recommendations={opRecs}
-                        isGenerating={generatingOps}
-                        onRecommend={() => handleRecommend("opportunity")}
-                        onAddFromRec={addFromRec}
-                        debugInfo={opDebugInfo}
-                        onShowDebug={() => setShowOpDebug(true)}
                     />
 
                     {/* --- DANGER ZONE --- */}
@@ -720,7 +677,7 @@ export default function ProfileEditor({
                             <button
                                 type="button"
                                 onClick={handleDeleteAccount}
-                                className="bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-sm text-sm"
+                                className="bg-red-600 text-white font-bold py-2 px-4 rounded-lg border border-black text-sm"
                             >
                                 Delete Account
                             </button>
@@ -730,12 +687,12 @@ export default function ProfileEditor({
                     {/* --- FLOATING STATUS BAR --- */}
                     {(hasUnsavedChanges || isPending) && (
                         <div className="fixed bottom-0 left-0 right-0 p-6 flex justify-center items-end pointer-events-none z-40">
-                            <div className="pointer-events-auto bg-white/90 backdrop-blur-md border border-slate-200 shadow-2xl rounded-full px-6 py-2 flex items-center gap-4">
+                            <div className="pointer-events-auto bg-white/90 backdrop-blur-md border border-black rounded-full px-6 py-2 flex items-center gap-4">
                                 <div className="flex items-center gap-3">
                                     {isPending ? (
                                         <>
                                             <svg
-                                                className="animate-spin h-5 w-5 text-indigo-600"
+                                                className="animate-spin h-5 w-5 text-[#d70026]"
                                                 viewBox="0 0 24 24"
                                             >
                                                 <circle
@@ -770,7 +727,7 @@ export default function ProfileEditor({
                                 <button
                                     type="submit"
                                     disabled={isPending}
-                                    className="bg-indigo-600 text-white text-sm font-bold py-2 px-5 rounded-full shadow-md active:scale-95 flex items-center gap-2"
+                                    className="bg-[#d70026] text-white text-sm font-bold py-2 px-5 rounded-full border border-black transition-colors flex items-center gap-2"
                                 >
                                     Save
                                 </button>
@@ -778,39 +735,6 @@ export default function ProfileEditor({
                         </div>
                     )}
                 </form>
-
-                {/* Debug Modal for Opportunities */}
-                {showOpDebug && opDebugInfo && (
-                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[80vh] overflow-hidden flex flex-col">
-                            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
-                                <h3 className="text-xl font-bold">🧠 AI Thought Process</h3>
-                                <button
-                                    onClick={() => setShowOpDebug(false)}
-                                    className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
-                                >
-                                    ×
-                                </button>
-                            </div>
-                            <div className="p-6 overflow-y-auto flex-1">
-                                <div className="space-y-6">
-                                    <div>
-                                        <h4 className="font-bold text-lg mb-2 text-indigo-600">Prompt Sent to AI:</h4>
-                                        <pre className="bg-gray-50 p-4 rounded-lg text-sm overflow-x-auto whitespace-pre-wrap border border-gray-200">
-                                            {opDebugInfo.prompt}
-                                        </pre>
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-lg mb-2 text-green-600">Raw AI Response:</h4>
-                                        <pre className="bg-gray-50 p-4 rounded-lg text-sm overflow-x-auto whitespace-pre-wrap border border-gray-200">
-                                            {opDebugInfo.rawResponse}
-                                        </pre>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
             </div>
         </div>
     );
@@ -942,81 +866,18 @@ function SectionTable({
         return true;
     };
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-full">
+        <div className="bg-white rounded-xl border border-black flex flex-col h-full">
             {/* Header */}
             <div className="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between items-center">
                 <h3 className="font-bold text-lg text-slate-800 flex items-center gap-2">
-                    {icon && <span>{icon}</span>} {title}
+                    {title}
                 </h3>
                 <div className="flex gap-2">
-                    {debugInfo && onShowDebug && (
-                        <button
-                            type="button"
-                            onClick={onShowDebug}
-                            className="text-xs font-bold bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg hover:bg-gray-200 transition-all"
-                        >
-                            🧠 Debug
-                        </button>
-                    )}
-                    {onRecommend && (
-                        <button
-                            type="button"
-                            onClick={onRecommend}
-                            disabled={isGenerating}
-                            className="text-xs font-bold text-[#d70026] border-2 border-[#d70026] px-3 py-1.5 bg-[#d70026] text-white transition-all disabled:opacity-50"
-                        >
-                            {isGenerating ? "Analyzing..." : "Find Recommended"}
-                        </button>
-                    )}
                 </div>
             </div>
 
             <div className="p-6 flex-1 flex flex-col gap-6">
-                {/* AI Recommendations */}
-                {recommendations.length > 0 && (
-                    <div className="mb-6 animate-in fade-in slide-in-from-top-4">
-                        <h4 className="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
-                            <span>✨</span> Suggested for You
-                        </h4>
-                        <div className="grid grid-cols-1 gap-4">
-                            {recommendations.map((rec, idx) => {
-                                const isAdded = items.some(i => i.id === rec.id);
-                                return (
-                                    <div key={idx} className="border-2 border-black p-4 bg-white relative">
-                                        <div className="flex justify-between items-start mb-2">
-                                            <h5 className="font-bold text-slate-900">{rec.name || rec.title}</h5>
-                                            {!isAdded && onAddFromRec && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => onAddFromRec(rec)}
-                                                    className="text-xs font-bold bg-black text-white px-3 py-1 border-2 border-black transition-all"
-                                                >
-                                                    Add to List
-                                                </button>
-                                            )}
-                                        </div>
-                                        <p className="text-sm text-slate-600 mb-3 italic">"{rec.justification || rec.matchReason}"</p>
-                                        {rec.actionPlan && (
-                                            <div className="bg-slate-50 border border-slate-200 p-3 text-xs">
-                                                <p className="font-bold text-slate-900 mb-1">Action Plan:</p>
-                                                <p className="text-slate-600">{rec.actionPlan}</p>
-                                            </div>
-                                        )}
-                                        {rec.generatedTags && (
-                                            <div className="flex gap-2 mt-2">
-                                                {(rec.generatedTags || []).map((tag: string) => (
-                                                    <span key={tag} className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 px-2 py-0.5 border border-slate-200">
-                                                        {tag}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                )}
+
 
                 {/* List of Items */}
                 <div className="flex flex-wrap gap-3">
@@ -1033,11 +894,11 @@ function SectionTable({
                                 <div
                                     key={item.id}
                                     className={`
-                                        border rounded-xl transition-all duration-200 shadow-sm
+                                        border rounded-xl transition-all duration-200
                                         ${
                                             isExpanded
-                                                ? "border-indigo-200 bg-indigo-50/30 ring-1 ring-indigo-200 w-full"
-                                                : "border-slate-200 bg-white shadow-md max-w-xs"
+                                                ? "border-red-200 bg-red-50/30 ring-1 ring-red-200 w-full"
+                                                : "border-black bg-white max-w-xs"
                                         }
                                     `}
                                 >
@@ -1075,7 +936,7 @@ function SectionTable({
                                                 <button
                                                     type="button"
                                                     onClick={() => onToggleCourseExpand(item.id)}
-                                                    className="text-xs font-medium text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded transition"
+                                                    className="text-xs font-medium text-[#d70026] bg-red-50 px-3 py-1.5 rounded transition"
                                                 >
                                                     {isExpanded ? "Done" : "Details"}
                                                 </button>
@@ -1106,7 +967,7 @@ function SectionTable({
                                     {/* Expanded Course Editor */}
                                     {isCourseSection && isExpanded && onCourseDataChange && (
                                         <div className="px-4 pb-4 pt-0 animate-fadeIn">
-                                            <div className="h-px bg-indigo-100 w-full mb-4" />
+                                            <div className="h-px bg-red-100 w-full mb-4" />
 
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                 {/* Status - Always shown */}
@@ -1124,7 +985,7 @@ function SectionTable({
                                                             });
                                                             onCourseDataChange(newData);
                                                         }}
-                                                        className="w-full text-sm border-slate-200 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                                                        className="w-full text-sm border-slate-200 rounded-md focus:ring-[#d70026] focus:border-[#d70026]"
                                                     >
                                                         <option value="IN_PROGRESS">
                                                             In Progress
@@ -1158,7 +1019,7 @@ function SectionTable({
                                                                 });
                                                                 onCourseDataChange(newData);
                                                             }}
-                                                            className="w-full text-sm border-slate-200 rounded-md focus:ring-indigo-500 focus:border-indigo-500 invalid:border-red-300 invalid:text-red-600"
+                                                            className="w-full text-sm border-slate-200 rounded-md focus:ring-[#d70026] focus:border-[#d70026] invalid:border-red-300 invalid:text-red-600"
                                                         >
                                                             <option value="">
                                                                 -- Select Grade --
@@ -1198,7 +1059,7 @@ function SectionTable({
                                                                 });
                                                                 onCourseDataChange(newData);
                                                             }}
-                                                            className="w-full text-sm border-slate-200 rounded-md focus:ring-indigo-500 focus:border-indigo-500 invalid:border-red-300 invalid:text-red-600"
+                                                            className="w-full text-sm border-slate-200 rounded-md focus:ring-[#d70026] focus:border-[#d70026] invalid:border-red-300 invalid:text-red-600"
                                                         >
                                                             <option value="">
                                                                 -- Select Level --
@@ -1234,7 +1095,7 @@ function SectionTable({
                                                                     });
                                                                     onCourseDataChange(newData);
                                                                 }}
-                                                                className="w-full text-sm border-slate-200 rounded-md focus:ring-indigo-500 focus:border-indigo-500 invalid:border-red-300 invalid:text-red-600"
+                                                                className="w-full text-sm border-slate-200 rounded-md focus:ring-[#d70026] focus:border-[#d70026] invalid:border-red-300 invalid:text-red-600"
                                                             >
                                                                 <option value="">
                                                                     -- Select --
@@ -1268,7 +1129,7 @@ function SectionTable({
                                                                     });
                                                                     onCourseDataChange(newData);
                                                                 }}
-                                                                className="w-full text-sm border-slate-200 rounded-md focus:ring-indigo-500 focus:border-indigo-500 invalid:border-red-300 invalid:text-red-600"
+                                                                className="w-full text-sm border-slate-200 rounded-md focus:ring-[#d70026] focus:border-[#d70026] invalid:border-red-300 invalid:text-red-600"
                                                             >
                                                                 <option value="">
                                                                     -- Select --
@@ -1305,12 +1166,12 @@ function SectionTable({
                             selectedId &&
                             pendingCourseData &&
                             onPendingCourseDataChange && (
-                                <div className="bg-slate-50 rounded-xl p-4 border border-indigo-100 animate-fadeIn space-y-4">
+                                <div className="bg-slate-50 rounded-xl p-4 border border-red-100 animate-fadeIn space-y-4">
                                     <div className="flex items-center gap-2 mb-2">
-                                        <span className="text-xs font-bold text-indigo-600 uppercase tracking-wider bg-indigo-50 px-2 py-1 rounded">
+                                        <span className="text-xs font-bold text-[#d70026] uppercase tracking-wider bg-red-50 px-2 py-1 rounded">
                                             Course Details Required
                                         </span>
-                                        <div className="h-px bg-indigo-100 flex-1"></div>
+                                        <div className="h-px bg-red-100 flex-1"></div>
                                     </div>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         {/* Status - Always shown */}
@@ -1326,7 +1187,7 @@ function SectionTable({
                                                         status: e.target.value,
                                                     })
                                                 }
-                                                className="w-full text-sm border-slate-200 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                                                className="w-full text-sm border-slate-200 rounded-md focus:ring-[#d70026] focus:border-[#d70026]"
                                             >
                                                 <option value="IN_PROGRESS">In Progress</option>
                                                 <option value="COMPLETED">Completed</option>
@@ -1352,7 +1213,7 @@ function SectionTable({
                                                             grade: e.target.value,
                                                         })
                                                     }
-                                                    className="w-full text-sm border-slate-200 rounded-md focus:ring-indigo-500 focus:border-indigo-500 invalid:border-red-300 invalid:text-red-600"
+                                                    className="w-full text-sm border-slate-200 rounded-md focus:ring-[#d70026] focus:border-[#d70026] invalid:border-red-300 invalid:text-red-600"
                                                 >
                                                     <option value="">-- Select Grade --</option>
                                                     <option value="A+">A+</option>
@@ -1388,7 +1249,7 @@ function SectionTable({
                                                             confidence: e.target.value,
                                                         })
                                                     }
-                                                    className="w-full text-sm border-slate-200 rounded-md focus:ring-indigo-500 focus:border-indigo-500 invalid:border-red-300 invalid:text-red-600"
+                                                    className="w-full text-sm border-slate-200 rounded-md focus:ring-[#d70026] focus:border-[#d70026] invalid:border-red-300 invalid:text-red-600"
                                                 >
                                                     <option value="">-- Select Level --</option>
                                                     <option value="middle">Middle School</option>
@@ -1416,7 +1277,7 @@ function SectionTable({
                                                                 confidence: e.target.value,
                                                             })
                                                         }
-                                                        className="w-full text-sm border-slate-200 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                                                        className="w-full text-sm border-slate-200 rounded-md focus:ring-[#d70026] focus:border-[#d70026]"
                                                     >
                                                         <option value="">-- Select --</option>
                                                         <option value="VERY_LOW">Very Low</option>
@@ -1438,7 +1299,7 @@ function SectionTable({
                                                                 stress: e.target.value,
                                                             })
                                                         }
-                                                        className="w-full text-sm border-slate-200 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                                                        className="w-full text-sm border-slate-200 rounded-md focus:ring-[#d70026] focus:border-[#d70026]"
                                                     >
                                                         <option value="">-- Select --</option>
                                                         <option value="VERY_LOW">Very Low</option>
@@ -1468,10 +1329,10 @@ function SectionTable({
                                             }}
                                             onFocus={() => setIsDropdownOpen(true)}
                                             placeholder={placeholder}
-                                            className="w-full pl-3 pr-8 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow"
+                                            className="w-full pl-3 pr-8 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#d70026] focus:border-[#d70026] transition-shadow"
                                         />
                                         {isDropdownOpen && (
-                                            <div className="absolute z-50 left-0 right-0 bottom-full mb-1 max-h-60 overflow-y-auto bg-white border border-slate-200 rounded-lg shadow-lg">
+                                            <div className="absolute z-50 left-0 right-0 bottom-full mb-1 max-h-60 overflow-y-auto bg-white border border-black rounded-lg">
                                                 {filteredItems.length === 0 ? (
                                                     <div className="p-3 text-sm text-slate-500 text-center">
                                                         No matches found
@@ -1515,7 +1376,7 @@ function SectionTable({
                                         <select
                                             value={selectedId}
                                             onChange={(e) => onSelect(e.target.value)}
-                                            className="w-full pl-3 pr-8 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none bg-white transition-shadow"
+                                            className="w-full pl-3 pr-8 py-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#d70026] focus:border-[#d70026] appearance-none bg-white transition-shadow"
                                         >
                                             <option value="">{placeholder}</option>
                                             {availableItems.map((item) => {
@@ -1553,11 +1414,11 @@ function SectionTable({
                                 onClick={onAdd}
                                 disabled={!selectedId || !isPendingValid()}
                                 className={`
-                    px-5 py-2.5 rounded-lg text-sm font-bold shadow-sm transition-all
+                    px-5 py-2.5 rounded-lg text-sm font-bold border border-black transition-all
                     ${
                         selectedId && isPendingValid()
-                            ? "bg-slate-800 text-white hover:bg-slate-900 hover:shadow-md active:scale-95"
-                            : "bg-slate-100 text-slate-400 cursor-not-allowed"
+                            ? "bg-[#d70026] text-white hover:bg-[#b00020]"
+                            : "bg-gray-100 text-gray-400 cursor-not-allowed"
                     }
                   `}
                             >

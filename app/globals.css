@@ -8,7 +8,7 @@
     --accent-background-2: #1a1a1a;
 
     --foreground: #d70026;
-    --foreground-2: #a70825;
+    --foreground-2: #d70026;
 
     --button-color: #ffd8c4;
     --button-color-2: #ffc6a9;
@@ -26,26 +26,48 @@
 
 /* ===== CUSTOM SCROLLBAR STYLING ===== */
 html {
-    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+    scrollbar-color: rgba(215, 0, 38, 0.4) transparent; /* Match red accent */
     scrollbar-width: thin;
+    scrollbar-gutter: stable;
 }
 
 ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    width: 6px;
+    height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-    background: var(--scrollbar-track);
+    background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--scrollbar-thumb);
-    border-radius: 5px;
+    background: rgba(215, 0, 38, 0.2); /* Subtle red thumb */
+    border-radius: 10px;
+    border: 1px solid transparent;
+    background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--scrollbar-thumb-hover);
+    background: rgba(215, 0, 38, 0.5);
+}
+
+/* Specific scrollable containers */
+.custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.2);
 }
 
 @theme inline {
@@ -149,6 +171,7 @@ ITS LOWK NOT THAT HARD ITS PRETTY SELF EXPLANATORY */
     display: flex;
     flex-direction: row;
     align-items: center;
+    border-bottom: 1px solid black;
 }
 
 .nav-brand {

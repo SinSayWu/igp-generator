@@ -27,11 +27,11 @@ export function PathwaysSection({ programs, selectedProgramIds, onToggle }: Path
                             key={prog.id}
                             onClick={() => onToggle(prog.id)}
                             className={`p-4 rounded border cursor-pointer transition-all select-none ${
-                                isSelected ? "bg-red-50" : "bg-white hover:bg-gray-50"
+                                isSelected ? "bg-red-50" : "bg-white"
                             }`}
                             style={{
                                 borderColor: isSelected
-                                    ? "#d70026"
+                                    ? "#000000"
                                     : "var(--accent-background)",
                             }}
                         >

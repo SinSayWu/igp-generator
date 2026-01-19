@@ -8,11 +8,12 @@ type OpportunitiesProps = {
     initialRecommendations?: any[];
     initialAnalysis?: string;
     goals: any[];
+    onAction?: (action: string) => void;
 };
 
 import { addGoal } from "@/app/actions/add-goal";
 
-export default function Opportunities({ studentId, initialRecommendations = [], initialAnalysis, goals = [] }: OpportunitiesProps) {
+export default function Opportunities({ studentId, initialRecommendations = [], initialAnalysis, goals = [], onAction }: OpportunitiesProps) {
     const [recommendations, setRecommendations] = useState<any[]>(initialRecommendations);
     const [isGenerating, setIsGenerating] = useState(false);
     const [addingGoalId, setAddingGoalId] = useState<string | null>(null);
@@ -39,6 +40,7 @@ export default function Opportunities({ studentId, initialRecommendations = [], 
                 if (data.debug) {
                     setDebugInfo(data.debug);
                 }
+                onAction?.("generate");
             } else if (data.error) {
                 setError(data.error);
             }
@@ -65,13 +67,13 @@ export default function Opportunities({ studentId, initialRecommendations = [], 
                             onClick={() => setShowDebug(true)}
                             className="bg-gray-100 text-gray-600 px-4 py-3 rounded-xl hover:bg-gray-200 transition-colors font-medium flex items-center gap-2"
                         >
-                            🧠 Debug Thought Process
+                            Debug Thought Process
                         </button>
                     )}
                     <button
                         onClick={handleRecommendOps}
                         disabled={isGenerating}
-                        className="bg-[#d70026] text-white px-6 py-3 border border-black rounded-xl font-bold transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
+                        className="bg-[#d70026] text-white px-6 py-3 border border-black rounded-xl font-bold transition-all hover:bg-[#b00020] disabled:opacity-50"
                     >
                         {isGenerating ? (
                             <span className="flex items-center gap-2">
@@ -83,7 +85,7 @@ export default function Opportunities({ studentId, initialRecommendations = [], 
                             </span>
                         ) : (
                             <span className="flex items-center gap-2">
-                                <span>✨</span> AI Matcher
+                                AI Matcher
                             </span>
                         )}
                     </button>
@@ -100,11 +102,11 @@ export default function Opportunities({ studentId, initialRecommendations = [], 
                 <div className="grid gap-6">
                     <div className="bg-red-50/50 border border-black rounded-2xl p-8">
                         <h3 className="text-xl font-bold mb-6 flex items-center gap-2 text-[#d70026]">
-                            <span>🚀</span> Top AI Matches for Your Profile
+                            Top AI Matches for Your Profile
                         </h3>
                         <div className="grid lg:grid-cols-2 gap-6">
                             {recommendations.map((rec) => (
-                                <div key={rec.id} className="bg-white border border-black rounded-xl p-6 flex flex-col justify-between transition-all hover:scale-[1.01]">
+                                <div key={rec.id} className="bg-white border border-black rounded-xl p-6 flex flex-col justify-between transition-all font-medium">
                                     <div>
                                         <div className="flex justify-between items-start mb-4">
                                             <h4 className="font-bold text-xl text-slate-900">
@@ -166,7 +168,7 @@ export default function Opportunities({ studentId, initialRecommendations = [], 
                                                 }
                                             }}
                                             disabled={addingGoalId === rec.id || goals.some(g => g.title === `Apply to ${rec.organization}: ${rec.title}`) || addedGoals.includes(`Apply to ${rec.organization}: ${rec.title}`)}
-                                            className="w-full py-2 rounded-lg border border-black font-bold text-sm enabled:hover:bg-black enabled:hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
+                                            className="w-full py-2 rounded-lg border border-black font-bold text-sm bg-[#d70026] text-white hover:bg-[#b00020] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
                                         >
                                             {addingGoalId === rec.id ? (
                                                 <>
@@ -176,10 +178,8 @@ export default function Opportunities({ studentId, initialRecommendations = [], 
                                                     </svg>
                                                     Adding...
                                                 </>
-                                            ) : (goals.some(g => g.title === `Apply to ${rec.organization}: ${rec.title}`) || addedGoals.includes(`Apply to ${rec.organization}: ${rec.title}`)) ? (
-                                                "✅ Goal Set! Good luck!"
                                             ) : (
-                                                "🎯 Set as Goal"
+                                                "Set as Goal"
                                             )}
                                         </button>
                                     </div>
@@ -205,7 +205,7 @@ export default function Opportunities({ studentId, initialRecommendations = [], 
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                                 </svg>
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-2">Goal Set! 🎯</h3>
+                            <h3 className="text-xl font-bold text-gray-900 mb-2">Goal Set!</h3>
                             <p className="text-sm text-gray-500 mb-6">
                                 {successModal.message}
                             </p>
@@ -234,7 +234,7 @@ export default function Opportunities({ studentId, initialRecommendations = [], 
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[80vh] overflow-hidden flex flex-col">
                         <div className="p-6 border-b border-gray-200 flex justify-between items-center">
-                            <h3 className="text-xl font-bold">🧠 AI Thought Process</h3>
+                            <h3 className="text-xl font-bold">AI Thought Process</h3>
                             <button
                                 onClick={() => setShowDebug(false)}
                                 className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
