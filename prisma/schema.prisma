@@ -106,6 +106,8 @@ model Student {
   interests        String[]
   subjectInterests String[] // e.g., "Science", "Math", "English", "History"
 
+  collegePlanSummary String? @db.Text()
+
   // Future Plans
   postHighSchoolPlan String?
   careerInterest     String?

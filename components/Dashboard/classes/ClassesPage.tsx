@@ -764,6 +764,7 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade }: Cl
                 onAddCourse={openAddCourseModal}
                 onEditCourse={openEditCourseModal}
                 currentGrade={currentGrade}
+                generatingFuture={generating}
             />
 
             <AddCourseModal

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 /* THESE ARE THE VARIABLES THAT YOU CAN CHANGE TO CHANGE THE COLOR SCHEME AND STUFF */
 :root {

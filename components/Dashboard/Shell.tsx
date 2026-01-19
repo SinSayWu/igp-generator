@@ -4,12 +4,19 @@ import { useMemo, useState } from "react";
 import Overview from "./Overview";
 import ClassesPage from "./Classes";
 import Extracurriculars from "./Extracurriculars";
-import Schools from "./Schools";
+import Colleges from "./Colleges";
 import Jobs from "./Jobs";
 import Goals from "./Goals";
 import { StudentCourseData, ClubData, SportData, CollegeData, CourseCatalogItem } from "./types";
 
-type TabId = "overview" | "classes" | "extracurriculars" | "schools" | "jobs" | "chatbot" | "goals";
+type TabId =
+    | "overview"
+    | "classes"
+    | "extracurriculars"
+    | "colleges"
+    | "jobs"
+    | "chatbot"
+    | "goals";
 
 type DashboardUser = {
     firstName: string;
@@ -30,6 +37,7 @@ type DashboardUser = {
         clubs: ClubData[];
         sports: SportData[];
         targetColleges: CollegeData[];
+        collegePlanSummary?: string | null;
     } | null;
 };
 
@@ -50,8 +58,12 @@ export default function DashboardShell({ user, courseCatalog = [] }: DashboardSh
             targetColleges: 0,
         };
 
-        const plan = student?.postHighSchoolPlan ?? null;
-        const showSchools = isStudent && (plan === "College" || plan === "Vocational");
+        const plan = (student?.postHighSchoolPlan ?? "").toLowerCase();
+        const showColleges =
+            isStudent &&
+            (plan.includes("college") ||
+                plan.includes("university") ||
+                plan.includes("vocational"));
 
         const result: Array<{ id: TabId; label: string; badge?: number }> = [
             { id: "overview", label: "Overview" },
@@ -64,10 +76,10 @@ export default function DashboardShell({ user, courseCatalog = [] }: DashboardSh
                 label: "Extracurriculars",
                 badge: studentCounts.clubs + studentCounts.sports,
             });
-            if (showSchools) {
+            if (showColleges) {
                 result.push({
-                    id: "schools",
-                    label: "Schools",
+                    id: "colleges",
+                    label: "Colleges",
                     badge: studentCounts.targetColleges,
                 });
             }
@@ -146,8 +158,11 @@ export default function DashboardShell({ user, courseCatalog = [] }: DashboardSh
                         sports={user.student?.sports ?? []}
                     />
                 )}
-                {safeActiveTab === "schools" && (
-                    <Schools colleges={user.student?.targetColleges ?? []} />
+                {safeActiveTab === "colleges" && (
+                    <Colleges
+                        colleges={user.student?.targetColleges ?? []}
+                        initialSummary={user.student?.collegePlanSummary ?? ""}
+                    />
                 )}
                 {safeActiveTab === "jobs" && <Jobs />}
                 {safeActiveTab === "goals" && <Goals />}

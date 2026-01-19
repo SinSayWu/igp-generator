@@ -43,4 +43,6 @@ export type CollegeData = {
     id: string;
     name: string;
     type: string;
+    requirements: string[];
+    suggestions: string[];
 };
