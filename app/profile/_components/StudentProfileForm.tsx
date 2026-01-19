@@ -29,6 +29,7 @@ export default async function StudentProfileForm({ userId }: { userId: string })
             },
             targetColleges: true,
             focusPrograms: true,
+            savedOpportunities: true,
         } as any, 
     });
 

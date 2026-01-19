@@ -110,7 +110,7 @@ export default function ProfileEditor({
         Map<string, { grade?: string; status: string; confidence?: string; stress?: string }>
     >(
         new Map(
-            student.studentCourses
+            (student.studentCourses || [])
                 .filter((sc) => (sc.status as any) !== "PLANNED") // Filter first
                 .map((sc) => [
                     sc.courseId,
@@ -129,10 +129,10 @@ export default function ProfileEditor({
         Array.from(new Set(student.subjectInterests || []))
     );
     const [selectedProgramIds, setSelectedProgramIds] = useState<string[]>(
-        student.focusPrograms.map((p) => p.id)
+        (student.focusPrograms || []).map((p) => p.id)
     );
     const [selectedCollegeIds, setSelectedCollegeIds] = useState<string[]>(
-        student.targetColleges.map((c) => c.id)
+        (student.targetColleges || []).map((c) => c.id)
     );
 
     // 4. Activity Lists & Logic
@@ -163,19 +163,19 @@ export default function ProfileEditor({
     };
 
     const [myClubs, setMyClubs] = useState<SelectableItem[]>(
-        student.clubs.map((i) => formatItem(i, "club"))
+        (student.clubs || []).map((i) => formatItem(i, "club"))
     );
     const [mySports, setMySports] = useState<SelectableItem[]>(
-        student.sports.map((i) => formatItem(i, "sport"))
+        (student.sports || []).map((i) => formatItem(i, "sport"))
     );
     const [myCourses, setMyCourses] = useState<SelectableItem[]>(
-        student.studentCourses
+        (student.studentCourses || [])
             .filter((sc) => (sc.status as any) !== "PLANNED") // Filter out PLANNED courses from the UI list
             .map((i) => formatItem(i.course, "course"))
     );
 
     const [myOpportunities, setMyOpportunities] = useState<SelectableItem[]>(
-        student.savedOpportunities.map((i) => formatItem(i, "course")) // Using course type for visual or maybe I should add opportunity type
+        (student.savedOpportunities || []).map((i) => formatItem(i, "course")) // Using course type for visual or maybe I should add opportunity type
     );
 
     const [selClub, setSelClub] = useState("");
@@ -943,7 +943,7 @@ function SectionTable({
                                         )}
                                         {rec.generatedTags && (
                                             <div className="flex gap-2 mt-2">
-                                                {rec.generatedTags.map((tag: string) => (
+                                                {(rec.generatedTags || []).map((tag: string) => (
                                                     <span key={tag} className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 px-2 py-0.5 border border-slate-200">
                                                         {tag}
                                                     </span>

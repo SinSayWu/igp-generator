@@ -202,9 +202,9 @@ export default function CollegesPage({ colleges, initialSummary = "" }: Colleges
                                         <p className="text-sm font-semibold text-slate-700">
                                             Requirements
                                         </p>
-                                        {college.requirements.length > 0 ? (
+                                        {(college.requirements || []).length > 0 ? (
                                             <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-600">
-                                                {college.requirements.map((req, idx) => (
+                                                {(college.requirements || []).map((req, idx) => (
                                                     <li key={`${college.id}-req-${idx}`}>{req}</li>
                                                 ))}
                                             </ul>
@@ -218,9 +218,9 @@ export default function CollegesPage({ colleges, initialSummary = "" }: Colleges
                                         <p className="text-sm font-semibold text-slate-700">
                                             Recommendations
                                         </p>
-                                        {college.suggestions.length > 0 ? (
+                                        {(college.suggestions || []).length > 0 ? (
                                             <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-600">
-                                                {college.suggestions.map((rec, idx) => (
+                                                {(college.suggestions || []).map((rec, idx) => (
                                                     <li key={`${college.id}-rec-${idx}`}>{rec}</li>
                                                 ))}
                                             </ul>
