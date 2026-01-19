@@ -202,8 +202,8 @@ export default function PATH({ user, courseCatalog, isLocked }: PATHProps) {
                         )}
                     </div>
                 </div>
-                <div className="bg-gray-50 border border-black p-6 rounded-xl flex flex-col justify-center gap-2">
-                    <h3 className="text-lg font-bold uppercase">Future Opportunities</h3>
+                <div className="bg-white border border-black p-6 rounded-xl flex flex-col gap-4">
+                    <h3 className="text-lg font-bold border-b border-black/5 pb-2 uppercase text-gray-400">Future Opportunities</h3>
                     <p className="font-medium text-gray-500 text-sm leading-tight">
                         Your profile is being matched with opportunities relevant to {student?.postHighSchoolPlan || "your future goals"}. 
                         Check the <span className="text-black font-bold border-b border-black">Opportunities</span> tab for updates.

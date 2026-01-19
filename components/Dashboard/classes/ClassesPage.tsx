@@ -757,7 +757,7 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade, init
                             value={chatInput}
                             onChange={(e) => setChatInput(e.target.value)}
                             placeholder="Ask about your schedule or request a change..."
-                            className="flex-1 rounded-full border border-slate-300 px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                            className="flex-1 rounded-full border border-slate-300 px-4 py-2 text-sm focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-200"
                             onKeyDown={(e) => {
                                 if (e.key === "Enter" && !e.shiftKey) {
                                     e.preventDefault();
@@ -769,7 +769,7 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade, init
                             type="button"
                             onClick={handleScheduleChat}
                             disabled={chatLoading || !chatInput.trim()}
-                            className="rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+                            className="rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
                         >
                             Send
                         </button>

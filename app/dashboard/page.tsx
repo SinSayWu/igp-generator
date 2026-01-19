@@ -17,6 +17,11 @@ export default async function DashboardPage() {
     const user = await prisma.user.findUnique({
         where: { id: session.userId },
         include: {
+            admin: {
+                include: {
+                    school: true
+                }
+            },
             student: {
                 include: {
                     _count: {
@@ -32,47 +37,20 @@ export default async function DashboardPage() {
                             course: true,
                         },
                     },
-                    clubs: {
-                        select: {
-                            id: true,
-                            name: true,
-                            category: true,
-                            description: true, // Added for type match
-                            teacherLeader: true, // Added for type match
-                            studentLeaders: true, // Added for type match
-                        },
-                    },
+                    clubs: true,
                     clubRecommendations: {
-                        select: {
-                            id: true,
-                            reason: true,
-                            timing: true,
-                            club: true, 
-                        },
+                        include: {
+                            club: true,
+                        }
                     },
-                    sports: {
-                        select: {
-                            id: true,
-                            name: true,
-                            season: true,
-                        },
-                    },
-                    targetColleges: {
-                        select: {
-                            id: true,
-                            name: true,
-                            type: true,
-                            requirements: true,
-                            suggestions: true,
-                        },
-                    },
+                    sports: true,
+                    targetColleges: true,
                     opportunityRecommendations: {
                         include: {
                             opportunity: true,
                         }
                     },
                     goals: true,
-
                 },
             },
         },
@@ -86,14 +64,17 @@ export default async function DashboardPage() {
         }
     }
 
+    let schoolId = user.student?.schoolId || user.admin?.schoolId;
+
     const courseCatalog = await prisma.course.findMany({
-        where: { schoolId: user.student?.schoolId ?? undefined },
+        where: { schoolId: schoolId ?? undefined },
         orderBy: { name: "asc" },
     });
 
     return (
         <DashboardShell
             user={{
+                id: user.id,
                 firstName: user.firstName,
                 lastName: user.lastName,
                 role: user.role,

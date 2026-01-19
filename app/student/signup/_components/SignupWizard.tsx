@@ -316,7 +316,7 @@ export default function SignupWizard({ existingStudent, existingSchoolData }: Pr
                                             value={schoolCode}
                                             onChange={(e) => setSchoolCode(e.target.value)}
                                             className="w-full border-slate-300 rounded-lg p-3"
-                                            placeholder="e.g. 42069"
+                                            placeholder="e.g. 12345"
                                         />
                                         <p className="text-xs text-slate-500 mt-1">
                                             Provided by your administrator.

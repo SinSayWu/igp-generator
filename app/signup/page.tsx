@@ -18,7 +18,7 @@ export default function Signup() {
                         href="/student/signup"
                         className="group relative w-full flex flex-col items-center justify-center py-6 px-4 border border-black rounded-xl bg-white hover:bg-gray-50 transition-all duration-200"
                     >
-                         <span className="text-3xl mb-2">🎓</span>
+                         <span className="text-3xl mb-2"></span>
                         <span className="text-lg font-bold text-gray-900 group-hover:text-[#d70026]">
                             Sign Up as Student
                         </span>
@@ -31,7 +31,7 @@ export default function Signup() {
                         href="/admin/signup"
                         className="group relative w-full flex flex-col items-center justify-center py-6 px-4 border border-black rounded-xl bg-white hover:bg-gray-50 transition-all duration-200"
                     >
-                         <span className="text-3xl mb-2">🛡️</span>
+                         <span className="text-3xl mb-2"></span>
                         <span className="text-lg font-bold text-gray-900 group-hover:text-gray-700">
                             Sign Up as Admin
                         </span>

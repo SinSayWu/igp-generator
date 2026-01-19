@@ -59,12 +59,10 @@ export default function DefaultHomePage() {
                         <h2 className="text-group-header red-header">PLOT YOUR FUTURE</h2>
                         {/* <hr className="text-group-line" /> */}
                         <div className="text-group-body" style={{ maxWidth: "800px" }}>
-                            <span className="highlight-red">Summit</span> combs through hundreds of colleges and
-                            databases to give you the best idea of what you need to
-                            accomplish to reach your <span className="highlight-red">peak</span>. It recommends classes and
-                            extracurricular based on where you want to attend and what
-                            you want to achieve, packed into a <span className="highlight-red">personalized IGP</span> just for
-                            you.
+                            <span className="highlight-red">Summit</span> is an AI-powered personalized graduation planner that turns your interests, transcript, and post-high-school goals into a course pathway 
+                            that meets your school’s requirements—plus recommended clubs, local opportunities, and next steps. All of this is
+                            packed into a <span className="highlight-red"> Personalized Academic Trajectory for High-school (PATH)</span> designed just for
+                            you to help you reach your <span className="highlight-red">peak</span>.
                         </div>
                     </div>
               

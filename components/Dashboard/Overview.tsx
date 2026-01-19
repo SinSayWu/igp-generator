@@ -2,12 +2,16 @@
 
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import AdminOverview from "./AdminOverview";
+import Goals from "./Goals";
+import { CourseCatalogItem } from "./types";
 
 type OverviewProps = {
     user: {
         firstName: string;
         lastName: string;
         role: string;
+        id?: string; // Added to help fetch admin details
         student?: {
             gradeLevel: number;
             postHighSchoolPlan: string | null;
@@ -23,9 +27,16 @@ type OverviewProps = {
             goals?: any[];
         } | null;
     };
+    courseCatalog: CourseCatalogItem[];
 };
 
-export default function Overview({ user }: OverviewProps) {
+export default function Overview({ user, courseCatalog }: OverviewProps) {
+    if (user.role === "ADMIN") {
+        // Fallback for ID if not present in the simplified user object
+        // Usually it's there in the dashboard shell user
+        return <AdminOverview userId={(user as any).id || (user as any).userId || ""} courseCatalog={courseCatalog} />;
+    }
+
     if (!user.student) {
         return (
             <div className="p-10 flex flex-col items-center justify-center min-h-[50vh] text-center">
@@ -63,79 +74,9 @@ export default function Overview({ user }: OverviewProps) {
                 ))}
             </div>
 
-            {/* Content Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Main Analysis Section */}
-                <div className="lg:col-span-2 flex flex-col gap-4">
-                    <div className="flex items-center justify-between">
-                         <h2 className="text-2xl font-bold flex items-center gap-3">
-                             <span className="w-2 h-8 bg-[var(--foreground)]"></span>
-                             AI Analysis & Insights
-                         </h2>
-                         <button className="text-xs font-bold border border-black px-3 py-1 rounded-lg hover:bg-black hover:text-white transition-colors">Refresh Analysis</button>
-                    </div>
-                    
-                    <div className="bg-white border border-black rounded-xl p-6 min-h-[300px]">
-                        {student.latestOpportunityAnalysis || student.latestClubAnalysis || student.latestCourseAnalysis ? (
-                            <div className="prose prose-sm max-w-none">
-                                {student.latestCourseAnalysis && (
-                                    <div className="mb-8">
-                                        <h3 className="text-black border-b border-gray-200 pb-2 mb-4 font-black">Academic Path</h3>
-                                        <div className="text-gray-800">
-                                            <ReactMarkdown>{student.latestCourseAnalysis}</ReactMarkdown>
-                                        </div>
-                                    </div>
-                                )}
-                                {student.latestOpportunityAnalysis && (
-                                    <div className="mb-6">
-                                        <h3 className="text-black border-b border-gray-200 pb-2 mb-4 font-black">Career Opportunities</h3>
-                                        <div className="text-gray-800">
-                                            <ReactMarkdown>{student.latestOpportunityAnalysis}</ReactMarkdown>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        ) : (
-                             <div className="h-full flex flex-col items-center justify-center text-gray-400 gap-4 py-12">
-                                 <svg className="w-16 h-16 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                 </svg>
-                                 <p className="font-bold">No insights yet.</p>
-                                 <p className="text-xs text-center">Add some classes, clubs, or goals to get personalized AI analysis here.</p>
-                             </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* Side Summary */}
-                <div className="flex flex-col gap-4">
-                     <h2 className="text-2xl font-bold flex items-center gap-3">
-                         <span className="w-2 h-8 bg-black"></span>
-                         Profile Summary
-                     </h2>
-                     <div className="bg-[var(--button-color)] border border-black rounded-xl p-6 flex flex-col gap-4">
-                         <h3 className="font-black text-lg">Next Steps</h3>
-                         <div className="space-y-3">
-                             <div className="bg-white p-3 rounded-lg border border-black">
-                                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Status</p>
-                                 <p className="font-bold text-sm">Review Recommended Opportunities</p>
-                             </div>
-                             <div className="bg-white p-3 rounded-lg border border-black">
-                                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Graduation Year</p>
-                                 <p className="font-bold text-sm">{student.gradeLevel ? `Class of ${new Date().getFullYear() + (12 - student.gradeLevel)}` : "Not set"}</p>
-                             </div>
-                             <div className="bg-white p-3 rounded-lg border border-black">
-                                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Target Career</p>
-                                 <p className="font-bold text-sm">{student.postHighSchoolPlan || "Not specified"}</p>
-                             </div>
-                         </div>
-                     </div>
-                     
-                     <div className="bg-black text-white rounded-xl p-6 border border-black hover:bg-gray-900 transition-all cursor-pointer group active:bg-gray-800">
-                         <h3 className="font-black text-lg mb-2 group-hover:text-[var(--foreground)] transition-colors italic">Chat with Summit AI &rarr;</h3>
-                         <p className="text-gray-400 text-sm">Get answers to any academic or extracurricular questions.</p>
-                     </div>
-                </div>
+            {/* Goals Component */}
+            <div className="mt-4">
+                <Goals user={user} goals={student.goals ?? []} />
             </div>
         </div>
     );

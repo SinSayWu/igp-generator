@@ -20,7 +20,7 @@ export default async function Navbar() {
     }
 
     return (
-        <nav className="navbar">
+        <nav className="navbar print:bg-transparent print:border-none">
             <Link href="/" className="nav-brand">
                 <div className="nav-logo-wrap">
                     <Image src={logo} alt="logo" fill className="nav-logo" />
@@ -28,7 +28,7 @@ export default async function Navbar() {
                 <h1 className="nav-title">SUMMIT</h1>
             </Link>
 
-            <div className="nav-links">
+            <div className="nav-links print:hidden">
                 {!isLoggedIn ? (
                     <>
                         <Link href="/signup" className="btn">Sign Up</Link>

@@ -19,10 +19,10 @@ type TabId =
     | "extracurriculars"
     | "colleges"
     | "jobs"
-    | "goals"
     | "path";
 
 type DashboardUser = {
+    id: string;
     firstName: string;
     lastName: string;
     role: string;
@@ -94,7 +94,6 @@ export default function DashboardShell({ user, courseCatalog = [] }: DashboardSh
                 });
             }
             result.push({ id: "jobs", label: "Opportunities" });
-            result.push({ id: "goals", label: "Goals" });
         }
         return result;
     }, [user.role, user.student]);
@@ -115,8 +114,8 @@ export default function DashboardShell({ user, courseCatalog = [] }: DashboardSh
     useEffect(() => {
         setVisitedTabs(prev => new Set(prev).add(safeActiveTab));
         
-        // If they navigate to goals, hide the notice
-        if (safeActiveTab === "goals") {
+        // If they navigate to overview, hide the notice
+        if (safeActiveTab === "overview") {
             setShowNewGoalNotice(false);
         }
     }, [safeActiveTab]);
@@ -154,12 +153,6 @@ export default function DashboardShell({ user, courseCatalog = [] }: DashboardSh
 
     return (
         <div className="dashboard-wrapper min-h-screen flex flex-col">
-            {/* Print-only Header */}
-            <div className="hidden print:flex items-center gap-2 p-6 border-b border-black mb-6">
-                <div className="w-8 h-8 bg-black rounded flex items-center justify-center text-white font-bold">S</div>
-                <h1 className="text-xl font-bold tracking-tight uppercase">Summit</h1>
-            </div>
-
             {/* Header */}
             <header
                 style={{
@@ -217,7 +210,7 @@ export default function DashboardShell({ user, courseCatalog = [] }: DashboardSh
                         <div className="w-10 h-10 bg-black rounded flex items-center justify-center text-white font-bold">!</div>
                         <div>
                             <p className="font-black text-black">YOU HAVE A NEW GOAL!</p>
-                            <p className="text-sm font-bold text-[#d70026]">Navigate to the Goals tab to see it.</p>
+                            <p className="text-sm font-bold text-[#d70026]">Navigate to the Overview tab to see it.</p>
                         </div>
                     </div>
                     <button 
@@ -236,7 +229,7 @@ export default function DashboardShell({ user, courseCatalog = [] }: DashboardSh
 
             {/* Main content */}
             <main className="flex-1 p-6 bg-white dark:bg-gray-100">
-                {safeActiveTab === "overview" && <Overview user={user} />}
+                {safeActiveTab === "overview" && <Overview user={user} courseCatalog={courseCatalog} />}
                 {safeActiveTab === "classes" && (
                     <ClassesPage
                         courses={user.student?.studentCourses ?? []}
@@ -271,7 +264,6 @@ export default function DashboardShell({ user, courseCatalog = [] }: DashboardSh
                         onAction={handleAction}
                     />
                 )}
-                {safeActiveTab === "goals" && <Goals user={user} goals={user.student?.goals ?? []} />}
                 {safeActiveTab === "path" && (
                     <PATH 
                         user={user} 
