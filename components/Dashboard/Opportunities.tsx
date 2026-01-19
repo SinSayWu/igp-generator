@@ -263,20 +263,9 @@ export default function Opportunities({ studentId, initialRecommendations = [], 
                                 </div>
 
                                 {/* Server Logs Section - Added for Debugging */}
-                                {(debugInfo as any).logs && (
-                                    <div>
-                                        <h4 className="font-bold text-lg mb-2 text-blue-600">🖥️ Server-Side Logs:</h4>
-                                        <div className="bg-slate-900 text-slate-50 p-4 rounded-lg text-xs font-mono border border-slate-700 max-h-[300px] overflow-y-auto">
-                                            {((debugInfo as any).logs as string[]).map((log, i) => (
-                                                <div key={i} className="mb-1 border-b border-white/10 pb-1 last:border-0 last:pb-0">
-                                                    <span className="text-gray-500 mr-2">[{i + 1}]</span>
-                                                    <span className={log.includes("WARNING") ? "text-yellow-400" : log.includes("Error") ? "text-red-400" : "text-green-400"}>
-                                                        {log}
-                                                    </span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
+                                {/* Server Logs Section - Removed */}
+                                {false && (
+                                    <div></div>
                                 )}
                             </div>
                         </div>

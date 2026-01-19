@@ -21,7 +21,7 @@
 ### Instructions
 1. **Bio Analysis:** Analyze the student's **Bio** and **Career Interests**. Prioritize opportunities that provide "hands-on" experience in their target field.
 2. **Contextual Evaluation:** 
-   - **Local Advantage:** If an opportunity is marked `within45Min: true`, highlight it as a highly accessible "Local" option.
+
    - **Financial Benefit:** If `paid: true`, highlight it as an "Earn while you learn" option.
 3. **Strategic Selection:** Choose a mix of opportunities that satisfy both short-term needs (e.g., local summer jobs) and long-term goals (e.g., technical internships).
 4. **Actionable Advice:** Every "actionPlan" must be specific to the organization mentioned.

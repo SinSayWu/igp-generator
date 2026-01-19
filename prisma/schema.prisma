@@ -245,7 +245,7 @@ model Opportunity {
   title           String
   organization    String
   locationJson    String
-  within45Min     Boolean
+
   type            String
   paid            Boolean
   paidDescription String?

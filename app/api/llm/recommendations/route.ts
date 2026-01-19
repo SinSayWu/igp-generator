@@ -93,7 +93,7 @@ export async function POST(req: Request) {
                 description: o.description,
                 eligibility: o.eligibility,
                 paid: o.paid,
-                within45Min: o.within45Min
+
             }));
 
             const template = fs.readFileSync(path.join(dataDir, "opportunity_prompt.txt"), "utf8");
