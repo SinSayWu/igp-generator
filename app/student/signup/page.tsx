@@ -47,6 +47,7 @@ export default async function CreateStudentSignUpPage() {
                     schoolData = {
                         schoolId: school.id,
                         schoolName: school.name,
+                        rigorLevels: school.rigorLevels,
                         allClubs: school.clubs,
                         allSports: school.sports,
                         allCourses: school.courses,
