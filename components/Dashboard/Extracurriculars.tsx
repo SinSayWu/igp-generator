@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import ReactMarkdown from "react-markdown";
 import { recommendClubs } from "@/app/actions/recommend-clubs";
 import { ClubData, SportData, RecommendationData } from "./types";
 import { Club } from "@prisma/client";
@@ -9,14 +10,19 @@ type ExtracurricularsProps = {
     clubs: ClubData[];
     sports: SportData[];
     initialRecommendations: RecommendationData[];
+    initialAnalysis?: string;
 };
 
-export default function Extracurriculars({ clubs, sports, initialRecommendations = [] }: ExtracurricularsProps) {
+export default function Extracurriculars({ clubs, sports, initialRecommendations = [], initialAnalysis }: ExtracurricularsProps) {
     const totalActivities = clubs.length + sports.length;
     // Map initial DB data to the shape the UI expects (which is basically the same, just stricter typing)
     const [recommendations, setRecommendations] = useState<RecommendationData[]>(initialRecommendations);
     const [isPending, startTransition] = useTransition();
     const [showRecommendations, setShowRecommendations] = useState(initialRecommendations.length > 0);
+    const [debugInfo, setDebugInfo] = useState<{ rawResponse: string; prompt?: string } | null>(
+        initialAnalysis ? { rawResponse: JSON.stringify({ thought_process: initialAnalysis }) } : null
+    );
+    const [showDebug, setShowDebug] = useState(false);
 
     const handleRecommend = () => {
         startTransition(async () => {
@@ -24,6 +30,9 @@ export default function Extracurriculars({ clubs, sports, initialRecommendations
             if (result.recommendations) {
                 setRecommendations(result.recommendations);
                 setShowRecommendations(true);
+                if (result.debug) {
+                    setDebugInfo(result.debug);
+                }
             } else if (result.error) {
                 alert(result.error);
             }
@@ -42,6 +51,14 @@ export default function Extracurriculars({ clubs, sports, initialRecommendations
                         </p>
                     </div>
                      <div className="flex gap-2">
+                        {debugInfo && (
+                            <button
+                                onClick={() => setShowDebug(true)}
+                                className="bg-gray-100 text-gray-600 px-4 py-3 rounded-xl hover:bg-gray-200 transition-colors font-medium flex items-center gap-2"
+                            >
+                                🧠 Debug Thought Process
+                            </button>
+                        )}
                         <button
                             onClick={handleRecommend}
                             disabled={isPending}
@@ -287,6 +304,44 @@ export default function Extracurriculars({ clubs, sports, initialRecommendations
                     </div>
                 )}
             </section>
+
+            {/* Debug Modal */}
+            {showDebug && debugInfo && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[80vh] overflow-hidden flex flex-col">
+                        <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+                            <h3 className="text-xl font-bold">🧠 AI Thought Process</h3>
+                            <button
+                                onClick={() => setShowDebug(false)}
+                                className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
+                            >
+                                ×
+                            </button>
+                        </div>
+                        <div className="p-6 overflow-y-auto flex-1">
+                            <div className="space-y-6">
+
+                                <div>
+                                    <h4 className="font-bold text-lg mb-2 text-green-600">AI Logic & Reasoning:</h4>
+                                    <div className="bg-gray-50 p-4 rounded-lg text-sm border border-gray-200 prose prose-sm max-w-none">
+                                        {(() => {
+                                            try {
+                                                const parsed = JSON.parse(debugInfo.rawResponse);
+                                                if (parsed.thought_process) {
+                                                    return <ReactMarkdown>{parsed.thought_process}</ReactMarkdown>;
+                                                }
+                                                return <pre className="whitespace-pre-wrap">{debugInfo.rawResponse}</pre>;
+                                            } catch (e) {
+                                                return <pre className="whitespace-pre-wrap">{debugInfo.rawResponse}</pre>;
+                                            }
+                                        })()}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

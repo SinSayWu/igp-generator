@@ -24,7 +24,7 @@ interface MyCourse {
 
 interface OnboardingData {
     gradeLevel: number;
-    age: number;
+    dateOfBirth: Date;
     bio: string;
     courses: MyCourse[];
     subjectInterests: string[];
@@ -45,7 +45,7 @@ export async function completeOnboarding(userId: string, data: OnboardingData) {
         const {
             // Step 1
             gradeLevel,
-            age,
+            dateOfBirth,
             bio,
 
             // Step 2
@@ -73,7 +73,7 @@ export async function completeOnboarding(userId: string, data: OnboardingData) {
             where: { userId },
             data: {
                 gradeLevel,
-                age,
+                dateOfBirth,
                 bio,
                 subjectInterests: subjectInterests || [],
                 studyHallsPerYear: studyHallsPerYear || 0,

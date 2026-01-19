@@ -84,7 +84,11 @@ export default function SignupWizard({ existingStudent, existingSchoolData }: Pr
     // --- State: Profile ---
     // Step 1: Basic Info
     const [gradeLevel, setGradeLevel] = useState(existingStudent?.gradeLevel || 9);
-    const [age, setAge] = useState(existingStudent?.age || 14);
+    const [birthday, setBirthday] = useState(
+        existingStudent?.dateOfBirth 
+            ? new Date(existingStudent.dateOfBirth).toISOString().split('T')[0] 
+            : ""
+    );
     const [bio, setBio] = useState(existingStudent?.bio || "");
 
     // Step 2: Courses
@@ -189,7 +193,7 @@ export default function SignupWizard({ existingStudent, existingSchoolData }: Pr
                     // Update existing profile (reuses Onboarding action logic basically)
                     await completeOnboarding(existingStudent.userId, {
                         gradeLevel,
-                        age,
+                        dateOfBirth: new Date(birthday),
                         bio,
                         courses: myCourses,
                         subjectInterests,
@@ -213,7 +217,7 @@ export default function SignupWizard({ existingStudent, existingSchoolData }: Pr
                         password,
                         schoolCode: Number(schoolCode),
                         gradeLevel,
-                        age,
+                        dateOfBirth: new Date(birthday),
                         bio,
                         courses: myCourses,
                         subjectInterests,
@@ -384,12 +388,12 @@ export default function SignupWizard({ existingStudent, existingSchoolData }: Pr
                                 </div>
                                 <div>
                                     <label className="block text-sm font-bold text-slate-700 mb-1">
-                                        Age
+                                        Birthday
                                     </label>
                                     <input
-                                        type="number"
-                                        value={age}
-                                        onChange={(e) => setAge(Number(e.target.value))}
+                                        type="date"
+                                        value={birthday}
+                                        onChange={(e) => setBirthday(e.target.value)}
                                         className="w-full border-slate-300 rounded-lg p-3"
                                     />
                                 </div>

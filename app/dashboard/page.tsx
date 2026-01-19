@@ -58,6 +58,13 @@ export default async function DashboardPage() {
                             suggestions: true,
                         },
                     },
+                    opportunityRecommendations: {
+                        include: {
+                            opportunity: true,
+                        }
+                    },
+                    goals: true,
+
                 },
             },
         },
@@ -66,7 +73,7 @@ export default async function DashboardPage() {
     if (!user) redirect("/");
 
     if (user.role === "STUDENT") {
-        if (!user.student || !user.student.gradeLevel || !user.student.age) {
+        if (!user.student || !user.student.gradeLevel || !user.student.dateOfBirth) {
             redirect("/onboarding");
         }
     }
@@ -90,8 +97,27 @@ export default async function DashboardPage() {
                     })),
                     studentCourses: (user.student.studentCourses || []).map((sc: any) => ({
                         ...sc,
+                        ...sc,
                         gradeLevel: sc.gradeLevel
-                    }))
+                    })),
+                    opportunityRecommendations: (user.student.opportunityRecommendations || []).map((r: any) => ({
+                         id: r.id,
+                         matchReason: r.matchReason,
+                         actionPlan: r.actionPlan,
+                         title: r.opportunity.title,
+                         organization: r.opportunity.organization,
+                         link: r.opportunity.link,
+                         location: ((l) => { try { return JSON.parse(l); } catch { return l; } })(r.opportunity.locationJson),
+                         time_commitment: r.opportunity.timeCommitment,
+                         time_of_year: r.opportunity.timeOfYear,
+                         type: r.opportunity.type,
+                         deadline_or_application_window: r.opportunity.deadline,
+                         generatedTags: r.generatedTags && r.generatedTags.length > 0 ? r.generatedTags : [r.opportunity.type].filter(Boolean)
+                    })),
+                    latestOpportunityAnalysis: user.student.latestOpportunityAnalysis,
+                    latestClubAnalysis: user.student.latestClubAnalysis,
+                    latestCourseAnalysis: user.student.latestCourseAnalysis,
+                    goals: user.student.goals,
                 } : null,
             }}
             courseCatalog={courseCatalog as any}

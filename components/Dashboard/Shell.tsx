@@ -37,9 +37,21 @@ type DashboardUser = {
         studentCourses: StudentCourseData[];
         clubs: ClubData[];
         clubRecommendations: RecommendationData[];
+        opportunityRecommendations?: any[]; // Added
         sports: SportData[];
         targetColleges: CollegeData[];
         collegePlanSummary?: string | null;
+        latestOpportunityAnalysis?: string | null;
+        latestClubAnalysis?: string | null;
+        latestCourseAnalysis?: string | null;
+        goals?: {
+            id: string;
+            title: string;
+            status: string;
+            priority: string;
+            steps: any;
+            aiAnalysis?: string | null;
+        }[];
     } | null;
 };
 
@@ -72,17 +84,15 @@ export default function DashboardShell({ user, courseCatalog = [] }: DashboardSh
         ];
 
         if (isStudent && student) {
-            result.push({ id: "classes", label: "Classes", badge: studentCounts.studentCourses });
+            result.push({ id: "classes", label: "Classes" });
             result.push({
                 id: "extracurriculars",
                 label: "Extracurriculars",
-                badge: studentCounts.clubs + studentCounts.sports,
             });
             if (showColleges) {
                 result.push({
                     id: "colleges",
                     label: "Colleges",
-                    badge: studentCounts.targetColleges,
                 });
             }
             result.push({ id: "jobs", label: "Opportunities" });
@@ -146,12 +156,13 @@ export default function DashboardShell({ user, courseCatalog = [] }: DashboardSh
 
             {/* Main content */}
             <main className="flex-1 p-6 bg-white dark:bg-gray-100">
-                {safeActiveTab === "overview" && <Overview user={user} />}
+                {safeActiveTab === "overview" && <Overview user={user} goals={user.student?.goals ?? []} />}
                 {safeActiveTab === "classes" && (
                     <ClassesPage
                         courses={user.student?.studentCourses ?? []}
                         courseCatalog={courseCatalog}
                         currentGrade={user.student?.gradeLevel ?? 9}
+                        initialAnalysis={user.student?.latestCourseAnalysis || undefined}
                     />
                 )}
                 {safeActiveTab === "extracurriculars" && (
@@ -159,6 +170,7 @@ export default function DashboardShell({ user, courseCatalog = [] }: DashboardSh
                         clubs={user.student?.clubs ?? []}
                         sports={user.student?.sports ?? []}
                         initialRecommendations={user.student?.clubRecommendations ?? []}
+                        initialAnalysis={user.student?.latestClubAnalysis || undefined}
                     />
                 )}
                 {safeActiveTab === "colleges" && (
@@ -167,7 +179,14 @@ export default function DashboardShell({ user, courseCatalog = [] }: DashboardSh
                         initialSummary={user.student?.collegePlanSummary ?? ""}
                     />
                 )}
-                {safeActiveTab === "jobs" && <Opportunities studentId={user.student?.userId || ""} />}
+                {safeActiveTab === "jobs" && (
+                    <Opportunities 
+                        studentId={user.student?.userId || ""} 
+                        initialRecommendations={user.student?.opportunityRecommendations || []} 
+                        initialAnalysis={user.student?.latestOpportunityAnalysis || undefined}
+                        goals={user.student?.goals ?? []}
+                    />
+                )}
                 {safeActiveTab === "goals" && <Goals />}
                 {safeActiveTab === "chatbot" && (
                     <div className="flex flex-col gap-6">

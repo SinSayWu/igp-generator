@@ -57,7 +57,7 @@ export interface SignupData {
     password: string;
     schoolCode: number;
     gradeLevel: number;
-    age: number;
+    dateOfBirth: Date;
     bio: string;
     courses: MyCourse[];
     subjectInterests: string[];
@@ -83,7 +83,7 @@ export async function signupAndProfileSetup(data: SignupData) {
         password,
         schoolCode,
         gradeLevel,
-        age,
+        dateOfBirth,
         bio,
         courses,
         subjectInterests,
@@ -123,7 +123,7 @@ export async function signupAndProfileSetup(data: SignupData) {
         school: { connect: { id: school.id } },
         gradeLevel,
         graduationYear: new Date().getFullYear() + (12 - gradeLevel), // Approximation
-        age,
+        dateOfBirth,
         bio,
         subjectInterests,
         maxStudyHallsPerYear: maxStudyHallsPerYear || studyHallsPerYear, // Fallback to min if not set

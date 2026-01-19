@@ -149,7 +149,65 @@ async function main() {
     }
 
     // =======================================================
-    // 4. TEST ACCOUNTS
+    // 5. OPPORTUNITIES (NEW)
+    // =======================================================
+    console.log("Seeding opportunities...");
+    
+    // Read opportunities.json from root (or data, checking root based on previous find)
+    // The user found it in root: c:\Users\yuhan\Main\github\igp-generator\opportunities.json
+    const opportunitiesPath = path.join(__dirname, "../opportunities.json");
+    if (fs.existsSync(opportunitiesPath)) {
+        const opportunitiesRaw = fs.readFileSync(opportunitiesPath, "utf-8");
+        const opportunitiesData = JSON.parse(opportunitiesRaw);
+        
+        console.log(`Found ${opportunitiesData.length} opportunities.`);
+
+        for (const op of opportunitiesData) {
+            try {
+                await prisma.opportunity.upsert({
+                    where: { originalId: op.id },
+                    update: {
+                        title: op.title,
+                        organization: op.organization,
+                        locationJson: JSON.stringify(op.location),
+                        within45Min: op.within_45_min_of_clemson === true || op.within_45_min_of_clemson === "true",
+                        type: op.type,
+                        paid: op.paid === true || op.paid === "true",
+                        timeOfYear: op.time_of_year,
+                        timeCommitment: JSON.stringify(op.time_commitment),
+                        eligibility: op.eligibility,
+                        deadline: op.deadline_or_application_window,
+                        description: op.description,
+                        link: op.link,
+                    },
+                    create: {
+                        originalId: op.id,
+                        title: op.title,
+                        organization: op.organization,
+                        locationJson: JSON.stringify(op.location),
+                        within45Min: op.within_45_min_of_clemson === true || op.within_45_min_of_clemson === "true",
+                        type: op.type,
+                        paid: op.paid === true || op.paid === "true",
+                        timeOfYear: op.time_of_year,
+                        timeCommitment: JSON.stringify(op.time_commitment),
+                        eligibility: op.eligibility,
+                        deadline: op.deadline_or_application_window,
+                        description: op.description,
+                        link: op.link,
+                    },
+                });
+            } catch (e: any) {
+                console.error(`Failed to seed opportunity ${op.id}:`, e.message);
+                // Continue or rethrow? Let's strictly fail if needed, or log and continue. 
+                // Creating a simplified error summary.
+            }
+        }
+    } else {
+        console.warn("opportunities.json not found at " + opportunitiesPath);
+    }
+    
+    // =======================================================
+    // 4. TEST ACCOUNTS (Renumbered to 6 technically but keeping logical flow)
     // =======================================================
 
     console.log("Creating test accounts...");

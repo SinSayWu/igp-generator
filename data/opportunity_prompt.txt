@@ -1,5 +1,10 @@
 **Role:** You are an expert Career and College Readiness Advisor.
-**Task:** Recommend exactly 10 opportunities (jobs, internships, volunteering) for this student.
+**Task:** Recommend exactly 6 opportunities (jobs, internships, volunteering) for this student.
+
+**CRITICAL RULES:**
+1. **NO HALLUCINATIONS:** You must ONLY recommend opportunities listed in the "Available Opportunities Catalog" below. Do not invent or generate any opportunities not present in the provided list.
+2. **STRICT LIMIT:** You must return exactly 6 recommendations.
+3. If the catalog has fewer than 6 items, return all of them.
 
 ---
 
@@ -27,7 +32,7 @@ Output ONLY valid JSON in the following structure:
 {
     "recommendations": [
         {
-            "id": "op_id",
+            "id": "EXACT_ID_FROM_CATALOG",
             "title": "Opportunity Title",
             "organization": "Organization Name",
             "matchReason": "Why this matches based on their bio and career plans...",

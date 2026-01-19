@@ -459,10 +459,23 @@
         },
 
         {
-            "id": "SCI-PHYS-SCI",
+            "id": "SCI-PHYS-SCI-CP",
             "name": "Physical Science CP",
             "subj": "SCI",
             "lvl": "CP",
+            "cr": 1.0,
+            "grades": [9],
+            "req": ["SCIENCE_CREDIT"],
+            "counts_for_grad": true,
+            "pre": null,
+            "bundle": null,
+            "program_tag": null
+        },
+        {
+            "id": "SCI-PHYS-SCI-H",
+            "name": "Physical Science Honors",
+            "subj": "SCI",
+            "lvl": "HON",
             "cr": 1.0,
             "grades": [9],
             "req": ["SCIENCE_CREDIT"],

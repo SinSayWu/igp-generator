@@ -147,12 +147,12 @@ export async function POST(req: Request) {
         }
 
         // 3. Step 1: Generate Draft Schedule (The Creator)
-        const apiKey = process.env.GPT_API_KEY;
+        const apiKey = process.env.OPENAI_API_KEY || process.env.GPT_API_KEY;
         console.log("Chat Route - API Key Present:", !!apiKey);
-        if (!apiKey) throw new Error("GPT_API_KEY not set");
+        if (!apiKey) throw new Error("OPENAI_API_KEY not set");
 
         const openai = new OpenAI({ apiKey });
-        const modelName = isChatMode ? "gpt-4o-mini" : "gpt-5.2";
+        const modelName = isChatMode ? "gpt-4o-mini" : "gpt-4o";
 
         const draftCompletion = await openai.chat.completions.create({
             model: modelName,
@@ -625,6 +625,13 @@ export async function POST(req: Request) {
                             }
                         }
                     }
+                }
+                // Save the Chain of Thought Analysis
+                if (auditContentForDebug) {
+                     await prisma.student.update({
+                        where: { userId: session.user.id },
+                        data: { latestCourseAnalysis: auditContentForDebug }
+                    });
                 }
             } catch (saveError) {
                 console.error("Failed to save schedule to database:", saveError);

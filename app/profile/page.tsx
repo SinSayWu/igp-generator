@@ -22,7 +22,7 @@ export default async function ProfilePage() {
 
     if (user.role === "STUDENT") {
         // If they are a student user but don't have a student record yet, handle that error
-        if (!user.student || !user.student.gradeLevel || !user.student.age) {
+        if (!user.student || !user.student.gradeLevel || !user.student.dateOfBirth) {
             redirect("/student/signup");
         }
         return <StudentProfileForm userId={user.id} />;

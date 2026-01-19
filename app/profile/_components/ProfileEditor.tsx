@@ -188,6 +188,8 @@ export default function ProfileEditor({
     const [opRecs, setOpRecs] = useState<any[]>([]);
     const [generatingClubs, setGeneratingClubs] = useState(false);
     const [generatingOps, setGeneratingOps] = useState(false);
+    const [opDebugInfo, setOpDebugInfo] = useState<{ rawResponse: string; prompt: string } | null>(null);
+    const [showOpDebug, setShowOpDebug] = useState(false);
 
     const [pendingCourseData, setPendingCourseData] = useState<{
         status: string;
@@ -290,9 +292,18 @@ export default function ProfileEditor({
                 body: JSON.stringify({ studentId: student.userId, type }),
             });
             const data = await res.json();
+            
+            console.log(`[${type}] API Response:`, data);
+            
             if (data.recommendations) {
                 if (type === "club") setClubRecs(data.recommendations);
                 else setOpRecs(data.recommendations);
+            }
+            
+            // Capture debug info for opportunities (moved outside recommendations check)
+            if (type === "opportunity" && data.debug) {
+                console.log("[opportunity] Setting debug info:", data.debug);
+                setOpDebugInfo(data.debug);
             }
         } catch (err) {
             console.error(err);
@@ -691,6 +702,8 @@ export default function ProfileEditor({
                         isGenerating={generatingOps}
                         onRecommend={() => handleRecommend("opportunity")}
                         onAddFromRec={addFromRec}
+                        debugInfo={opDebugInfo}
+                        onShowDebug={() => setShowOpDebug(true)}
                     />
 
                     {/* --- DANGER ZONE --- */}
@@ -765,6 +778,39 @@ export default function ProfileEditor({
                         </div>
                     )}
                 </form>
+
+                {/* Debug Modal for Opportunities */}
+                {showOpDebug && opDebugInfo && (
+                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                        <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[80vh] overflow-hidden flex flex-col">
+                            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+                                <h3 className="text-xl font-bold">🧠 AI Thought Process</h3>
+                                <button
+                                    onClick={() => setShowOpDebug(false)}
+                                    className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
+                                >
+                                    ×
+                                </button>
+                            </div>
+                            <div className="p-6 overflow-y-auto flex-1">
+                                <div className="space-y-6">
+                                    <div>
+                                        <h4 className="font-bold text-lg mb-2 text-indigo-600">Prompt Sent to AI:</h4>
+                                        <pre className="bg-gray-50 p-4 rounded-lg text-sm overflow-x-auto whitespace-pre-wrap border border-gray-200">
+                                            {opDebugInfo.prompt}
+                                        </pre>
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-lg mb-2 text-green-600">Raw AI Response:</h4>
+                                        <pre className="bg-gray-50 p-4 rounded-lg text-sm overflow-x-auto whitespace-pre-wrap border border-gray-200">
+                                            {opDebugInfo.rawResponse}
+                                        </pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
@@ -808,6 +854,8 @@ interface SectionTableProps {
     isGenerating?: boolean;
     onRecommend?: () => void;
     onAddFromRec?: (rec: any) => void;
+    debugInfo?: { rawResponse: string; prompt: string } | null;
+    onShowDebug?: () => void;
 }
 
 function SectionTable({
@@ -831,6 +879,8 @@ function SectionTable({
     isGenerating = false,
     onRecommend,
     onAddFromRec,
+    debugInfo,
+    onShowDebug,
 }: SectionTableProps) {
     const availableItems = allRawItems.filter(
         (raw) => !items.some((existing) => existing.id === raw.id)
@@ -898,16 +948,27 @@ function SectionTable({
                 <h3 className="font-bold text-lg text-slate-800 flex items-center gap-2">
                     {icon && <span>{icon}</span>} {title}
                 </h3>
-                {onRecommend && (
-                    <button
-                        type="button"
-                        onClick={onRecommend}
-                        disabled={isGenerating}
-                        className="text-xs font-bold text-[#d70026] border-2 border-[#d70026] px-3 py-1.5 bg-[#d70026] text-white transition-all disabled:opacity-50"
-                    >
-                        {isGenerating ? "Analyzing..." : "Find Recommended"}
-                    </button>
-                )}
+                <div className="flex gap-2">
+                    {debugInfo && onShowDebug && (
+                        <button
+                            type="button"
+                            onClick={onShowDebug}
+                            className="text-xs font-bold bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg hover:bg-gray-200 transition-all"
+                        >
+                            🧠 Debug
+                        </button>
+                    )}
+                    {onRecommend && (
+                        <button
+                            type="button"
+                            onClick={onRecommend}
+                            disabled={isGenerating}
+                            className="text-xs font-bold text-[#d70026] border-2 border-[#d70026] px-3 py-1.5 bg-[#d70026] text-white transition-all disabled:opacity-50"
+                        >
+                            {isGenerating ? "Analyzing..." : "Find Recommended"}
+                        </button>
+                    )}
+                </div>
             </div>
 
             <div className="p-6 flex-1 flex flex-col gap-6">

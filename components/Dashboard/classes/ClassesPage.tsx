@@ -24,6 +24,7 @@ type ClassesPageProps = {
     courses: StudentCourseData[];
     courseCatalog: CourseCatalogItem[];
     currentGrade: number;
+    initialAnalysis?: string;
 };
 
 type PendingCourseData = {
@@ -42,13 +43,15 @@ type ChatMessage = {
 
 type ChatPayloadMessage = ChatMessage | { role: "system"; content: string };
 
-export default function ClassesPage({ courses, courseCatalog, currentGrade }: ClassesPageProps) {
+export default function ClassesPage({ courses, courseCatalog, currentGrade, initialAnalysis }: ClassesPageProps) {
     const router = useRouter();
     const [generating, setGenerating] = useState(false);
     const [isCatalogOpen, setIsCatalogOpen] = useState(false);
     const [isMutating, startTransition] = useTransition();
 
-    const [debugInfo, setDebugInfo] = useState<{ draft: string; audit: string } | null>(null);
+    const [debugInfo, setDebugInfo] = useState<{ draft: string; audit: string } | null>(
+        initialAnalysis ? { draft: "(Loaded from previous session)", audit: initialAnalysis } : null
+    );
     const [showDebug, setShowDebug] = useState(false);
 
     const [courseToDelete, setCourseToDelete] = useState<{ id: string; name: string } | null>(null);

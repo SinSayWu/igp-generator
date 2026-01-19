@@ -60,7 +60,7 @@ export async function recommendClubs() {
         .join(", ");
 
     const prompt = `
-    You are a helpful school counselor AI.
+    You are a helpful school counselor AI speaking directly to the student.
     The student's name is ${student.user.firstName}.
     They are in grade ${student.gradeLevel}.
     
@@ -78,19 +78,26 @@ export async function recommendClubs() {
     
     For each recommendation, provide:
     1. "id": The club ID.
-    2. "reason": A personalized justification. You MUST explicitly reference their specific courses (e.g. "Because you are taking...") or target colleges (e.g. "Since you are interested in...") or specific interests in your reasoning whenever relevant. Connect the dots for them.
+    2. "reason": A personalized justification written in SECOND PERSON, directly addressing the student with "you/your". You MUST explicitly reference their specific courses (e.g. "Because you're taking...") or target colleges (e.g. "Since you're interested in...") or specific interests. Make it feel like you're talking TO them, not ABOUT them. Connect the dots for them in a friendly, personal way.
     3. "timing": "NOW" if it's appropriate for their current grade (${student.gradeLevel}), or "FUTURE" if it's better suited for older students (e.g. they are in 9th grade but the club is for upperclassmen like NHS).
 
-    Return ONLY a raw JSON array of objects. Do not include markdown formatting.
-    Example response:
-    [
-        { "id": "123", "reason": "Since you are taking AP Biology, this club allows you to apply those concepts...", "timing": "NOW" },
-        { "id": "456", "reason": "Given your interest in engineering colleges like MIT...", "timing": "FUTURE" }
-    ]
+    Return a JSON object with the following structure:
+    {
+        "thought_process": "A markdown-formatted string where you evaluate the student's profile, weigh pros and cons of potential clubs, and explain your selection logic. Use bolding and lists.",
+        "recommendations": [
+            { "id": "123", "reason": "...", "timing": "NOW" },
+            ...
+        ]
+    }
     `;
 
-    type RecResponse = { id: string; reason: string; timing: "NOW" | "FUTURE" }[];
-    let parsedRecs: RecResponse = [];
+    type RecResponse = { 
+        thought_process: string;
+        recommendations: { id: string; reason: string; timing: "NOW" | "FUTURE" }[] 
+    };
+    let parsedRecs: RecResponse = { thought_process: "", recommendations: [] };
+    let rawAIResponse = "";
+    
     try {
         const response = await openai.chat.completions.create({
             model: "gpt-4o",
@@ -102,6 +109,9 @@ export async function recommendClubs() {
             return { error: "Failed to generate recommendations" };
         }
 
+        // Store raw response for debug
+        rawAIResponse = content;
+
         // Clean up code blocks if present
         const jsonContent = content.replace(/^```json\s*/, "").replace(/\s*```$/, "");
         
@@ -109,7 +119,7 @@ export async function recommendClubs() {
             parsedRecs = JSON.parse(jsonContent);
         } catch (e) {
             console.error("Failed to parse AI response:", content);
-            return { error: "Failed to parse recommendations" };
+            return { error: "Failed to parse recommendations", debug: { rawResponse: rawAIResponse } };
         }
     } catch (error) {
         console.error("OpenAI API error:", error);
@@ -130,7 +140,7 @@ export async function recommendClubs() {
             });
 
             // Create new ones
-            for (const rec of parsedRecs) {
+            for (const rec of parsedRecs.recommendations) {
                 // Verify club exists (and belongs to school)
                 const club = availableClubs.find((c) => c.id === rec.id);
                 if (club) {
@@ -144,6 +154,14 @@ export async function recommendClubs() {
                     });
                 }
             }
+            
+            // Save the Chain of Thought Analysis
+            if (parsedRecs.thought_process) {
+                await (tx as any).student.update({
+                    where: { userId: student.userId },
+                    data: { latestClubAnalysis: parsedRecs.thought_process }
+                });
+            }
 
             // Return the freshly created records with club data
             return await (tx as any).clubRecommendation.findMany({
@@ -152,7 +170,10 @@ export async function recommendClubs() {
             });
         });
 
-        return { recommendations };
+        return { 
+            recommendations,
+            debug: { rawResponse: rawAIResponse, prompt }
+        };
 
     } catch (error: any) {
         console.error("Database error:", error);
