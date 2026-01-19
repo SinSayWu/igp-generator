@@ -5,13 +5,13 @@ import fs from "fs";
 import path from "path";
 
 const prisma = new PrismaClient();
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
 
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
+    const openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+    });
     try {
         const { studentId, type } = await req.json();
 
