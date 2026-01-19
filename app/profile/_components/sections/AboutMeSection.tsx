@@ -16,21 +16,36 @@ export function AboutMeSection({ student, rigorLevels }: AboutMeSectionProps) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2">Name</label>
+                    <input
+                        type="text"
+                        name="name"
+                        defaultValue={student.name || ""}
+                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:border-transparent transition"
+                        style={{ borderColor: "var(--accent-background)" }}
+                        placeholder="Your name"
+                    />
+                </div>
+                <div>
                     <label className="block text-sm font-semibold text-gray-800 mb-2">
                         Grade Level
                     </label>
-                    <select
-                        name="gradeLevel"
-                        defaultValue={student.gradeLevel || 9}
-                        className="w-full px-4 py-2 border rounded-lg bg-slate-100 text-slate-500 cursor-not-allowed"
-                        style={{ borderColor: "var(--accent-background)" }}
-                        disabled
-                    >
-                        <option value="9">Freshman (9th)</option>
-                        <option value="10">Sophomore (10th)</option>
-                        <option value="11">Junior (11th)</option>
-                        <option value="12">Senior (12th)</option>
-                    </select>
+                    <div className="text-base font-medium text-slate-800">
+                        {(() => {
+                            switch (student.gradeLevel) {
+                                case 9:
+                                    return "Freshman (9th)";
+                                case 10:
+                                    return "Sophomore (10th)";
+                                case 11:
+                                    return "Junior (11th)";
+                                case 12:
+                                    return "Senior (12th)";
+                                default:
+                                    return `Grade ${student.gradeLevel || "N/A"}`;
+                            }
+                        })()}
+                    </div>
                 </div>
                 <div>
                     <label className="block text-sm font-semibold text-gray-800 mb-2">

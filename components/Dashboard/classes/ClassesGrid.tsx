@@ -97,7 +97,10 @@ export default function ClassesGrid({
                     {["MS", "9", "10", "11", "12"].map((gradeKey) => {
                         const gradeCourses = scheduleByGrade[gradeKey] || [];
                         const isFuture = isFutureGrade(gradeKey);
+                        const currentGradeKey = currentGrade < 9 ? "MS" : String(currentGrade);
+                        const isCurrentGrade = gradeKey === currentGradeKey;
                         const showLoading = generatingFuture && isFuture;
+                        const showCurrentStudyHallLoading = generatingFuture && isCurrentGrade;
                         const sortedCourses = [...gradeCourses].sort((a, b) => {
                             const statusRank: Record<string, number> = {
                                 IN_PROGRESS: 0,
@@ -311,7 +314,9 @@ export default function ClassesGrid({
                                                                 className={`w-full h-full rounded border border-dashed text-xs transition-colors ${
                                                                     isFuture
                                                                         ? "text-slate-300 cursor-not-allowed"
-                                                                        : "text-slate-400 hover:text-indigo-700 hover:border-indigo-300 hover:bg-indigo-50/60"
+                                                                        : showCurrentStudyHallLoading
+                                                                          ? "text-indigo-700 border-indigo-300 bg-gradient-to-br from-indigo-200 via-fuchsia-200 to-cyan-200 animate-pulse"
+                                                                          : "text-slate-400 hover:text-indigo-700 hover:border-indigo-300 hover:bg-indigo-50/60"
                                                                 }`}
                                                                 title={
                                                                     isFuture
@@ -343,7 +348,9 @@ export default function ClassesGrid({
                                             className={`w-full h-20 p-4 flex items-center justify-center text-center text-xs sm:text-sm transition-colors ${
                                                 isFuture
                                                     ? "text-slate-300 cursor-not-allowed"
-                                                    : "text-slate-500 hover:text-indigo-700 hover:bg-indigo-50/60"
+                                                    : showCurrentStudyHallLoading
+                                                      ? "text-indigo-700 border border-indigo-300 bg-gradient-to-br from-indigo-200 via-fuchsia-200 to-cyan-200 animate-pulse"
+                                                      : "text-slate-500 hover:text-indigo-700 hover:bg-indigo-50/60"
                                             }`}
                                             title={
                                                 isFuture

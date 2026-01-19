@@ -328,7 +328,7 @@ export default function AddCourseModal({
                                     }
                                 `}
                             >
-                                Add Course
+                                {editingCourseId ? "Save" : "Add Course"}
                             </button>
                         </div>
                     </div>

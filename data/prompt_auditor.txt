@@ -41,12 +41,14 @@
 * Extra courses beyond requirements count as electives.
 * Any valid course can be an elective (CP/Honors/AP included), even with no `req` field.
 
-**4. Interest Alignment & Filler**
+**4. Interest Alignment, Pathway & Filler**
 * No empty placeholders (no “Free Slot”/“TBD”).
 * Study Hall only if opted‑in; otherwise replace with interest‑aligned electives.
-* If study halls are opted‑in, do not exceed the max per year and do not go below the min per year.
+* If study halls are opted-in, do not exceed the max per year and do not go below the min per year.
 * Avoid generic filler unless required or explicitly requested.
 * Optional adds must align with interests, pathway, and focus.
+* You must preserve the student's selected pathways/elective focuses (such as Band, PLTW, JROTC, etc.) through all four years. Do not drop or interrupt these unless explicitly requested by the student.
+* When in doubt, always suggest the most rigorous course option that still satisfies the student's profile preferences.
 * Ensure the planner used a short options list and selected the best fit by rigor history, interests, focus, and path.
 
 **5. Rigor & Catalog Accuracy**
