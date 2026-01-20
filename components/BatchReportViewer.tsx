@@ -1,7 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { saveEvaluation, type EvaluatedCriteria } from '@/app/actions/save-evaluation';
+
 
 interface Recommendation {
   id: string;
@@ -33,15 +35,66 @@ interface StudentOutput {
     recommendations: Recommendation[];
   };
   pathSummary: string;
+  manualEvaluation?: EvaluatedCriteria;
 }
+
 
 interface BatchReportViewerProps {
   students: StudentOutput[];
 }
 
-export default function BatchReportViewer({ students }: BatchReportViewerProps) {
+export default function BatchReportViewer({ students: initialStudents }: BatchReportViewerProps) {
+  const [students, setStudents] = useState(initialStudents);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const selectedStudent = students[selectedIndex];
+  
+  // Local state for the current evaluation to allow editing before saving
+  const [evaluation, setEvaluation] = useState<EvaluatedCriteria>({
+    metGradReqs: false,
+    interestsAligned: false,
+    rigorPreserved: false,
+    scheduleFeasible: false,
+    clubAlignment: false,
+  });
+
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+  // Reset/Load evaluation when switching students
+  useEffect(() => {
+    if (selectedStudent) {
+      setEvaluation(selectedStudent.manualEvaluation || {
+        metGradReqs: false,
+        interestsAligned: false,
+        rigorPreserved: false,
+        scheduleFeasible: false,
+        clubAlignment: false,
+      });
+      setSaveStatus('idle');
+    }
+  }, [selectedStudent]);
+
+  const handleCheckboxChange = (key: keyof EvaluatedCriteria) => {
+    setEvaluation(prev => ({ ...prev, [key]: !prev[key] }));
+    setSaveStatus('idle');
+  };
+
+  const handleSave = async () => {
+    if (!selectedStudent) return;
+    setIsSaving(true);
+    const result = await saveEvaluation(selectedStudent.id, evaluation);
+    setIsSaving(false);
+    
+    if (result.success) {
+      setSaveStatus('success');
+      // Update local students state to reflect the saved change
+      setStudents(prev => prev.map((s, i) => 
+        i === selectedIndex ? { ...s, manualEvaluation: evaluation } : s
+      ));
+    } else {
+      setSaveStatus('error');
+    }
+  };
 
   if (!selectedStudent) return <div className="p-10">No students found.</div>;
 
@@ -73,11 +126,48 @@ export default function BatchReportViewer({ students }: BatchReportViewerProps) 
         <div className="max-w-6xl mx-auto space-y-12">
           
           {/* Header */}
-          <header className="border-b border-slate-200 pb-6">
-            <h1 className="text-3xl font-bold text-slate-900">
-              {selectedStudent.name} 
-              <span className="ml-3 text-sm font-normal text-slate-400 font-mono">({selectedStudent.id})</span>
-            </h1>
+          <header className="border-b border-slate-200 pb-6 flex justify-between items-start">
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900">
+                {selectedStudent.name} 
+                <span className="ml-3 text-sm font-normal text-slate-400 font-mono">({selectedStudent.id})</span>
+              </h1>
+            </div>
+
+            {/* Manual Evaluation Box */}
+            <div className="bg-slate-50 border border-slate-200 p-4 rounded-lg shadow-sm min-w-[300px]">
+              <h4 className="font-semibold text-slate-700 mb-3 text-sm">Manual Evaluation</h4>
+              <div className="space-y-2 text-sm text-slate-600">
+                {[
+                  { key: 'metGradReqs', label: 'Met Graduation Requirements' },
+                  { key: 'interestsAligned', label: 'Courses Aligned with Interests' },
+                  { key: 'rigorPreserved', label: 'Preservation of Course Rigor' },
+                  { key: 'scheduleFeasible', label: 'Schedule Feasibility' },
+                  { key: 'clubAlignment', label: 'Club/Opp Alignment' },
+                ].map(({ key, label }) => (
+                  <label key={key} className="flex items-center gap-2 cursor-pointer hover:text-slate-900">
+                    <input
+                      type="checkbox"
+                      checked={evaluation[key as keyof EvaluatedCriteria]}
+                      onChange={() => handleCheckboxChange(key as keyof EvaluatedCriteria)}
+                      className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    {label}
+                  </label>
+                ))}
+              </div>
+              <div className="mt-4 flex items-center justify-between">
+                <button
+                  onClick={handleSave}
+                  disabled={isSaving}
+                  className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 px-4 rounded transition-colors disabled:opacity-50"
+                >
+                  {isSaving ? 'Saving...' : 'Save Evaluation'}
+                </button>
+                {saveStatus === 'success' && <span className="text-xs text-green-600 font-medium">Saved!</span>}
+                {saveStatus === 'error' && <span className="text-xs text-red-600 font-medium">Failed</span>}
+              </div>
+            </div>
           </header>
 
           {/* Path Summary */}
