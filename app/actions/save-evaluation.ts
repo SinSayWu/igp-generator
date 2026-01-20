@@ -5,12 +5,17 @@ import path from 'path';
 
 const filePath = path.join(process.cwd(), 'ai_batch_output.json');
 
+export type Criterion = {
+  value: boolean;
+  comment: string;
+};
+
 export type EvaluatedCriteria = {
-  metGradReqs: boolean;
-  interestsAligned: boolean;
-  rigorPreserved: boolean;
-  scheduleFeasible: boolean;
-  clubAlignment: boolean;
+  metGradReqs: Criterion;
+  interestsAligned: Criterion;
+  rigorPreserved: Criterion;
+  scheduleFeasible: Criterion;
+  clubAlignment: Criterion;
 };
 
 export async function saveEvaluation(studentId: string, evaluation: EvaluatedCriteria) {
