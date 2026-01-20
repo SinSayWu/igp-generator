@@ -20,14 +20,15 @@ async function test() {
         
         // Test Context Retrieval
         try {
-            const ctx = await getStudentContext(user.id);
-            if (!ctx) {
-                console.error("Context is null (student profile might be missing)");
+            const ctxArr = await getStudentContext(user.id);
+            if (!ctxArr || ctxArr.length === 0) {
+                console.error("Context is null/empty");
                 return;
             }
+            const ctx = ctxArr[0];
             console.log("Context retrieved successfully.");
-            console.log(`- Grade: ${ctx.gradeLevel}`);
-            console.log(`- Courses: ${ctx.courses.length}`);
+            console.log(`- Grade: ${ctx.grade}`);
+            console.log(`- Completed Courses: ${ctx.completed_courses.length}`);
         } catch (e) {
             console.error("Context retrieval failed:", e);
         }
