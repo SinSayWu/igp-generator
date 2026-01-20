@@ -480,17 +480,27 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade, init
 
         try {
             const scheduleSnapshot = buildScheduleSnapshot();
+            
+            // Build a simplified course catalog for the AI
+            const catalogForAI = courseCatalog.map(c => ({
+                name: c.name,
+                department: c.department,
+                level: c.level,
+                credits: c.credits,
+                availableGrades: c.availableGrades,
+            }));
+            
             const payloadMessages: ChatPayloadMessage[] = [...nextMessages];
             payloadMessages.splice(payloadMessages.length - 1, 0, {
                 role: "system",
-                content: `[SYSTEM INJECTION] The user is actively viewing the following schedule JSON. If they request changes, you MUST modify this JSON and output the full NEW JSON. If they ask questions, answer based on this schedule.\n\n${JSON.stringify(
+                content: `[SYSTEM INJECTION] The user is actively viewing the following schedule JSON. If they request changes, you MUST modify this JSON and output the full NEW JSON. If they ask questions, answer based on this schedule.\n\nCurrent Schedule:\n${JSON.stringify(
                     scheduleSnapshot
-                )}`,
+                )}\n\nAvailable Course Catalog:\n${JSON.stringify(catalogForAI, null, 2)}`,
             });
             payloadMessages.splice(payloadMessages.length - 1, 0, {
                 role: "system",
                 content:
-                    "[CHAT MODE] Single-pass chat response. Answer the student's request directly. If a schedule update is requested, include the full JSON schedule in a code block.",
+                    "[CHAT MODE] Single-pass chat response. Answer the student's request directly. If a schedule update is requested, include the full JSON schedule in a code block. When suggesting courses, ONLY suggest courses from the provided catalog.",
             });
 
             const res = await fetch("/api/chat", {
@@ -701,7 +711,7 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade, init
                                 <div
                                     className={`max-w-[85%] rounded-2xl px-4 py-2 text-sm ${
                                         msg.role === "user"
-                                            ? "bg-indigo-600 text-white"
+                                            ? "bg-[#ffd8c4] text-red-900 border border-black"
                                             : "bg-white text-slate-700 border border-slate-200"
                                     }`}
                                 >

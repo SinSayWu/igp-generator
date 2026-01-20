@@ -41,8 +41,8 @@ export default function DebugModal({ open, debugInfo, onClose }: DebugModalProps
                     </button>
                 </div>
 
-                <div className="flex-1 overflow-hidden flex flex-col md:flex-row gap-4">
-                    <div className="flex-1 flex flex-col min-h-0 bg-gray-50 rounded-xl border border-gray-200">
+                <div className="flex-1 overflow-hidden flex flex-row gap-4">
+                    <div className="w-1/2 flex flex-col min-h-0 bg-gray-50 rounded-xl border border-gray-200">
                         <div className="p-3 border-b border-gray-200 bg-gray-100/50 flex justify-between items-center">
                             <span className="font-semibold text-sm text-gray-700">
                                 Step 1: The Planner (Draft)
@@ -60,7 +60,7 @@ export default function DebugModal({ open, debugInfo, onClose }: DebugModalProps
                         </div>
                     </div>
 
-                    <div className="flex-1 flex flex-col min-h-0 bg-indigo-50/50 rounded-xl border border-indigo-200">
+                    <div className="w-1/2 flex flex-col min-h-0 bg-indigo-50/50 rounded-xl border border-indigo-200">
                         <div className="p-3 border-b border-indigo-200 bg-indigo-100/50 flex justify-between items-center">
                             <span className="font-semibold text-sm text-indigo-900">
                                 Step 2: The Auditor (Validation)

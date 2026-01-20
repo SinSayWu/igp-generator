@@ -110,13 +110,12 @@ export async function POST(req: Request) {
         };
 
         const currentGrade = parseStudentGrade();
-        const planYearsAhead = generateAllFuture ? Math.max(0, 12 - (currentGrade ?? 12)) : 1;
+        const planYearsAhead = Math.max(0, 12 - (currentGrade ?? 12));
 
         const systemPrompt = promptTemplate
             .replace("{{CLASSES}}", classes)
             .replace("{{GRADUATION_REQS}}", graduationReqs)
-            .replace("{{STUDENTS}}", studentDataStr)
-            .replace("{{N}}", String(planYearsAhead));
+            .replace("{{STUDENTS}}", studentDataStr);
 
         // Detect if this is a "reprompt" (conversational update)
         // We look for the [SYSTEM INJECTION] tag we added in the frontend
