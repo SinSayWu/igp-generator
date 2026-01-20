@@ -51,7 +51,7 @@ export default function ClassesGrid({
         return [...fullCredit, ...halfSlots];
     };
     return (
-        <section className="rounded-2xl border border-black bg-white">
+        <section className="rounded-2xl border border-black bg-white overflow-hidden">
             <div className="flex items-center justify-between p-6 bg-slate-50 border-b border-black">
                 <div>
                     <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">

@@ -538,7 +538,7 @@ export default function ProfileEditor({
                     </SectionCard>
 
                     {/* Note: Ensure FuturePlansSection uses <h3> for headers so they pop inside the card */}
-                    <SectionCard className="border-l-4 border-l-[#d70026]">
+                    <SectionCard>
                         <FuturePlansSection
                             plan={plan}
                             ncaa={ncaa}
@@ -866,7 +866,7 @@ function SectionTable({
         return true;
     };
     return (
-        <div className="bg-white rounded-xl border border-black flex flex-col h-full">
+        <div className="bg-white rounded-xl border border-black flex flex-col h-full overflow-hidden">
             {/* Header */}
             <div className="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between items-center">
                 <h3 className="font-bold text-lg text-slate-800 flex items-center gap-2">
