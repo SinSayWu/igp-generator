@@ -258,22 +258,15 @@ export default function BatchReportViewer({ students: initialStudents }: BatchRe
               </div>
             </section>
           )}
-          <section>
-            <h3 className="text-xl font-semibold text-blue-600 border-l-4 border-blue-600 pl-3 mb-4">
-              Path Summary (College Plan)
-            </h3>
-            <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm leading-relaxed text-slate-700">
-                <ReactMarkdown>{selectedStudent.pathSummary || 'No summary available.'}</ReactMarkdown>
-            </div>
-          </section>
-
           {/* Course Plan */}
           <section>
             <h3 className="text-xl font-semibold text-blue-600 border-l-4 border-blue-600 pl-3 mb-4">
               4-Year Course Plan
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-              {Object.entries(selectedStudent.courseGen?.schedule?.schedule || {}).map(([grade, courses]) => (
+              {Object.entries(selectedStudent.courseGen?.schedule?.schedule || {})
+                .sort(([gradeA], [gradeB]) => parseInt(gradeA) - parseInt(gradeB))
+                .map(([grade, courses]) => (
                 <div key={grade} className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
                   <div className="bg-slate-50 px-4 py-2 border-b border-slate-200 font-semibold text-center text-slate-700">
                     Grade {grade}
