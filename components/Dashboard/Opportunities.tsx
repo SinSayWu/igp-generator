@@ -54,13 +54,7 @@ export default function Opportunities({ studentId, initialRecommendations = [], 
 
     return (
         <div className="flex flex-col gap-10">
-            <div className="flex justify-between items-center">
-                <div className="flex flex-col gap-2">
-                    <h2 className="text-2xl font-bold">Opportunities</h2>
-                    <p className="text-gray-600">
-                        Discover internships, summer programs, and other career-building experiences.
-                    </p>
-                </div>
+            <div className="flex justify-end items-center">
                 <div className="flex gap-2">
                     {debugInfo && (
                         <button
@@ -275,4 +269,3 @@ export default function Opportunities({ studentId, initialRecommendations = [], 
         </div>
     );
 }
-

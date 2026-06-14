@@ -4,7 +4,6 @@ import { useState, useTransition } from "react";
 import ReactMarkdown from "react-markdown";
 import { recommendClubs } from "@/app/actions/recommend-clubs";
 import { ClubData, SportData, RecommendationData } from "./types";
-import { Club } from "@prisma/client";
 
 type ExtracurricularsProps = {
     clubs: ClubData[];
@@ -44,14 +43,7 @@ export default function Extracurriculars({ clubs, sports, initialRecommendations
     return (
         <div className="flex flex-col gap-10">
             <div className="flex flex-col gap-6">
-                <div className="flex justify-between items-start">
-                    <div>
-                        <h2 className="text-2xl font-bold">Extracurriculars</h2>
-                        <p className="text-gray-600">
-                            Monitor your clubs, sports, volunteer work, and other activities to balance your
-                            schedule.
-                        </p>
-                    </div>
+                <div className="flex justify-end items-start">
                      <div className="flex gap-2">
                         {debugInfo && (
                             <button
@@ -165,7 +157,7 @@ export default function Extracurriculars({ clubs, sports, initialRecommendations
 
                                         <div className="mb-4 text-sm text-slate-600 flex-grow">
                                             <div className="mb-2 italic text-slate-500 text-xs bg-slate-50 p-2 rounded border border-slate-100">
-                                                "{reason}"
+                                                &quot;{reason}&quot;
                                             </div>
                                             {club.description && (
                                                 <p className="line-clamp-3">
@@ -335,7 +327,7 @@ export default function Extracurriculars({ clubs, sports, initialRecommendations
                                                     return <ReactMarkdown>{parsed.thought_process}</ReactMarkdown>;
                                                 }
                                                 return <pre className="whitespace-pre-wrap">{debugInfo.rawResponse}</pre>;
-                                            } catch (e) {
+                                            } catch {
                                                 return <pre className="whitespace-pre-wrap">{debugInfo.rawResponse}</pre>;
                                             }
                                         })()}

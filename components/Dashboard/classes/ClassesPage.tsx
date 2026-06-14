@@ -601,14 +601,7 @@ export default function ClassesPage({ courses, courseCatalog, currentGrade, init
     return (
         <div className="flex flex-col gap-10">
             <div className="flex flex-col gap-6">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
-                        <h2 className="text-2xl font-bold">Classes</h2>
-                        <p className="text-gray-600">
-                            Track your current and completed classes, view grades, and explore
-                            suggested future courses.
-                        </p>
-                    </div>
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-end">
                     <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
                         {debugInfo && (
                             <button

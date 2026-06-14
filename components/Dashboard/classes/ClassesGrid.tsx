@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { CourseCatalogItem, StudentCourseData } from "../types";
 
 type ClassesGridProps = {
@@ -19,6 +20,16 @@ export default function ClassesGrid({
     currentGrade,
     generatingFuture,
 }: ClassesGridProps) {
+    const [showAddCourseNotice, setShowAddCourseNotice] = useState(() => {
+        if (typeof window === "undefined") return true;
+        return localStorage.getItem("hideAddCourseNotice") !== "true";
+    });
+
+    const hideAddCourseNoticePermanently = () => {
+        localStorage.setItem("hideAddCourseNotice", "true");
+        setShowAddCourseNotice(false);
+    };
+
     const isFutureGrade = (gradeKey: string) => {
         if (gradeKey === "MS") return false;
         const gradeNum = Number(gradeKey);
@@ -63,14 +74,34 @@ export default function ClassesGrid({
                 </div>
             </div>
 
-            <div className="px-6 pt-6 pb-6">
-                <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-                    <strong className="font-semibold">
-                        Only add courses you’ve taken or are taking.
-                    </strong>
-                    <span className="ml-2">Click any cell below to add them.</span>
+            {showAddCourseNotice && (
+                <div className="px-6 pt-6 pb-6">
+                    <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 flex items-center justify-between gap-4">
+                        <div>
+                            <strong className="font-semibold">
+                                Only add courses you’ve taken or are taking.
+                            </strong>
+                            <span className="ml-2">Click any cell below to add them.</span>
+                        </div>
+                        <div className="flex shrink-0 items-center gap-2">
+                            <button
+                                type="button"
+                                onClick={() => setShowAddCourseNotice(false)}
+                                className="rounded-lg px-3 py-1.5 text-xs font-black uppercase tracking-wide text-amber-900 transition-colors hover:bg-amber-100"
+                            >
+                                Dismiss
+                            </button>
+                            <button
+                                type="button"
+                                onClick={hideAddCourseNoticePermanently}
+                                className="rounded-lg px-3 py-1.5 text-xs font-black uppercase tracking-wide text-amber-900 transition-colors hover:bg-amber-100"
+                            >
+                                Never show again
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            )}
 
             <div className="bg-white relative mt-2">
                 <div className="flex divide-x divide-black border-b border-black bg-slate-50">

@@ -2,14 +2,16 @@
 
 import { useMemo, useState, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
+import logo from "@/images/logo.png";
 import Overview from "./Overview";
 import ClassesPage from "./Classes";
 import Extracurriculars from "./Extracurriculars";
 import Colleges from "./Colleges";
 import Opportunities from "./Opportunities";
-import Goals from "./Goals";
 import PATH from "./PathTab";
-import AIChat from "./AIChat";
+import AdminOverview from "./AdminOverview";
 import { StudentCourseData, ClubData, SportData, CollegeData, CourseCatalogItem, RecommendationData } from "./types";
 import { setGoalStepStatus } from "@/app/actions/set-goal-step-status";
 
@@ -19,7 +21,11 @@ type TabId =
     | "extracurriculars"
     | "colleges"
     | "jobs"
-    | "path";
+    | "path"
+    | "interventions"
+    | "featureUpdates"
+    | "dataManagement"
+    | "aiInsights";
 
 type DashboardUser = {
     id: string;
@@ -68,7 +74,7 @@ export default function DashboardShell({ user, courseCatalog = [] }: DashboardSh
     const searchParams = useSearchParams();
     const router = useRouter();
     const [showNewGoalNotice, setShowNewGoalNotice] = useState(false);
-    const [isChatOpen, setIsChatOpen] = useState(false);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
     const [visitedTabs, setVisitedTabs] = useState<Set<TabId>>(new Set());
 
@@ -78,10 +84,10 @@ export default function DashboardShell({ user, courseCatalog = [] }: DashboardSh
 
         const result: Array<{ id: TabId; label: string; badge?: number }> = [
             { id: "overview", label: "Overview" },
-            { id: "path", label: "PATH" },
         ];
 
         if (isStudent && student) {
+            result.push({ id: "path", label: "PATH" });
             result.push({ id: "classes", label: "Classes" });
             result.push({
                 id: "extracurriculars",
@@ -94,6 +100,11 @@ export default function DashboardShell({ user, courseCatalog = [] }: DashboardSh
                 });
             }
             result.push({ id: "jobs", label: "Opportunities" });
+        } else {
+            result.push({ id: "interventions", label: "Interventions" });
+            result.push({ id: "featureUpdates", label: "Feature Updates" });
+            result.push({ id: "dataManagement", label: "Data Management" });
+            result.push({ id: "aiInsights", label: "AI Insights" });
         }
         return result;
     }, [user.role, user.student]);
@@ -103,6 +114,22 @@ export default function DashboardShell({ user, courseCatalog = [] }: DashboardSh
     const safeActiveTab = useMemo<TabId>(() => {
         return tabs.some((t) => t.id === activeTab) ? activeTab : (tabs[0]?.id ?? "overview");
     }, [activeTab, tabs]);
+
+    const activeTabDescription = useMemo(() => {
+        if (safeActiveTab === "classes") {
+            return "Track your current and completed classes, view grades, and explore suggested future courses.";
+        }
+
+        if (safeActiveTab === "extracurriculars") {
+            return "Monitor your clubs, sports, volunteer work, and other activities to balance your schedule.";
+        }
+
+        if (safeActiveTab === "jobs") {
+            return "Discover internships, summer programs, and other career-building experiences.";
+        }
+
+        return "";
+    }, [safeActiveTab]);
 
     useEffect(() => {
         if (searchParams.get('newGoal') === 'true') {
@@ -152,24 +179,28 @@ export default function DashboardShell({ user, courseCatalog = [] }: DashboardSh
 
 
     return (
-        <div className="dashboard-wrapper min-h-screen flex flex-col">
-            {/* Header */}
-            <header
-                style={{
-                    backgroundColor: "var(--background)",
-                    color: "var(--foreground-2)",
-                    borderBottom: "2px solid var(--accent-background)",
-                }}
-                className="p-4 border-b border-black md:border-stone-800 dashboard-header print:hidden"
-            >
-                {/* Top row with title and welcome message */}
-                <div className="flex justify-between items-center mb-4">
-                    <h1 className="text-3xl font-bold">Dashboard</h1>
-                    <p className="text-xl font-bold">Welcome Back, {user.firstName}</p>
+        <div className={`dashboard-wrapper min-h-screen ${isSidebarCollapsed ? "sidebar-collapsed" : ""}`}>
+            <aside className="dashboard-sidebar print:hidden">
+                <div className="dashboard-sidebar-brand">
+                    <Link href="/" className="dashboard-sidebar-logo" aria-label="Summit home">
+                        <Image src={logo} alt="" fill className="dashboard-sidebar-logo-img" />
+                    </Link>
+                    <div className="dashboard-sidebar-brand-text">
+                        <strong>SUMMIT</strong>
+                    </div>
                 </div>
 
-                {/* Navigation tabs */}
-                <nav className="flex gap-6 text-xl font-bold">
+                <button
+                    type="button"
+                    className="dashboard-sidebar-toggle"
+                    onClick={() => setIsSidebarCollapsed((current) => !current)}
+                    aria-label={isSidebarCollapsed ? "Expand dashboard sidebar" : "Collapse dashboard sidebar"}
+                    title={isSidebarCollapsed ? "Expand" : "Collapse"}
+                >
+                    {isSidebarCollapsed ? ">" : "<"}
+                </button>
+
+                <nav className="dashboard-sidebar-nav" aria-label="Dashboard sections">
                     {tabs.map((tab) => {
                         const isPATH = tab.id === "path";
                         const isLocked = isPATH && !(user.student?.goals?.some(g => g.title === "Explore the Website" && g.status === "COMPLETED"));
@@ -177,31 +208,54 @@ export default function DashboardShell({ user, courseCatalog = [] }: DashboardSh
                         return (
                             <button
                                 key={tab.id}
-                                className={`transition-all duration-200 hover:-translate-y-1 ${
-                                    safeActiveTab === tab.id
-                                        ? "border-b-2 border-black"
-                                        : "opacity-60 hover:opacity-100"
-                                } ${
-                                    isPATH && safeActiveTab !== "path"
-                                        ? "opacity-60 hover:opacity-100"
-                                        : ""
-                                }`}
+                                className={`dashboard-sidebar-link ${safeActiveTab === tab.id ? "is-active" : ""}`}
                                 onClick={() => setActiveTab(tab.id)}
+                                title={tab.label}
                             >
-                                <span className="inline-flex items-center gap-2">
-                                    <span>{tab.label}</span>
-                                    {isLocked && <span className="text-sm">Locked</span>}
+                                <span className="dashboard-sidebar-icon">{tab.label.charAt(0)}</span>
+                                <span className="dashboard-sidebar-label">
+                                    {tab.label}
+                                    {isLocked && <small>Locked</small>}
                                     {typeof tab.badge === "number" && (
-                                        <span className="text-sm font-bold px-2 py-0.5 rounded-full bg-[var(--accent-background)] text-[var(--foreground)]">
+                                        <small>
                                             {tab.badge}
-                                        </span>
+                                        </small>
                                     )}
                                 </span>
                             </button>
                         );
                     })}
                 </nav>
-            </header>
+
+                <div className="dashboard-sidebar-footer">
+                    <Link href="/profile" className="dashboard-sidebar-link" title="Profile">
+                        <span className="dashboard-sidebar-icon">P</span>
+                        <span className="dashboard-sidebar-label">Profile</span>
+                    </Link>
+                    <form action="/api/logout" method="post">
+                        <button type="submit" className="dashboard-sidebar-link" title="Log Out">
+                            <span className="dashboard-sidebar-action-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" focusable="false">
+                                    <path d="M6 3h7a2 2 0 0 1 2 2v2.2a1 1 0 1 1-2 0V5H6v14h7v-2.2a1 1 0 1 1 2 0V19a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" />
+                                    <path d="M16.3 8.3a1 1 0 0 1 1.4 0l3 3a1 1 0 0 1 0 1.4l-3 3a1 1 0 0 1-1.4-1.4l1.29-1.3H10a1 1 0 1 1 0-2h7.59l-1.3-1.3a1 1 0 0 1 0-1.4Z" />
+                                </svg>
+                            </span>
+                            <span className="dashboard-sidebar-label">Log Out</span>
+                        </button>
+                    </form>
+                </div>
+            </aside>
+
+            <div className="dashboard-main-shell">
+                <header className="dashboard-page-title print:hidden">
+                    <div>
+                        <p>Welcome Back, {user.firstName}</p>
+                        <h1>{tabs.find((tab) => tab.id === safeActiveTab)?.label ?? "Dashboard"}</h1>
+                        {activeTabDescription && (
+                            <span className="dashboard-page-description">{activeTabDescription}</span>
+                        )}
+                    </div>
+                </header>
 
             {/* New Goal Notification */}
             {showNewGoalNotice && (
@@ -228,8 +282,16 @@ export default function DashboardShell({ user, courseCatalog = [] }: DashboardSh
             )}
 
             {/* Main content */}
-            <main className="flex-1 p-6 bg-white dark:bg-gray-100">
-                {safeActiveTab === "overview" && <Overview user={user} courseCatalog={courseCatalog} />}
+            <main className="dashboard-main-content flex-1 p-6 bg-white dark:bg-gray-100">
+                {user.role === "ADMIN" && (
+                    <AdminOverview
+                        key={safeActiveTab}
+                        userId={user.id}
+                        courseCatalog={courseCatalog}
+                        section={safeActiveTab === "overview" || safeActiveTab === "interventions" || safeActiveTab === "featureUpdates" || safeActiveTab === "dataManagement" || safeActiveTab === "aiInsights" ? safeActiveTab : "overview"}
+                    />
+                )}
+                {user.role !== "ADMIN" && safeActiveTab === "overview" && <Overview user={user} courseCatalog={courseCatalog} />}
                 {safeActiveTab === "classes" && (
                     <ClassesPage
                         courses={user.student?.studentCourses ?? []}
@@ -272,6 +334,7 @@ export default function DashboardShell({ user, courseCatalog = [] }: DashboardSh
                     />
                 )}
             </main>
+            </div>
 
         </div>
     );
